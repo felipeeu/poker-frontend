@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useApi } from '../api/useApi'
+import { Card } from './Card'
 import { useAppStore } from '../state/useAppStore'
 import type { CurrentHand, Seat } from '../types'
 
@@ -26,6 +27,10 @@ export const TableDetail = () => {
   const actorSeatNo = currentHand?.['actor-seat'] as number | undefined
   const legalActions = currentHand?.['legal-actions'] as Record<string, string[]> | undefined
   const legalForSeat = legalActions ? legalActions[String(actionSeat)] || legalActions[actionSeat] : undefined
+  const board = currentHand?.board as string[] | undefined
+  const holeCards = currentHand?.['hole-cards'] as Record<string, string[]> | undefined
+  const seatHoleCards = holeCards ? holeCards[String(actionSeat)] || holeCards[actionSeat] : undefined
+
 
   const displaySeats = useMemo(() => {
     const seats = selectedTable?.seats ?? []
@@ -86,6 +91,21 @@ export const TableDetail = () => {
     setStatus('')
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/sit-in`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': seatNo }),
+      })
+      updateTable(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleLeaveSeat = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await api.request(`/api/tables/${selectedTable.id}/leave`, {
         method: 'POST',
         body: JSON.stringify({ 'seat-no': seatNo }),
       })
@@ -200,6 +220,37 @@ export const TableDetail = () => {
 
         <SeatLayout seats={displaySeats} actorSeatNo={actorSeatNo} />
 
+        <div className="cards-panel">
+          <div className="cards-panel__row">
+            <div className="cards-panel__head">
+              <h3>Board</h3>
+              <span className="muted">{board?.length || 0} / 5</span>
+            </div>
+            <div className="card-row">
+              {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map(
+                (card, idx) => (
+                  <Card key={`board-${idx}`} value={card} faceDown={!card} />
+                ),
+              )}
+            </div>
+          </div>
+
+          <div className="cards-panel__row">
+            <div className="cards-panel__head">
+              <h3>Hole Cards (Seat {actionSeat})</h3>
+              <span className="muted">{seatHoleCards?.length || 0} / 2</span>
+            </div>
+            <div className="card-row">
+              {(seatHoleCards && seatHoleCards.length > 0
+                ? seatHoleCards
+                : Array.from({ length: 2 }).map(() => undefined)
+              ).map((card, idx) => (
+                <Card key={`hole-${idx}`} value={card} faceDown={!card} />
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="seat-actions">
           <h3>Seat Actions</h3>
           <div className="seat-grid">
@@ -228,6 +279,7 @@ export const TableDetail = () => {
           <div className="actions">
             <button className="btn btn--small" onClick={handleJoinSeat} disabled={!token}>Join Seat</button>
             <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>Buy In</button>
+            <button className="btn btn--ghost btn--small" onClick={handleLeaveSeat} disabled={!token}>Leave Seat</button>
             <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>Sit Out</button>
             <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>Sit In</button>
           </div>
