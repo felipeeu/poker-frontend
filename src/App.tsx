@@ -45,6 +45,8 @@ function App() {
   const [seatStack, setSeatStack] = useState(1000)
   const [buyInAmount, setBuyInAmount] = useState(500)
   const [dealerSeat, setDealerSeat] = useState(1)
+  const [actionSeat, setActionSeat] = useState(1)
+  const [actionAmount, setActionAmount] = useState(20)
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -199,6 +201,27 @@ function App() {
     try {
       const hand = await apiFetch(`/api/tables/${selectedTable.id}/hands/resolve`, {
         method: 'POST',
+      })
+      setSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const submitAction = async (type: string) => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const payload: Record<string, unknown> = {
+        'seat-no': actionSeat,
+        type,
+      }
+      if (type === 'bet' || type === 'raise' || type === 'all-in') {
+        payload.amount = actionAmount
+      }
+      const hand = await apiFetch(`/api/tables/${selectedTable.id}/actions`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
       })
       setSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
     } catch (err) {
@@ -381,6 +404,33 @@ function App() {
                 <div className="actions">
                   <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>Start Hand</button>
                   <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>Resolve Showdown</button>
+                </div>
+              </div>
+              <div className="seat-actions">
+                <h3>Player Actions</h3>
+                <div className="seat-grid">
+                  <label>Seat No</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={actionSeat}
+                    onChange={(e) => setActionSeat(Number(e.target.value))}
+                  />
+                  <label>Amount</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={actionAmount}
+                    onChange={(e) => setActionAmount(Number(e.target.value))}
+                  />
+                </div>
+                <div className="actions">
+                  <button className="btn btn--small" onClick={() => submitAction('check')} disabled={!token}>Check</button>
+                  <button className="btn btn--small" onClick={() => submitAction('call')} disabled={!token}>Call</button>
+                  <button className="btn btn--small" onClick={() => submitAction('fold')} disabled={!token}>Fold</button>
+                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('bet')} disabled={!token}>Bet</button>
+                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('raise')} disabled={!token}>Raise</button>
+                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('all-in')} disabled={!token}>All-in</button>
                 </div>
               </div>
               <pre>{JSON.stringify(selectedTable, null, 2)}</pre>
