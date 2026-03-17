@@ -28,4 +28,6 @@ export type WsStatus = 'disconnected' | 'connecting' | 'connected'
 export type CurrentHand = {
   'actor-seat'?: number
   'legal-actions'?: Record<string, string[]>
+  board?: string[]
+  'hole-cards'?: Record<string, string[]>
 } & Record<string, unknown>
