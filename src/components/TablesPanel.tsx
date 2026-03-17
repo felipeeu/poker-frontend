@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
 
@@ -13,6 +14,7 @@ export const TablesPanel = () => {
   const setStatus = useAppStore((state) => state.setStatus)
   const [newTableId, setNewTableId] = useState('table-1')
   const [newTableName, setNewTableName] = useState('Main Table')
+  const navigate = useNavigate()
 
   const loadTables = async () => {
     try {
@@ -27,6 +29,7 @@ export const TablesPanel = () => {
     try {
       const body = await api.request(`/api/tables/${id}`)
       setSelectedTable(body)
+      navigate(`/tables/${id}`)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -45,6 +48,7 @@ export const TablesPanel = () => {
       })
       updateTable(table)
       setSelectedTable(table)
+      navigate(`/tables/${table.id}`)
     } catch (err) {
       setStatus((err as Error).message)
     }
