@@ -55,6 +55,8 @@ function App() {
   }, [selectedTable])
 
   const actorSeatNo = currentHand?.['actor-seat'] as number | undefined
+  const legalActions = currentHand?.['legal-actions'] as Record<string, string[]> | undefined
+  const legalForSeat = legalActions ? legalActions[String(actionSeat)] || legalActions[actionSeat] : undefined
 
   const displaySeats = useMemo(() => {
     const seats = selectedTable?.seats ?? []
@@ -465,13 +467,16 @@ function App() {
                   />
                 </div>
                 <div className="actions">
-                  <button className="btn btn--small" onClick={() => submitAction('check')} disabled={!token}>Check</button>
-                  <button className="btn btn--small" onClick={() => submitAction('call')} disabled={!token}>Call</button>
-                  <button className="btn btn--small" onClick={() => submitAction('fold')} disabled={!token}>Fold</button>
-                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('bet')} disabled={!token}>Bet</button>
-                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('raise')} disabled={!token}>Raise</button>
-                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('all-in')} disabled={!token}>All-in</button>
+                  <button className="btn btn--small" onClick={() => submitAction('check')} disabled={!token || (legalForSeat ? !legalForSeat.includes('check') : false)}>Check</button>
+                  <button className="btn btn--small" onClick={() => submitAction('call')} disabled={!token || (legalForSeat ? !legalForSeat.includes('call') : false)}>Call</button>
+                  <button className="btn btn--small" onClick={() => submitAction('fold')} disabled={!token || (legalForSeat ? !legalForSeat.includes('fold') : false)}>Fold</button>
+                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('bet')} disabled={!token || (legalForSeat ? !legalForSeat.includes('bet') : false)}>Bet</button>
+                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('raise')} disabled={!token || (legalForSeat ? !legalForSeat.includes('raise') : false)}>Raise</button>
+                  <button className="btn btn--ghost btn--small" onClick={() => submitAction('all-in')} disabled={!token || (legalForSeat ? !legalForSeat.includes('all-in') : false)}>All-in</button>
                 </div>
+                {legalForSeat && (
+                  <p className="muted">Legal actions: {legalForSeat.join(', ')}</p>
+                )}
               </div>
               <pre>{JSON.stringify(selectedTable, null, 2)}</pre>
             </div>
