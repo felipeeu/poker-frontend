@@ -44,6 +44,7 @@ function App() {
   const [seatNo, setSeatNo] = useState(1)
   const [seatStack, setSeatStack] = useState(1000)
   const [buyInAmount, setBuyInAmount] = useState(500)
+  const [dealerSeat, setDealerSeat] = useState(1)
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -173,6 +174,33 @@ function App() {
       })
       updateTableInList(table)
       setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleStartHand = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const hand = await apiFetch(`/api/tables/${selectedTable.id}/hands/start`, {
+        method: 'POST',
+        body: JSON.stringify({ 'dealer-seat': dealerSeat }),
+      })
+      setSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleResolve = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const hand = await apiFetch(`/api/tables/${selectedTable.id}/hands/resolve`, {
+        method: 'POST',
+      })
+      setSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -337,6 +365,22 @@ function App() {
                 <div className="actions">
                   <button className="btn btn--small" onClick={handleJoinSeat} disabled={!token}>Join Seat</button>
                   <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>Buy In</button>
+                </div>
+              </div>
+              <div className="seat-actions">
+                <h3>Hand Controls</h3>
+                <div className="seat-grid">
+                  <label>Dealer Seat</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={dealerSeat}
+                    onChange={(e) => setDealerSeat(Number(e.target.value))}
+                  />
+                </div>
+                <div className="actions">
+                  <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>Start Hand</button>
+                  <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>Resolve Showdown</button>
                 </div>
               </div>
               <pre>{JSON.stringify(selectedTable, null, 2)}</pre>
