@@ -18,6 +18,8 @@ export const TableDetail = () => {
   const [dealerSeat, setDealerSeat] = useState(1)
   const [actionSeat, setActionSeat] = useState(1)
   const [actionAmount, setActionAmount] = useState(20)
+  const [boardText, setBoardText] = useState('')
+  const [holeText, setHoleText] = useState('')
 
   const currentHand = useMemo(() => {
     if (!selectedTable) return null
@@ -185,6 +187,33 @@ export const TableDetail = () => {
     }
   }
 
+  const handleSetCards = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const board = boardText
+        .split(/[,\s]+/)
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+      const holes = holeText
+        .split(/[,\s]+/)
+        .map((entry) => entry.trim())
+        .filter(Boolean)
+
+      const payload: Record<string, unknown> = {}
+      if (board.length > 0) payload.board = board
+      if (holes.length > 0) payload['hole-cards'] = { [String(actionSeat)]: holes }
+
+      const hand = await api.request(`/api/tables/${selectedTable.id}/hands/cards`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+      mergeSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
   const submitAction = async (type: string) => {
     if (!selectedTable) return
     setStatus('')
@@ -342,6 +371,18 @@ export const TableDetail = () => {
               value={actionAmount}
               onChange={(e) => setActionAmount(Number(e.target.value))}
             />
+            <label>Board Cards</label>
+            <input
+              placeholder="Ah Kd 7c 2s 9h"
+              value={boardText}
+              onChange={(e) => setBoardText(e.target.value)}
+            />
+            <label>Hole Cards (Seat)</label>
+            <input
+              placeholder="Qs Jd"
+              value={holeText}
+              onChange={(e) => setHoleText(e.target.value)}
+            />
           </div>
           <div className="actions">
             <button className="btn btn--small" onClick={() => submitAction('check')} disabled={!token || (legalForSeat ? !legalForSeat.includes('check') : false)}>Check</button>
@@ -350,6 +391,7 @@ export const TableDetail = () => {
             <button className="btn btn--ghost btn--small" onClick={() => submitAction('bet')} disabled={!token || (legalForSeat ? !legalForSeat.includes('bet') : false)}>Bet</button>
             <button className="btn btn--ghost btn--small" onClick={() => submitAction('raise')} disabled={!token || (legalForSeat ? !legalForSeat.includes('raise') : false)}>Raise</button>
             <button className="btn btn--ghost btn--small" onClick={() => submitAction('all-in')} disabled={!token || (legalForSeat ? !legalForSeat.includes('all-in') : false)}>All-in</button>
+            <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>Set Cards</button>
           </div>
           {legalForSeat && (
             <p className="muted">Legal actions: {legalForSeat.join(', ')}</p>
