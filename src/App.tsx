@@ -18,6 +18,7 @@ function App() {
             <Route path="/" element={<Navigate to="/tables" replace />} />
             <Route path="/tables" element={<TablesDashboard />} />
             <Route path="/tables/:tableId" element={<TablesDashboard />} />
+            <Route path="*" element={<Navigate to="/tables" replace />} />
           </Routes>
         </main>
       </div>
