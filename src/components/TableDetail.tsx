@@ -144,6 +144,20 @@ export const TableDetail = () => {
     }
   }
 
+  const handleTimeout = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const hand = await api.request(`/api/tables/${selectedTable.id}/timeout`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': actionSeat }),
+      })
+      mergeSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
   const handleStartHand = async () => {
     if (!selectedTable) return
     setStatus('')
@@ -307,6 +321,7 @@ export const TableDetail = () => {
           <div className="actions">
             <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>Start Hand</button>
             <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>Resolve Showdown</button>
+            <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>Timeout</button>
           </div>
         </div>
 
