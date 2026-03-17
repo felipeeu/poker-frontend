@@ -143,6 +143,16 @@ h1 {
   justify-content: space-between;
 }
 
+.create-table {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px dashed var(--line);
+  background: rgba(15, 23, 42, 0.5);
+  display: grid;
+  gap: 12px;
+}
+
 .table-list {
   list-style: none;
   padding: 0;

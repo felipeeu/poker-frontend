@@ -39,6 +39,8 @@ function App() {
   const [events, setEvents] = useState<ApiEvent[]>([])
   const [status, setStatus] = useState<string>('')
   const [wsStatus, setWsStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
+  const [newTableId, setNewTableId] = useState('table-1')
+  const [newTableName, setNewTableName] = useState('Main Table')
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -123,6 +125,24 @@ function App() {
     setToken('')
     setUserId('')
     setSelectedTable(null)
+  }
+
+  const handleCreateTable = async () => {
+    setStatus('')
+    try {
+      const payload = {
+        id: newTableId.trim(),
+        name: newTableName.trim(),
+      }
+      const table = await apiFetch('/api/tables', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
   }
 
   const updateTableInList = (table: Table) => {
@@ -210,6 +230,17 @@ function App() {
           <div className="panel__header">
             <h2>Tables</h2>
             <button className="btn btn--small" onClick={loadTables}>Refresh</button>
+          </div>
+          <div className="create-table">
+            <div className="field">
+              <label>Table ID</label>
+              <input value={newTableId} onChange={(e) => setNewTableId(e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Name</label>
+              <input value={newTableName} onChange={(e) => setNewTableName(e.target.value)} />
+            </div>
+            <button className="btn" onClick={handleCreateTable} disabled={!token}>Create Table</button>
           </div>
           <ul className="table-list">
             {tables.map((table) => (
