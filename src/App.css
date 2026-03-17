@@ -253,6 +253,39 @@ h1 {
   border-bottom: 1px dashed var(--line);
 }
 
+.seat-layout {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.seat-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  display: grid;
+  gap: 6px;
+}
+
+.seat-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.seat-card.is-actor {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.4);
+}
+
+.seat-card.is-sitting-out {
+  opacity: 0.7;
+}
+
 .events {
   display: grid;
   gap: 12px;

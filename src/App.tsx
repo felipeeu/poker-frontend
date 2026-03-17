@@ -49,6 +49,22 @@ function App() {
   const [actionAmount, setActionAmount] = useState(20)
   const wsRef = useRef<WebSocket | null>(null)
 
+  const currentHand = useMemo(() => {
+    if (!selectedTable) return null
+    return (selectedTable['current-hand'] || selectedTable.current_hand) as any
+  }, [selectedTable])
+
+  const actorSeatNo = currentHand?.['actor-seat'] as number | undefined
+
+  const displaySeats = useMemo(() => {
+    const seats = selectedTable?.seats ?? []
+    return [...seats].sort((a, b) => {
+      const aNo = a['seat-no'] ?? a['seat_no'] ?? 0
+      const bNo = b['seat-no'] ?? b['seat_no'] ?? 0
+      return aNo - bNo
+    })
+  }, [selectedTable])
+
   useEffect(() => {
     localStorage.setItem('poker_token', token)
     localStorage.setItem('poker_user_id', userId)
@@ -359,6 +375,30 @@ function App() {
               <div className="detail-row">
                 <span>Seats</span>
                 <strong>{selectedTable.seats?.length || 0}</strong>
+              </div>
+              <div className="seat-layout">
+                {displaySeats.length === 0 && <p className="muted">No seats yet.</p>}
+                {displaySeats.map((seat) => {
+                  const seatNo = seat['seat-no'] ?? seat['seat_no'] ?? 0
+                  const user = seat['user-id'] ?? seat.user_id ?? 'empty'
+                  const stack = seat.stack ?? 0
+                  const sittingOut = Boolean(seat['sitting-out?'] ?? seat.sitting_out)
+                  const isActor = actorSeatNo === seatNo
+                  return (
+                    <div
+                      key={seatNo}
+                      className={`seat-card ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''}`}
+                    >
+                      <div className="seat-card__head">
+                        <span>Seat {seatNo}</span>
+                        {isActor && <span className="pill">Acting</span>}
+                      </div>
+                      <strong>{user}</strong>
+                      <span className="muted">Stack: {stack}</span>
+                      {sittingOut && <span className="pill pill--ghost">Sitting out</span>}
+                    </div>
+                  )
+                })}
               </div>
               <div className="seat-actions">
                 <h3>Seat Actions</h3>
