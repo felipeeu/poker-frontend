@@ -226,6 +226,64 @@ function App() {
     }
   }
 
+  const handleSitOut = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await apiFetch(`/api/tables/${selectedTable.id}/sit-out`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': seatNo }),
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleSitIn = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await apiFetch(`/api/tables/${selectedTable.id}/sit-in`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': seatNo }),
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleOpenTable = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await apiFetch(`/api/tables/${selectedTable.id}/open`, {
+        method: 'POST',
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleCloseTable = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await apiFetch(`/api/tables/${selectedTable.id}/close`, {
+        method: 'POST',
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
   const submitAction = async (type: string) => {
     if (!selectedTable) return
     setStatus('')
@@ -430,6 +488,15 @@ function App() {
                 <div className="actions">
                   <button className="btn btn--small" onClick={handleJoinSeat} disabled={!token}>Join Seat</button>
                   <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>Buy In</button>
+                  <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>Sit Out</button>
+                  <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>Sit In</button>
+                </div>
+              </div>
+              <div className="seat-actions">
+                <h3>Table Controls</h3>
+                <div className="actions">
+                  <button className="btn btn--small" onClick={handleOpenTable} disabled={!token}>Open Table</button>
+                  <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>Close Table</button>
                 </div>
               </div>
               <div className="seat-actions">
