@@ -41,6 +41,9 @@ function App() {
   const [wsStatus, setWsStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
   const [newTableId, setNewTableId] = useState('table-1')
   const [newTableName, setNewTableName] = useState('Main Table')
+  const [seatNo, setSeatNo] = useState(1)
+  const [seatStack, setSeatStack] = useState(1000)
+  const [buyInAmount, setBuyInAmount] = useState(500)
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
@@ -137,6 +140,36 @@ function App() {
       const table = await apiFetch('/api/tables', {
         method: 'POST',
         body: JSON.stringify(payload),
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleJoinSeat = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await apiFetch(`/api/tables/${selectedTable.id}/join`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': seatNo, stack: seatStack }),
+      })
+      updateTableInList(table)
+      setSelectedTable(table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleBuyIn = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await apiFetch(`/api/tables/${selectedTable.id}/buy-in`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': seatNo, amount: buyInAmount }),
       })
       updateTableInList(table)
       setSelectedTable(table)
@@ -275,6 +308,36 @@ function App() {
               <div className="detail-row">
                 <span>Seats</span>
                 <strong>{selectedTable.seats?.length || 0}</strong>
+              </div>
+              <div className="seat-actions">
+                <h3>Seat Actions</h3>
+                <div className="seat-grid">
+                  <label>Seat No</label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={seatNo}
+                    onChange={(e) => setSeatNo(Number(e.target.value))}
+                  />
+                  <label>Stack</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={seatStack}
+                    onChange={(e) => setSeatStack(Number(e.target.value))}
+                  />
+                  <label>Buy-in</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={buyInAmount}
+                    onChange={(e) => setBuyInAmount(Number(e.target.value))}
+                  />
+                </div>
+                <div className="actions">
+                  <button className="btn btn--small" onClick={handleJoinSeat} disabled={!token}>Join Seat</button>
+                  <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>Buy In</button>
+                </div>
               </div>
               <pre>{JSON.stringify(selectedTable, null, 2)}</pre>
             </div>
