@@ -30,4 +30,9 @@ export type CurrentHand = {
   'legal-actions'?: Record<string, string[]>
   board?: string[]
   'hole-cards'?: Record<string, string[]>
+  pot?: number
+  'side-pots'?: Array<{ amount: number; 'eligible-seat-nos': number[] }>
+  'dealer-seat'?: number
+  'small-blind-seat'?: number
+  'big-blind-seat'?: number
 } & Record<string, unknown>

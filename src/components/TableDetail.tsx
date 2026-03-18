@@ -2,12 +2,13 @@ import { useMemo, useState } from 'react'
 import { useApi } from '../api/useApi'
 import { Card } from './Card'
 import { useAppStore } from '../state/useAppStore'
-import type { CurrentHand, Seat } from '../types'
+import type { CurrentHand, Seat, Table } from '../types'
 
 export const TableDetail = () => {
   const api = useApi()
   const selectedTable = useAppStore((state) => state.selectedTable)
   const token = useAppStore((state) => state.token)
+  const userId = useAppStore((state) => state.userId)
   const updateTable = useAppStore((state) => state.updateTable)
   const setSelectedTable = useAppStore((state) => state.setSelectedTable)
   const setStatus = useAppStore((state) => state.setStatus)
@@ -16,7 +17,6 @@ export const TableDetail = () => {
   const [seatStack, setSeatStack] = useState(1000)
   const [buyInAmount, setBuyInAmount] = useState(500)
   const [dealerSeat, setDealerSeat] = useState(1)
-  const [actionSeat, setActionSeat] = useState(1)
   const [actionAmount, setActionAmount] = useState(20)
   const [boardText, setBoardText] = useState('')
   const [holeText, setHoleText] = useState('')
@@ -28,10 +28,40 @@ export const TableDetail = () => {
 
   const actorSeatNo = currentHand?.['actor-seat'] as number | undefined
   const legalActions = currentHand?.['legal-actions'] as Record<string, string[]> | undefined
-  const legalForSeat = legalActions ? legalActions[String(actionSeat)] || legalActions[actionSeat] : undefined
   const board = currentHand?.board as string[] | undefined
   const holeCards = currentHand?.['hole-cards'] as Record<string, string[]> | undefined
-  const seatHoleCards = holeCards ? holeCards[String(actionSeat)] || holeCards[actionSeat] : undefined
+  const pot = currentHand?.pot as number | undefined
+  const sidePots = currentHand?.['side-pots'] as Array<{
+    amount: number
+    'eligible-seat-nos': number[]
+  }> | undefined
+  const street = (currentHand?.street as string | undefined) ?? 'waiting'
+  const handStatus = (currentHand?.status as string | undefined) ?? 'idle'
+  const handDealerSeat = currentHand?.['dealer-seat'] as number | undefined
+  const smallBlindSeat = currentHand?.['small-blind-seat'] as number | undefined
+  const bigBlindSeat = currentHand?.['big-blind-seat'] as number | undefined
+
+  const ownedSeats = useMemo(() => {
+    const seats = selectedTable?.seats ?? []
+    return seats.filter((seat) => {
+      const seatUser = seat['user-id'] ?? seat.user_id
+      return seatUser && seatUser === userId
+    })
+  }, [selectedTable, userId])
+
+  const mySeatNo = ownedSeats.length === 1 ? ownedSeats[0]['seat-no'] ?? ownedSeats[0].seat_no : undefined
+  const legalForSeat =
+    mySeatNo != null && legalActions
+      ? legalActions[String(mySeatNo)] || legalActions[mySeatNo]
+      : undefined
+  const seatHoleCards = holeCards
+    ? holeCards[String(mySeatNo ?? '')] || holeCards[mySeatNo as number]
+    : undefined
+  const canBet = Boolean(legalForSeat?.includes('bet'))
+  const canRaise = Boolean(legalForSeat?.includes('raise'))
+  const canAllIn = Boolean(legalForSeat?.includes('all-in'))
+  const isMyTurn = Boolean(mySeatNo != null && actorSeatNo === mySeatNo)
+  const hasSeatConflict = ownedSeats.length > 1
 
 
   const displaySeats = useMemo(() => {
@@ -51,8 +81,8 @@ export const TableDetail = () => {
         method: 'POST',
         body: JSON.stringify({ 'seat-no': seatNo, stack: seatStack }),
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -66,8 +96,8 @@ export const TableDetail = () => {
         method: 'POST',
         body: JSON.stringify({ 'seat-no': seatNo, amount: buyInAmount }),
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -81,8 +111,8 @@ export const TableDetail = () => {
         method: 'POST',
         body: JSON.stringify({ 'seat-no': seatNo }),
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -96,8 +126,8 @@ export const TableDetail = () => {
         method: 'POST',
         body: JSON.stringify({ 'seat-no': seatNo }),
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -111,8 +141,8 @@ export const TableDetail = () => {
         method: 'POST',
         body: JSON.stringify({ 'seat-no': seatNo }),
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -125,8 +155,8 @@ export const TableDetail = () => {
       const table = await api.request(`/api/tables/${selectedTable.id}/open`, {
         method: 'POST',
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -139,8 +169,8 @@ export const TableDetail = () => {
       const table = await api.request(`/api/tables/${selectedTable.id}/close`, {
         method: 'POST',
       })
-      updateTable(table)
-      setSelectedTable(table)
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -152,7 +182,7 @@ export const TableDetail = () => {
     try {
       const hand = await api.request(`/api/tables/${selectedTable.id}/timeout`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': actionSeat }),
+        body: JSON.stringify({ 'seat-no': mySeatNo ?? seatNo }),
       })
       mergeSelectedTable((prev) => (prev ? { ...prev, 'current-hand': hand } : prev))
     } catch (err) {
@@ -215,7 +245,7 @@ export const TableDetail = () => {
 
       const payload: Record<string, unknown> = {}
       if (board.length > 0) payload.board = board
-      if (holes.length > 0) payload['hole-cards'] = { [String(actionSeat)]: holes }
+      if (holes.length > 0) payload['hole-cards'] = { [String(seatNo)]: holes }
 
       const hand = await api.request(`/api/tables/${selectedTable.id}/hands/cards`, {
         method: 'POST',
@@ -229,10 +259,14 @@ export const TableDetail = () => {
 
   const submitAction = async (type: string) => {
     if (!selectedTable) return
+    if (mySeatNo == null) {
+      setStatus('You are not seated.')
+      return
+    }
     setStatus('')
     try {
       const payload: Record<string, unknown> = {
-        'seat-no': actionSeat,
+        'seat-no': mySeatNo,
         type,
       }
       if (type === 'bet' || type === 'raise' || type === 'all-in') {
@@ -261,20 +295,40 @@ export const TableDetail = () => {
     <section className="panel panel--detail">
       <h2>Table Detail</h2>
       <div className="table-detail">
+        <div className="table-status">
+          <div className="pill">Status: {selectedTable.status || 'unknown'}</div>
+          <div className="pill pill--ghost">Hand: {handStatus}</div>
+          <div className="pill pill--ghost">Street: {street}</div>
+          <div className="pill pill--ghost">Pot: {typeof pot === 'number' ? pot : 0}</div>
+        </div>
         <div className="detail-row">
           <span>ID</span>
           <strong>{selectedTable.id}</strong>
         </div>
         <div className="detail-row">
-          <span>Status</span>
-          <strong>{selectedTable.status || 'unknown'}</strong>
+          <span>Hand</span>
+          <strong>{handStatus}</strong>
+        </div>
+        <div className="detail-row">
+          <span>Street</span>
+          <strong>{street}</strong>
+        </div>
+        <div className="detail-row">
+          <span>Actor Seat</span>
+          <strong>{actorSeatNo ?? '-'}</strong>
         </div>
         <div className="detail-row">
           <span>Seats</span>
           <strong>{selectedTable.seats?.length || 0}</strong>
         </div>
 
-        <SeatLayout seats={displaySeats} actorSeatNo={actorSeatNo} />
+        <SeatLayout
+          seats={displaySeats}
+          actorSeatNo={actorSeatNo}
+          dealerSeat={handDealerSeat}
+          smallBlindSeat={smallBlindSeat}
+          bigBlindSeat={bigBlindSeat}
+        />
 
         <div className="cards-panel">
           <div className="cards-panel__row">
@@ -289,11 +343,29 @@ export const TableDetail = () => {
                 ),
               )}
             </div>
+            <div className="cards-panel__meta">
+              <div className="detail-row">
+                <span>Pot</span>
+                <strong>{typeof pot === 'number' ? pot : 0}</strong>
+              </div>
+              {sidePots && sidePots.length > 0 && (
+                <div className="detail-row detail-row--stack">
+                  <span>Side Pots</span>
+                  <div className="stack">
+                    {sidePots.map((side, idx) => (
+                      <div key={`side-pot-${idx}`} className="pill pill--ghost">
+                        #{idx + 1} {side.amount} | Seats {side['eligible-seat-nos'].join(', ')}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="cards-panel__row">
-            <div className="cards-panel__head">
-              <h3>Hole Cards (Seat {actionSeat})</h3>
+          <div className="cards-panel__head">
+              <h3>Hole Cards {mySeatNo != null ? `(Seat ${mySeatNo})` : ''}</h3>
               <span className="muted">{seatHoleCards?.length || 0} / 2</span>
             </div>
             <div className="card-row">
@@ -369,22 +441,52 @@ export const TableDetail = () => {
         </div>
 
         <div className="seat-actions">
-          <h3>Player Actions</h3>
+          <h3>Your Turn</h3>
+          {hasSeatConflict && (
+            <p className="error">Multiple seats belong to this user. Actions are disabled.</p>
+          )}
+          {!mySeatNo && !hasSeatConflict && (
+            <p className="muted">Join a seat to start playing.</p>
+          )}
+          {mySeatNo && !isMyTurn && (
+            <p className="muted">Waiting for seat {actorSeatNo ?? '-'}</p>
+          )}
           <div className="seat-grid">
-            <label>Seat No</label>
-            <input
-              type="number"
-              min={1}
-              value={actionSeat}
-              onChange={(e) => setActionSeat(Number(e.target.value))}
-            />
+            <label>Your Seat</label>
+            <input type="text" value={mySeatNo ?? '—'} disabled />
             <label>Amount</label>
             <input
               type="number"
               min={0}
               value={actionAmount}
               onChange={(e) => setActionAmount(Number(e.target.value))}
+              disabled={!(canBet || canRaise || canAllIn) || !isMyTurn || hasSeatConflict}
             />
+          </div>
+          <div className="actions">
+            {legalForSeat && legalForSeat.length > 0 ? (
+              legalForSeat.map((action) => (
+                <button
+                  key={action}
+                  className={`btn btn--small ${action === 'bet' || action === 'raise' || action === 'all-in' ? 'btn--ghost' : ''}`}
+                  onClick={() => submitAction(action)}
+                  disabled={!token || !isMyTurn || hasSeatConflict}
+                >
+                  {action === 'all-in' ? 'All-in' : action.charAt(0).toUpperCase() + action.slice(1)}
+                </button>
+              ))
+            ) : (
+              <span className="muted">No legal actions for this seat.</span>
+            )}
+          </div>
+          {legalForSeat && (
+            <p className="muted">Legal actions: {legalForSeat.join(', ')}</p>
+          )}
+        </div>
+
+        <details className="seat-actions">
+          <summary className="summary">Admin / Debug</summary>
+          <div className="seat-grid">
             <label>Board Cards</label>
             <input
               placeholder="Ah Kd 7c 2s 9h"
@@ -399,45 +501,61 @@ export const TableDetail = () => {
             />
           </div>
           <div className="actions">
-            <button className="btn btn--small" onClick={() => submitAction('check')} disabled={!token || (legalForSeat ? !legalForSeat.includes('check') : false)}>Check</button>
-            <button className="btn btn--small" onClick={() => submitAction('call')} disabled={!token || (legalForSeat ? !legalForSeat.includes('call') : false)}>Call</button>
-            <button className="btn btn--small" onClick={() => submitAction('fold')} disabled={!token || (legalForSeat ? !legalForSeat.includes('fold') : false)}>Fold</button>
-            <button className="btn btn--ghost btn--small" onClick={() => submitAction('bet')} disabled={!token || (legalForSeat ? !legalForSeat.includes('bet') : false)}>Bet</button>
-            <button className="btn btn--ghost btn--small" onClick={() => submitAction('raise')} disabled={!token || (legalForSeat ? !legalForSeat.includes('raise') : false)}>Raise</button>
-            <button className="btn btn--ghost btn--small" onClick={() => submitAction('all-in')} disabled={!token || (legalForSeat ? !legalForSeat.includes('all-in') : false)}>All-in</button>
             <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>Set Cards</button>
           </div>
-          {legalForSeat && (
-            <p className="muted">Legal actions: {legalForSeat.join(', ')}</p>
-          )}
-        </div>
-
-        <pre>{JSON.stringify(selectedTable, null, 2)}</pre>
+          <p className="muted">Manual card injection for testing only.</p>
+        </details>
       </div>
     </section>
   )
 }
 
-const SeatLayout = ({ seats, actorSeatNo }: { seats: Seat[]; actorSeatNo?: number }) => (
+const SeatLayout = ({
+  seats,
+  actorSeatNo,
+  dealerSeat,
+  smallBlindSeat,
+  bigBlindSeat,
+}: {
+  seats: Seat[]
+  actorSeatNo?: number
+  dealerSeat?: number
+  smallBlindSeat?: number
+  bigBlindSeat?: number
+}) => (
   <div className="seat-layout">
     {seats.length === 0 && <p className="muted">No seats yet.</p>}
     {seats.map((seat) => {
       const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
       const user = seat['user-id'] ?? seat.user_id ?? 'empty'
       const stack = seat.stack ?? 0
+      const committed = (seat as Seat & { 'committed-total'?: number; committed_total?: number })[
+        'committed-total'
+      ] ?? (seat as Seat & { committed_total?: number }).committed_total ?? 0
       const sittingOut = Boolean(seat['sitting-out?'] ?? seat.sitting_out)
       const isActor = actorSeatNo === seatNo
+      const isMine = user !== 'empty' && user === useAppStore.getState().userId
+      const isDealer = dealerSeat === seatNo
+      const isSmallBlind = smallBlindSeat === seatNo
+      const isBigBlind = bigBlindSeat === seatNo
       return (
         <div
           key={seatNo}
-          className={`seat-card ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''}`}
+          className={`seat-card ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}
         >
           <div className="seat-card__head">
             <span>Seat {seatNo}</span>
-            {isActor && <span className="pill">Acting</span>}
+            <div className="pill-row">
+              {isMine && <span className="pill pill--accent">You</span>}
+              {isActor && <span className="pill">Acting</span>}
+              {isDealer && <span className="pill pill--dealer">D</span>}
+              {isSmallBlind && <span className="pill pill--blind">SB</span>}
+              {isBigBlind && <span className="pill pill--blind">BB</span>}
+            </div>
           </div>
           <strong>{user}</strong>
           <span className="muted">Stack: {stack}</span>
+          <span className="muted">Committed: {committed}</span>
           {sittingOut && <span className="pill pill--ghost">Sitting out</span>}
         </div>
       )

@@ -57,6 +57,10 @@ h1 {
   gap: 24px;
 }
 
+.layout--table {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .panel {
   background: var(--panel);
   border-radius: 20px;
@@ -66,8 +70,30 @@ h1 {
   animation: lift 420ms ease;
 }
 
+.table-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
 .panel--detail {
   min-height: 420px;
+}
+
+.table-view__nav {
+  min-height: auto;
+}
+
+.table-view__nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.table-view__nav-row h2 {
+  margin-bottom: 4px;
 }
 
 .panel h2 {
@@ -92,6 +118,16 @@ h1 {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.summary::marker {
+  color: var(--muted);
 }
 
 .btn {
@@ -253,6 +289,10 @@ h1 {
   border-bottom: 1px dashed var(--line);
 }
 
+.detail-row strong {
+  text-transform: capitalize;
+}
+
 .seat-layout {
   margin-top: 16px;
   display: grid;
@@ -273,6 +313,21 @@ h1 {
 .cards-panel__row {
   display: grid;
   gap: 10px;
+}
+
+.cards-panel__meta {
+  display: grid;
+  gap: 8px;
+}
+
+.detail-row--stack {
+  align-items: flex-start;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .cards-panel__head {
@@ -400,8 +455,37 @@ h1 {
   box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.4);
 }
 
+.seat-card.is-mine {
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
+}
+
 .seat-card.is-sitting-out {
   opacity: 0.7;
+}
+
+.pill-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pill--accent {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.pill--dealer {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+}
+
+.pill--blind {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
 }
 
 .events {
@@ -413,6 +497,11 @@ h1 {
   border: 1px solid var(--line);
   padding: 12px;
   border-radius: 12px;
+}
+
+.event__summary {
+  margin: 8px 0 0;
+  color: var(--muted);
 }
 
 .error {
