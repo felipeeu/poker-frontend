@@ -38,3 +38,6 @@ Update:
 Update:
 - Added mobile-focused breakpoints for the header, status banner, table felt, seat layout, cards, and action buttons.
 - Tightened spacing and stacking on small screens so the table view remains playable on phones.
+
+Update:
+- Reworked the header into a more game-like lobby bar with a brand mark, live status chips, and a compact control deck for API/language settings.

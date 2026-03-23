@@ -34,6 +34,92 @@
   gap: 24px;
   margin-bottom: 32px;
   align-items: flex-end;
+  padding: 18px 20px;
+  border-radius: 28px;
+  border: 1px solid rgba(217, 177, 95, 0.18);
+  background:
+    linear-gradient(135deg, rgba(42, 23, 11, 0.92), rgba(15, 31, 22, 0.9)),
+    rgba(12, 21, 16, 0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 243, 209, 0.08),
+    var(--shadow);
+}
+
+.app__brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: min(100%, 520px);
+}
+
+.app__logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 30%, #f4d48f, #a76a22 72%);
+  color: #27170d;
+  box-shadow:
+    inset 0 2px 10px rgba(255, 247, 225, 0.28),
+    0 14px 28px rgba(0, 0, 0, 0.24);
+  font-size: 2rem;
+}
+
+.app__headline {
+  display: grid;
+  gap: 6px;
+}
+
+.app__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.header-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid rgba(242, 229, 187, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+}
+
+.header-chip--accent {
+  background: rgba(217, 177, 95, 0.16);
+  color: #f6d68a;
+  border-color: rgba(217, 177, 95, 0.28);
+}
+
+.header-chip--ghost {
+  color: var(--muted);
+}
+
+.header-chip--connected {
+  color: #9af0b7;
+  border-color: rgba(88, 214, 141, 0.3);
+  background: rgba(88, 214, 141, 0.1);
+}
+
+.header-chip--connecting {
+  color: #f7d48a;
+  border-color: rgba(251, 191, 36, 0.24);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.header-chip--disconnected {
+  color: #ffb1b1;
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(248, 113, 113, 0.08);
 }
 
 .eyebrow {
@@ -65,6 +151,20 @@ h1 {
   border-radius: 16px;
   min-width: 260px;
   box-shadow: var(--shadow);
+}
+
+.control-deck {
+  min-width: min(100%, 300px);
+  background: rgba(8, 18, 13, 0.56);
+  border: 1px solid rgba(217, 177, 95, 0.16);
+}
+
+.control-deck__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
 }
 
 .api-input input {
@@ -735,6 +835,18 @@ h1 {
   .api-input {
     min-width: 0;
     width: 100%;
+  }
+
+  .app__brand {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .app__logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    font-size: 1.6rem;
   }
 
   .layout {
