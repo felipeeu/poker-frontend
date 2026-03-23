@@ -478,6 +478,7 @@ h1 {
   align-content: space-between;
   font-weight: 700;
   color: #0f172a;
+  overflow: hidden;
 }
 
 .card--hearts,
@@ -526,6 +527,8 @@ h1 {
   align-self: start;
   justify-self: start;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .card__corner--mirror {
@@ -535,13 +538,17 @@ h1 {
 }
 
 .card__rank {
+  display: block;
   font-size: 0.85rem;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.04em;
+  transform: scaleX(0.92);
+  transform-origin: left center;
 }
 
 .card__suit {
+  display: block;
   font-size: 0.8rem;
   line-height: 1;
 }
@@ -550,6 +557,7 @@ h1 {
   justify-self: center;
   font-size: 1.3rem;
   opacity: 0.9;
+  line-height: 1;
 }
 
 .card__ghost {
@@ -780,6 +788,7 @@ h1 {
 
   .card__rank {
     font-size: 0.72rem;
+    transform: scaleX(0.88);
   }
 
   .card__suit {
@@ -829,6 +838,7 @@ h1 {
   .card__rank {
     font-size: 0.66rem;
     letter-spacing: -0.05em;
+    transform: scaleX(0.84);
   }
 
   .card__suit {
