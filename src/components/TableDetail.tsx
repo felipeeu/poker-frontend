@@ -62,6 +62,24 @@ export const TableDetail = () => {
   const canAllIn = Boolean(legalForSeat?.includes('all-in'))
   const isMyTurn = Boolean(mySeatNo != null && actorSeatNo === mySeatNo)
   const hasSeatConflict = ownedSeats.length > 1
+  const tableStatus = (selectedTable?.status ?? '').toLowerCase()
+  const isTableOpen = ['open', 'opened', 'active', 'running'].includes(tableStatus)
+  const hasHandInProgress = currentHand != null && !['idle', 'waiting', 'finished', 'resolved'].includes(handStatus)
+  const openTableDisabled = !token || !selectedTable || isTableOpen || hasHandInProgress
+  const openTableDisabledReason = (() => {
+    switch (true) {
+      case !token:
+        return 'Login required'
+      case !selectedTable:
+        return 'Select a table first'
+      case isTableOpen:
+        return 'Table is already open'
+      case hasHandInProgress:
+        return 'Cannot open a table during an active hand'
+      default:
+        return 'Open table'
+    }
+  })()
 
 
   const displaySeats = useMemo(() => {
@@ -416,7 +434,14 @@ export const TableDetail = () => {
         <div className="seat-actions">
           <h3>Table Controls</h3>
           <div className="actions">
-            <button className="btn btn--small" onClick={handleOpenTable} disabled={!token}>Open Table</button>
+            <button
+              className="btn btn--small"
+              onClick={handleOpenTable}
+              disabled={openTableDisabled}
+              title={openTableDisabledReason}
+            >
+              Open Table
+            </button>
             <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>Close Table</button>
           </div>
         </div>

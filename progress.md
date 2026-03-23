@@ -12,3 +12,11 @@ Update:
 - Added card styling CSS (face-up, face-down, empty slots).
 - Tried to run Playwright client; missing playwright dependency.
 - npm install -D playwright failed (EAI_AGAIN to registry.npmjs.org).
+
+Update:
+- Added disable logic for the `Open Table` button in `TableDetail`.
+- Button is now disabled when there is no auth token, no selected table, the table is already open/active, or a hand is already in progress.
+- Added a `title` message so the disabled reason is visible on hover.
+- `npm run lint` still fails on pre-existing `no-explicit-any` errors in `src/components/TablesPanel.tsx`.
+- `npm run build` still fails on pre-existing TypeScript errors in `src/api/client.ts` and `src/components/AuthPanel.tsx`.
+- Started the Vite dev server successfully, but the shared Playwright skill script could not import `playwright` from its own location even though the project has a local dependency.
