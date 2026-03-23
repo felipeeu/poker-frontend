@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react'
+import { useI18n } from '../i18n'
 import { useNavigate } from 'react-router-dom'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
+import type { Table } from '../types'
+
+type TablesResponse = {
+  tables: Table[]
+}
 
 export const TablesPanel = () => {
   const api = useApi()
+  const { t } = useI18n()
   const tables = useAppStore((state) => state.tables)
   const selectedTable = useAppStore((state) => state.selectedTable)
   const token = useAppStore((state) => state.token)
@@ -18,7 +25,7 @@ export const TablesPanel = () => {
 
   const loadTables = async () => {
     try {
-      const body = await api.request('/api/tables')
+      const body = await api.request<TablesResponse>('/api/tables')
       setTables(body.tables || [])
     } catch (err) {
       setStatus((err as Error).message)
@@ -27,7 +34,7 @@ export const TablesPanel = () => {
 
   const loadTable = async (id: string) => {
     try {
-      const body = await api.request(`/api/tables/${id}`)
+      const body = await api.request(`/api/tables/${id}`) as Table
       setSelectedTable(body)
       navigate(`/tables/${id}`)
     } catch (err) {
@@ -42,7 +49,7 @@ export const TablesPanel = () => {
         id: newTableId.trim(),
         name: newTableName.trim(),
       }
-      const table = await api.request('/api/tables', {
+      const table = await api.request<Table>('/api/tables', {
         method: 'POST',
         body: JSON.stringify(payload),
       })
@@ -62,19 +69,19 @@ export const TablesPanel = () => {
   return (
     <section className="panel">
       <div className="panel__header">
-        <h2>Tables</h2>
-        <button className="btn btn--small" onClick={loadTables}>Refresh</button>
+        <h2>{t('tables.title')}</h2>
+        <button className="btn btn--small" onClick={loadTables}>{t('tables.refresh')}</button>
       </div>
       <div className="create-table">
         <div className="field">
-          <label>Table ID</label>
+          <label>{t('tables.tableId')}</label>
           <input value={newTableId} onChange={(e) => setNewTableId(e.target.value)} />
         </div>
         <div className="field">
-          <label>Name</label>
+          <label>{t('tables.name')}</label>
           <input value={newTableName} onChange={(e) => setNewTableName(e.target.value)} />
         </div>
-        <button className="btn" onClick={handleCreateTable} disabled={!token}>Create Table</button>
+        <button className="btn" onClick={handleCreateTable} disabled={!token}>{t('tables.create')}</button>
       </div>
       <ul className="table-list">
         {tables.map((table) => (
@@ -87,7 +94,7 @@ export const TablesPanel = () => {
                 <strong>{table.name || table.id}</strong>
                 <span className="muted">{table.id}</span>
               </div>
-              <span className="pill">{table.status || 'unknown'}</span>
+              <span className="pill">{table.status || t('tables.unknown')}</span>
             </button>
           </li>
         ))}

@@ -20,3 +20,8 @@ Update:
 - `npm run lint` still fails on pre-existing `no-explicit-any` errors in `src/components/TablesPanel.tsx`.
 - `npm run build` still fails on pre-existing TypeScript errors in `src/api/client.ts` and `src/components/AuthPanel.tsx`.
 - Started the Vite dev server successfully, but the shared Playwright skill script could not import `playwright` from its own location even though the project has a local dependency.
+
+Update:
+- Added a lightweight built-in i18n layer with `en` and `pt-BR` dictionaries in `src/i18n.ts`.
+- Persisted the selected locale in the app store and added a language selector to the header.
+- Migrated the main visible UI strings in `ApiHeader`, `AuthPanel`, `TablesPanel`, `EventsPanel`, `TableView`, and `TableDetail` to use translations.

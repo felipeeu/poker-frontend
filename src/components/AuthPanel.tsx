@@ -1,9 +1,16 @@
 import { useState } from 'react'
+import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
 
+type AuthResponse = {
+  'access-token'?: string
+  'user-id'?: string
+}
+
 export const AuthPanel = () => {
   const api = useApi()
+  const { t } = useI18n()
   const token = useAppStore((state) => state.token)
   const userId = useAppStore((state) => state.userId)
   const status = useAppStore((state) => state.status)
@@ -17,7 +24,7 @@ export const AuthPanel = () => {
   const handleLogin = async () => {
     setStatus('')
     try {
-      const body = await api.request('/api/auth/login', {
+      const body = await api.request<AuthResponse>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
@@ -64,7 +71,7 @@ export const AuthPanel = () => {
         method: 'POST',
         body: JSON.stringify({ email: nextEmail, password: nextPassword }),
       })
-      const body = await api.request('/api/auth/login', {
+      const body = await api.request<AuthResponse>('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email: nextEmail, password: nextPassword }),
       })
@@ -77,35 +84,35 @@ export const AuthPanel = () => {
 
   return (
     <section className="panel">
-      <h2>Auth</h2>
+      <h2>{t('auth.title')}</h2>
       <div className="field">
-        <label>Email</label>
+        <label>{t('auth.email')}</label>
         <input value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
       <div className="field">
-        <label>Password</label>
+        <label>{t('auth.password')}</label>
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
       <div className="actions">
-        <button className="btn" onClick={handleLogin}>Login</button>
-        <button className="btn btn--ghost" onClick={handleSignup}>Signup</button>
-        <button className="btn btn--ghost" onClick={handleCreateTestUser}>Create Test User</button>
+        <button className="btn" onClick={handleLogin}>{t('auth.login')}</button>
+        <button className="btn btn--ghost" onClick={handleSignup}>{t('auth.signup')}</button>
+        <button className="btn btn--ghost" onClick={handleCreateTestUser}>{t('auth.createTestUser')}</button>
         <button className="btn btn--ghost" onClick={handleCreateAndLoginTestUser}>
-          Create + Login Test User
+          {t('auth.createAndLoginTestUser')}
         </button>
       </div>
       {token && (
         <div className="token">
-          <p>Logged in as</p>
-          <strong>{userId || 'unknown'}</strong>
-          <button className="link" onClick={clearAuth}>Logout</button>
+          <p>{t('auth.loggedInAs')}</p>
+          <strong>{userId || t('auth.unknown')}</strong>
+          <button className="link" onClick={clearAuth}>{t('auth.logout')}</button>
         </div>
       )}
       {generatedUser && (
         <div className="token">
-          <p>Test user created</p>
+          <p>{t('auth.testUserCreated')}</p>
           <strong>{generatedUser.email}</strong>
-          <p className="muted">Password: {generatedUser.password}</p>
+          <p className="muted">{t('auth.password')}: {generatedUser.password}</p>
         </div>
       )}
       {status && <p className="error">{status}</p>}

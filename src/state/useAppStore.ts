@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { Locale } from '../i18n'
 import type { ApiEvent, Table, WsStatus } from '../types'
 
 const DEFAULT_API = 'http://localhost:8080'
@@ -7,6 +8,7 @@ type AppStore = {
   apiBase: string
   token: string
   userId: string
+  locale: Locale
   tables: Table[]
   selectedTable: Table | null
   events: ApiEvent[]
@@ -15,6 +17,7 @@ type AppStore = {
   setApiBase: (value: string) => void
   setStatus: (value: string) => void
   setAuth: (token: string, userId: string) => void
+  setLocale: (locale: Locale) => void
   clearAuth: () => void
   setTables: (tables: Table[]) => void
   updateTable: (table: Table) => void
@@ -36,6 +39,7 @@ export const useAppStore = create<AppStore>((set) => ({
   apiBase: DEFAULT_API,
   token: readLocal('poker_token'),
   userId: readLocal('poker_user_id'),
+  locale: (readLocal('poker_locale') as Locale) || 'en',
   tables: [],
   selectedTable: null,
   events: [],
@@ -51,6 +55,14 @@ export const useAppStore = create<AppStore>((set) => ({
       // ignore storage errors
     }
     set({ token, userId })
+  },
+  setLocale: (locale) => {
+    try {
+      localStorage.setItem('poker_locale', locale)
+    } catch {
+      // ignore storage errors
+    }
+    set({ locale })
   },
   clearAuth: () => {
     try {

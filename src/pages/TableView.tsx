@@ -1,11 +1,14 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { TableDetail } from '../components/TableDetail'
 import { useAppStore } from '../state/useAppStore'
+import type { Table } from '../types'
 
 export const TableView = () => {
   const { tableId } = useParams()
+  const { t } = useI18n()
   const api = useApi()
   const selectedTable = useAppStore((state) => state.selectedTable)
   const events = useAppStore((state) => state.events)
@@ -25,23 +28,27 @@ export const TableView = () => {
       const payload = event.payload as
         | { 'seat-no'?: number; 'action-type'?: string; amount?: number }
         | undefined
-      if (!payload) return 'Action'
+      if (!payload) return t('table.event.action')
       const amount = typeof payload.amount === 'number' ? ` ${payload.amount}` : ''
-      return `Seat ${payload['seat-no'] ?? '?'} ${payload['action-type'] ?? 'action'}${amount}`
+      return t('table.event.seatAction', {
+        seat: payload['seat-no'] ?? '?',
+        action: payload['action-type'] ?? 'action',
+        amount,
+      })
     }
     switch (event.type) {
       case 'hand.started':
-        return 'Hand started'
+        return t('table.event.handStarted')
       case 'hand.updated':
-        return 'Hand updated'
+        return t('table.event.handUpdated')
       case 'hand.resolved':
-        return 'Hand resolved'
+        return t('table.event.handResolved')
       case 'table.updated':
-        return 'Table updated'
+        return t('table.event.tableUpdated')
       case 'table.created':
-        return 'Table created'
+        return t('table.event.tableCreated')
       case 'table.deleted':
-        return 'Table deleted'
+        return t('table.event.tableDeleted')
       default:
         return event.type
     }
@@ -53,7 +60,7 @@ export const TableView = () => {
 
     const load = async () => {
       try {
-        const body = await api.request(`/api/tables/${tableId}`)
+        const body = await api.request(`/api/tables/${tableId}`) as Table
         setSelectedTable(body)
       } catch (err) {
         setStatus((err as Error).message)
@@ -68,17 +75,17 @@ export const TableView = () => {
       <section className="panel panel--detail table-view__nav">
         <div className="table-view__nav-row">
           <div>
-            <h2>Table</h2>
-            <p className="muted">{tableId || 'loading...'}</p>
+            <h2>{t('table.navTitle')}</h2>
+            <p className="muted">{tableId || t('table.loading')}</p>
           </div>
           <Link className="btn btn--ghost" to="/tables">
-            Back to tables
+            {t('table.backToTables')}
           </Link>
         </div>
       </section>
       <TableDetail />
       <section className="panel panel--detail">
-        <h2>Recent Events</h2>
+        <h2>{t('table.recentEvents')}</h2>
         <div className="events">
           {tableEvents.map((event, idx) => (
             <div key={idx} className="event">
@@ -86,7 +93,7 @@ export const TableView = () => {
               <p className="event__summary">{formatEvent(event)}</p>
             </div>
           ))}
-          {tableEvents.length === 0 && <p className="muted">No events yet.</p>}
+          {tableEvents.length === 0 && <p className="muted">{t('events.none')}</p>}
         </div>
       </section>
     </>

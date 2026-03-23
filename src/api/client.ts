@@ -3,7 +3,7 @@ export type ApiClient = {
 }
 
 export const createApiClient = (apiBase: string, token: string): ApiClient => ({
-  async request(path: string, options: RequestInit = {}) {
+  async request<T = unknown>(path: string, options: RequestInit = {}) {
     const res = await fetch(`${apiBase}${path}`, {
       ...options,
       headers: {

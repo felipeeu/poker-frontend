@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { Card } from './Card'
 import { useAppStore } from '../state/useAppStore'
@@ -6,6 +7,7 @@ import type { CurrentHand, Seat, Table } from '../types'
 
 export const TableDetail = () => {
   const api = useApi()
+  const { t } = useI18n()
   const selectedTable = useAppStore((state) => state.selectedTable)
   const token = useAppStore((state) => state.token)
   const userId = useAppStore((state) => state.userId)
@@ -63,21 +65,22 @@ export const TableDetail = () => {
   const isMyTurn = Boolean(mySeatNo != null && actorSeatNo === mySeatNo)
   const hasSeatConflict = ownedSeats.length > 1
   const tableStatus = (selectedTable?.status ?? '').toLowerCase()
-  const isTableOpen = ['open', 'opened', 'active', 'running'].includes(tableStatus)
+  const isTableOpen = ['open', 'opened', 'active', 'running', 'waiting'].includes(tableStatus)
+  const isHandFinished = ['finished', 'resolved'].includes(handStatus)
   const hasHandInProgress = currentHand != null && !['idle', 'waiting', 'finished', 'resolved'].includes(handStatus)
   const openTableDisabled = !token || !selectedTable || isTableOpen || hasHandInProgress
   const openTableDisabledReason = (() => {
     switch (true) {
       case !token:
-        return 'Login required'
+        return t('detail.loginRequired')
       case !selectedTable:
-        return 'Select a table first'
+        return t('detail.selectTableFirst')
       case isTableOpen:
-        return 'Table is already open'
+        return t('detail.tableAlreadyOpen')
       case hasHandInProgress:
-        return 'Cannot open a table during an active hand'
+        return t('detail.cannotOpenDuringHand')
       default:
-        return 'Open table'
+        return t('detail.openTable')
     }
   })()
 
@@ -90,6 +93,44 @@ export const TableDetail = () => {
       return aNo - bNo
     })
   }, [selectedTable])
+  const selectedSeat = displaySeats.find((seat) => (seat['seat-no'] ?? seat.seat_no) === seatNo)
+  const selectedSeatUserId = selectedSeat?.['user-id'] ?? selectedSeat?.user_id ?? ''
+  const isSeatOccupied = Boolean(selectedSeatUserId)
+  const hasOwnedSeat = ownedSeats.length > 0
+  const hasValidSeatNo = Number.isFinite(seatNo) && seatNo > 0
+  const hasValidSeatStack = Number.isFinite(seatStack) && seatStack > 0
+  const joinSeatDisabled =
+    !token ||
+    !selectedTable ||
+    !isTableOpen ||
+    hasHandInProgress ||
+    isSeatOccupied ||
+    hasOwnedSeat ||
+    !hasValidSeatNo ||
+    !hasValidSeatStack
+  const joinSeatDisabledReason = (() => {
+    switch (true) {
+      case !token:
+        return t('detail.loginRequired')
+      case !selectedTable:
+        return t('detail.selectTableFirst')
+      case !isTableOpen:
+        return t('detail.tableMustBeOpen')
+      case hasHandInProgress:
+        return t('detail.cannotJoinDuringHand')
+      case isSeatOccupied:
+        return t('detail.selectedSeatOccupied')
+      case hasOwnedSeat:
+        return t('detail.alreadySeated')
+      case !hasValidSeatNo:
+        return t('detail.validSeatNumber')
+      case !hasValidSeatStack:
+        return t('detail.validStack')
+      default:
+        return t('detail.joinSeat')
+    }
+  })()
+  const canRemovePlayer = Boolean(token && selectedTable && selectedSeatUserId)
 
   const handleJoinSeat = async () => {
     if (!selectedTable) return
@@ -153,6 +194,24 @@ export const TableDetail = () => {
 
   const handleLeaveSeat = async () => {
     if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await api.request(`/api/tables/${selectedTable.id}/leave`, {
+        method: 'POST',
+        body: JSON.stringify({ 'seat-no': seatNo }),
+      })
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleRemovePlayer = async () => {
+    if (!selectedTable || !selectedSeatUserId) return
+    const confirmed = window.confirm(t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: seatNo }))
+    if (!confirmed) return
+
     setStatus('')
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/leave`, {
@@ -278,7 +337,7 @@ export const TableDetail = () => {
   const submitAction = async (type: string) => {
     if (!selectedTable) return
     if (mySeatNo == null) {
-      setStatus('You are not seated.')
+      setStatus(t('detail.notSeated'))
       return
     }
     setStatus('')
@@ -303,40 +362,41 @@ export const TableDetail = () => {
   if (!selectedTable) {
     return (
       <section className="panel panel--detail">
-        <h2>Table Detail</h2>
-        <p className="muted">Select a table to see details.</p>
+        <h2>{t('detail.title')}</h2>
+        <p className="muted">{t('detail.empty')}</p>
       </section>
     )
   }
 
   return (
     <section className="panel panel--detail">
-      <h2>Table Detail</h2>
+      <h2>{t('detail.title')}</h2>
       <div className="table-detail">
         <div className="table-status">
-          <div className="pill">Status: {selectedTable.status || 'unknown'}</div>
-          <div className="pill pill--ghost">Hand: {handStatus}</div>
-          <div className="pill pill--ghost">Street: {street}</div>
-          <div className="pill pill--ghost">Pot: {typeof pot === 'number' ? pot : 0}</div>
+          <div className="pill">{t('detail.status', { status: selectedTable.status || t('tables.unknown') })}</div>
+          <div className="pill pill--ghost">{t('detail.hand', { status: handStatus })}</div>
+          <div className="pill pill--ghost">{t('detail.street', { street })}</div>
+          <div className="pill pill--ghost">{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</div>
+          {isHandFinished && <div className="pill pill--accent">{t('detail.gameFinished')}</div>}
         </div>
         <div className="detail-row">
-          <span>ID</span>
+          <span>{t('detail.id')}</span>
           <strong>{selectedTable.id}</strong>
         </div>
         <div className="detail-row">
-          <span>Hand</span>
+          <span>{t('detail.handLabel')}</span>
           <strong>{handStatus}</strong>
         </div>
         <div className="detail-row">
-          <span>Street</span>
+          <span>{t('detail.streetLabel')}</span>
           <strong>{street}</strong>
         </div>
         <div className="detail-row">
-          <span>Actor Seat</span>
+          <span>{t('detail.actorSeat')}</span>
           <strong>{actorSeatNo ?? '-'}</strong>
         </div>
         <div className="detail-row">
-          <span>Seats</span>
+          <span>{t('detail.seats')}</span>
           <strong>{selectedTable.seats?.length || 0}</strong>
         </div>
 
@@ -351,7 +411,7 @@ export const TableDetail = () => {
         <div className="cards-panel">
           <div className="cards-panel__row">
             <div className="cards-panel__head">
-              <h3>Board</h3>
+              <h3>{t('detail.board')}</h3>
               <span className="muted">{board?.length || 0} / 5</span>
             </div>
             <div className="card-row">
@@ -363,16 +423,20 @@ export const TableDetail = () => {
             </div>
             <div className="cards-panel__meta">
               <div className="detail-row">
-                <span>Pot</span>
+                <span>{t('detail.potLabel')}</span>
                 <strong>{typeof pot === 'number' ? pot : 0}</strong>
               </div>
               {sidePots && sidePots.length > 0 && (
                 <div className="detail-row detail-row--stack">
-                  <span>Side Pots</span>
+                  <span>{t('detail.sidePots')}</span>
                   <div className="stack">
                     {sidePots.map((side, idx) => (
                       <div key={`side-pot-${idx}`} className="pill pill--ghost">
-                        #{idx + 1} {side.amount} | Seats {side['eligible-seat-nos'].join(', ')}
+                        {t('detail.sidePotSeats', {
+                          index: idx + 1,
+                          amount: side.amount,
+                          seats: side['eligible-seat-nos'].join(', '),
+                        })}
                       </div>
                     ))}
                   </div>
@@ -382,8 +446,8 @@ export const TableDetail = () => {
           </div>
 
           <div className="cards-panel__row">
-          <div className="cards-panel__head">
-              <h3>Hole Cards {mySeatNo != null ? `(Seat ${mySeatNo})` : ''}</h3>
+            <div className="cards-panel__head">
+              <h3>{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
               <span className="muted">{seatHoleCards?.length || 0} / 2</span>
             </div>
             <div className="card-row">
@@ -398,23 +462,23 @@ export const TableDetail = () => {
         </div>
 
         <div className="seat-actions">
-          <h3>Seat Actions</h3>
+          <h3>{t('detail.seatActions')}</h3>
           <div className="seat-grid">
-            <label>Seat No</label>
+            <label>{t('detail.seatNo')}</label>
             <input
               type="number"
               min={1}
               value={seatNo}
               onChange={(e) => setSeatNo(Number(e.target.value))}
             />
-            <label>Stack</label>
+            <label>{t('detail.stack')}</label>
             <input
               type="number"
               min={0}
               value={seatStack}
               onChange={(e) => setSeatStack(Number(e.target.value))}
             />
-            <label>Buy-in</label>
+            <label>{t('detail.buyIn')}</label>
             <input
               type="number"
               min={0}
@@ -423,16 +487,31 @@ export const TableDetail = () => {
             />
           </div>
           <div className="actions">
-            <button className="btn btn--small" onClick={handleJoinSeat} disabled={!token}>Join Seat</button>
-            <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>Buy In</button>
-            <button className="btn btn--ghost btn--small" onClick={handleLeaveSeat} disabled={!token}>Leave Seat</button>
-            <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>Sit Out</button>
-            <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>Sit In</button>
+            <button
+              className="btn btn--small"
+              onClick={handleJoinSeat}
+              disabled={joinSeatDisabled}
+              title={joinSeatDisabledReason}
+            >
+              {t('detail.joinSeat')}
+            </button>
+            <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>{t('detail.buyInAction')}</button>
+            <button className="btn btn--ghost btn--small" onClick={handleLeaveSeat} disabled={!token}>{t('detail.leaveSeat')}</button>
+            <button
+              className="btn btn--ghost btn--small"
+              onClick={handleRemovePlayer}
+              disabled={!canRemovePlayer}
+              title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
+            >
+              {t('detail.removePlayer')}
+            </button>
+            <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</button>
+            <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</button>
           </div>
         </div>
 
         <div className="seat-actions">
-          <h3>Table Controls</h3>
+          <h3>{t('detail.tableControls')}</h3>
           <div className="actions">
             <button
               className="btn btn--small"
@@ -440,16 +519,16 @@ export const TableDetail = () => {
               disabled={openTableDisabled}
               title={openTableDisabledReason}
             >
-              Open Table
+              {t('detail.openTable')}
             </button>
-            <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>Close Table</button>
+            <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</button>
           </div>
         </div>
 
         <div className="seat-actions">
-          <h3>Hand Controls</h3>
+          <h3>{t('detail.handControls')}</h3>
           <div className="seat-grid">
-            <label>Dealer Seat</label>
+            <label>{t('detail.dealerSeat')}</label>
             <input
               type="number"
               min={1}
@@ -458,28 +537,28 @@ export const TableDetail = () => {
             />
           </div>
           <div className="actions">
-            <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>Start Hand</button>
-            <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>Resolve Showdown</button>
-            <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>Timeout</button>
-            <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>Next Hand</button>
+            <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</button>
+            <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</button>
+            <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</button>
+            <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</button>
           </div>
         </div>
 
         <div className="seat-actions">
-          <h3>Your Turn</h3>
+          <h3>{t('detail.yourTurn')}</h3>
           {hasSeatConflict && (
-            <p className="error">Multiple seats belong to this user. Actions are disabled.</p>
+            <p className="error">{t('detail.seatConflict')}</p>
           )}
           {!mySeatNo && !hasSeatConflict && (
-            <p className="muted">Join a seat to start playing.</p>
+            <p className="muted">{t('detail.joinToPlay')}</p>
           )}
           {mySeatNo && !isMyTurn && (
-            <p className="muted">Waiting for seat {actorSeatNo ?? '-'}</p>
+            <p className="muted">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
           )}
           <div className="seat-grid">
-            <label>Your Seat</label>
+            <label>{t('detail.yourSeat')}</label>
             <input type="text" value={mySeatNo ?? '—'} disabled />
-            <label>Amount</label>
+            <label>{t('detail.amount')}</label>
             <input
               type="number"
               min={0}
@@ -501,34 +580,34 @@ export const TableDetail = () => {
                 </button>
               ))
             ) : (
-              <span className="muted">No legal actions for this seat.</span>
+              <span className="muted">{t('detail.noLegalActions')}</span>
             )}
           </div>
           {legalForSeat && (
-            <p className="muted">Legal actions: {legalForSeat.join(', ')}</p>
+            <p className="muted">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
           )}
         </div>
 
         <details className="seat-actions">
-          <summary className="summary">Admin / Debug</summary>
+          <summary className="summary">{t('detail.adminDebug')}</summary>
           <div className="seat-grid">
-            <label>Board Cards</label>
+            <label>{t('detail.boardCards')}</label>
             <input
-              placeholder="Ah Kd 7c 2s 9h"
+              placeholder={t('detail.boardCardsPlaceholder')}
               value={boardText}
               onChange={(e) => setBoardText(e.target.value)}
             />
-            <label>Hole Cards (Seat)</label>
+            <label>{t('detail.holeCardsSeatInput')}</label>
             <input
-              placeholder="Qs Jd"
+              placeholder={t('detail.holeCardsPlaceholder')}
               value={holeText}
               onChange={(e) => setHoleText(e.target.value)}
             />
           </div>
           <div className="actions">
-            <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>Set Cards</button>
+            <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</button>
           </div>
-          <p className="muted">Manual card injection for testing only.</p>
+          <p className="muted">{t('detail.manualCardInjection')}</p>
         </details>
       </div>
     </section>
@@ -547,19 +626,22 @@ const SeatLayout = ({
   dealerSeat?: number
   smallBlindSeat?: number
   bigBlindSeat?: number
-}) => (
-  <div className="seat-layout">
-    {seats.length === 0 && <p className="muted">No seats yet.</p>}
-    {seats.map((seat) => {
+}) => {
+  const { t } = useI18n()
+
+  return (
+    <div className="seat-layout">
+      {seats.length === 0 && <p className="muted">{t('detail.noSeatsYet')}</p>}
+      {seats.map((seat) => {
       const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
-      const user = seat['user-id'] ?? seat.user_id ?? 'empty'
+      const user = seat['user-id'] ?? seat.user_id ?? t('detail.emptySeatUser')
       const stack = seat.stack ?? 0
       const committed = (seat as Seat & { 'committed-total'?: number; committed_total?: number })[
         'committed-total'
       ] ?? (seat as Seat & { committed_total?: number }).committed_total ?? 0
       const sittingOut = Boolean(seat['sitting-out?'] ?? seat.sitting_out)
       const isActor = actorSeatNo === seatNo
-      const isMine = user !== 'empty' && user === useAppStore.getState().userId
+      const isMine = user !== t('detail.emptySeatUser') && user === useAppStore.getState().userId
       const isDealer = dealerSeat === seatNo
       const isSmallBlind = smallBlindSeat === seatNo
       const isBigBlind = bigBlindSeat === seatNo
@@ -569,21 +651,22 @@ const SeatLayout = ({
           className={`seat-card ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}
         >
           <div className="seat-card__head">
-            <span>Seat {seatNo}</span>
+            <span>{t('detail.seatTag', { seat: seatNo })}</span>
             <div className="pill-row">
-              {isMine && <span className="pill pill--accent">You</span>}
-              {isActor && <span className="pill">Acting</span>}
+              {isMine && <span className="pill pill--accent">{t('detail.you')}</span>}
+              {isActor && <span className="pill">{t('detail.acting')}</span>}
               {isDealer && <span className="pill pill--dealer">D</span>}
               {isSmallBlind && <span className="pill pill--blind">SB</span>}
               {isBigBlind && <span className="pill pill--blind">BB</span>}
             </div>
           </div>
           <strong>{user}</strong>
-          <span className="muted">Stack: {stack}</span>
-          <span className="muted">Committed: {committed}</span>
-          {sittingOut && <span className="pill pill--ghost">Sitting out</span>}
+          <span className="muted">{t('detail.stackValue', { value: stack })}</span>
+          <span className="muted">{t('detail.committedValue', { value: committed })}</span>
+          {sittingOut && <span className="pill pill--ghost">{t('detail.sittingOut')}</span>}
         </div>
       )
-    })}
-  </div>
-)
+      })}
+    </div>
+  )
+}
