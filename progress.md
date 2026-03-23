@@ -34,3 +34,7 @@ Update:
 Update:
 - Reshaped the table screen toward a more familiar online poker aesthetic with a green felt arena, wood rail, centered board area, and a dedicated control rail.
 - Shifted the app palette toward casino green and gold so the overall UI reads more like a poker client than a generic admin dashboard.
+
+Update:
+- Added mobile-focused breakpoints for the header, status banner, table felt, seat layout, cards, and action buttons.
+- Tightened spacing and stacking on small screens so the table view remains playable on phones.

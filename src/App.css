@@ -707,15 +707,74 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  .app {
+    padding: 18px 14px 28px;
+  }
+
+  .status-banner,
+  .app__header,
+  .table-view__nav-row,
+  .panel__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .api-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .panel {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
   .table-felt {
     border-radius: 28px;
     border-width: 8px;
     padding: 22px 12px;
+    gap: 18px;
   }
 
   .table-felt::before,
   .table-felt__rail {
     border-radius: 28px;
+  }
+
+  .table-status,
+  .card-row,
+  .pill-row {
+    gap: 8px;
+  }
+
+  .seat-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .seat-card {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .cards-panel {
+    padding: 12px;
+    width: 100%;
+  }
+
+  .card {
+    width: 56px;
+    height: 82px;
+    padding: 7px;
+  }
+
+  .detail-row {
+    gap: 12px;
   }
 
   .control-rail {
@@ -724,6 +783,47 @@ h1 {
 
   .table-meta {
     grid-template-columns: 1fr;
+  }
+
+  .actions > button,
+  .actions > a {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 520px) {
+  h1 {
+    font-size: 1.9rem;
+  }
+
+  .seat-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    width: 50px;
+    height: 74px;
+    border-radius: 10px;
+  }
+
+  .card-row {
+    gap: 8px;
+  }
+
+  .actions > button,
+  .actions > a {
+    flex-basis: 100%;
+  }
+
+  .table-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-banner {
+    padding: 12px;
   }
 }
 
