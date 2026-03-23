@@ -25,3 +25,12 @@ Update:
 - Added a lightweight built-in i18n layer with `en` and `pt-BR` dictionaries in `src/i18n.ts`.
 - Persisted the selected locale in the app store and added a language selector to the header.
 - Migrated the main visible UI strings in `ApiHeader`, `AuthPanel`, `TablesPanel`, `EventsPanel`, `TableView`, and `TableDetail` to use translations.
+
+Update:
+- Improved UX with a global status banner, always-visible header controls on table routes, and clearer websocket labels.
+- Added helper copy and a "use generated credentials" shortcut in the auth panel.
+- Added table summary cards and clearer empty states in the tables dashboard.
+
+Update:
+- Reshaped the table screen toward a more familiar online poker aesthetic with a green felt arena, wood rail, centered board area, and a dedicated control rail.
+- Shifted the app palette toward casino green and gold so the overall UI reads more like a poker client than a generic admin dashboard.

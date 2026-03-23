@@ -8,6 +8,7 @@ export const ApiHeader = () => {
   const setApiBase = useAppStore((state) => state.setApiBase)
   const setLocale = useAppStore((state) => state.setLocale)
   const { t } = useI18n()
+  const wsStatusLabel = t(`ws.${wsStatus}`)
 
   return (
     <header className="app__header">
@@ -24,7 +25,7 @@ export const ApiHeader = () => {
           <option value="en">{t('lang.en')}</option>
           <option value="pt-BR">{t('lang.pt-BR')}</option>
         </select>
-        <span className={`ws-badge ws-badge--${wsStatus}`}>{wsStatus}</span>
+        <span className={`ws-badge ws-badge--${wsStatus}`}>{wsStatusLabel}</span>
       </div>
     </header>
   )

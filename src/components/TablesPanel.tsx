@@ -22,6 +22,8 @@ export const TablesPanel = () => {
   const [newTableId, setNewTableId] = useState('table-1')
   const [newTableName, setNewTableName] = useState('Main Table')
   const navigate = useNavigate()
+  const tableCount = tables.length
+  const selectedTableName = selectedTable?.name || selectedTable?.id || '—'
 
   const loadTables = async () => {
     try {
@@ -72,7 +74,18 @@ export const TablesPanel = () => {
         <h2>{t('tables.title')}</h2>
         <button className="btn btn--small" onClick={loadTables}>{t('tables.refresh')}</button>
       </div>
+      <div className="info-grid">
+        <div className="info-card">
+          <span className="muted">{t('tables.countLabel')}</span>
+          <strong>{tableCount}</strong>
+        </div>
+        <div className="info-card">
+          <span className="muted">{t('tables.selectedLabel')}</span>
+          <strong>{selectedTableName}</strong>
+        </div>
+      </div>
       <div className="create-table">
+        <p className="panel__hint">{t('tables.helper')}</p>
         <div className="field">
           <label>{t('tables.tableId')}</label>
           <input value={newTableId} onChange={(e) => setNewTableId(e.target.value)} />
@@ -99,6 +112,7 @@ export const TablesPanel = () => {
           </li>
         ))}
       </ul>
+      {tables.length === 0 && <p className="empty-state">{t(token ? 'tables.empty' : 'tables.emptyLoggedOut')}</p>}
     </section>
   )
 }

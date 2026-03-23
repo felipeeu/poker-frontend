@@ -369,246 +369,254 @@ export const TableDetail = () => {
   }
 
   return (
-    <section className="panel panel--detail">
+    <section className="panel panel--detail panel--table">
       <h2>{t('detail.title')}</h2>
       <div className="table-detail">
-        <div className="table-status">
-          <div className="pill">{t('detail.status', { status: selectedTable.status || t('tables.unknown') })}</div>
-          <div className="pill pill--ghost">{t('detail.hand', { status: handStatus })}</div>
-          <div className="pill pill--ghost">{t('detail.street', { street })}</div>
-          <div className="pill pill--ghost">{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</div>
-          {isHandFinished && <div className="pill pill--accent">{t('detail.gameFinished')}</div>}
-        </div>
-        <div className="detail-row">
-          <span>{t('detail.id')}</span>
-          <strong>{selectedTable.id}</strong>
-        </div>
-        <div className="detail-row">
-          <span>{t('detail.handLabel')}</span>
-          <strong>{handStatus}</strong>
-        </div>
-        <div className="detail-row">
-          <span>{t('detail.streetLabel')}</span>
-          <strong>{street}</strong>
-        </div>
-        <div className="detail-row">
-          <span>{t('detail.actorSeat')}</span>
-          <strong>{actorSeatNo ?? '-'}</strong>
-        </div>
-        <div className="detail-row">
-          <span>{t('detail.seats')}</span>
-          <strong>{selectedTable.seats?.length || 0}</strong>
-        </div>
-
-        <SeatLayout
-          seats={displaySeats}
-          actorSeatNo={actorSeatNo}
-          dealerSeat={handDealerSeat}
-          smallBlindSeat={smallBlindSeat}
-          bigBlindSeat={bigBlindSeat}
-        />
-
-        <div className="cards-panel">
-          <div className="cards-panel__row">
-            <div className="cards-panel__head">
-              <h3>{t('detail.board')}</h3>
-              <span className="muted">{board?.length || 0} / 5</span>
+        <div className="table-arena">
+          <div className="table-status">
+            <div className="pill">{t('detail.status', { status: selectedTable.status || t('tables.unknown') })}</div>
+            <div className="pill pill--ghost">{t('detail.hand', { status: handStatus })}</div>
+            <div className="pill pill--ghost">{t('detail.street', { street })}</div>
+            <div className="pill pill--ghost">{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</div>
+            {isHandFinished && <div className="pill pill--accent">{t('detail.gameFinished')}</div>}
+          </div>
+          <div className="table-meta">
+            <div className="detail-row">
+              <span>{t('detail.id')}</span>
+              <strong>{selectedTable.id}</strong>
             </div>
-            <div className="card-row">
-              {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map(
-                (card, idx) => (
-                  <Card key={`board-${idx}`} value={card} faceDown={!card} />
-                ),
-              )}
+            <div className="detail-row">
+              <span>{t('detail.handLabel')}</span>
+              <strong>{handStatus}</strong>
             </div>
-            <div className="cards-panel__meta">
-              <div className="detail-row">
-                <span>{t('detail.potLabel')}</span>
-                <strong>{typeof pot === 'number' ? pot : 0}</strong>
-              </div>
-              {sidePots && sidePots.length > 0 && (
-                <div className="detail-row detail-row--stack">
-                  <span>{t('detail.sidePots')}</span>
-                  <div className="stack">
-                    {sidePots.map((side, idx) => (
-                      <div key={`side-pot-${idx}`} className="pill pill--ghost">
-                        {t('detail.sidePotSeats', {
-                          index: idx + 1,
-                          amount: side.amount,
-                          seats: side['eligible-seat-nos'].join(', '),
-                        })}
+            <div className="detail-row">
+              <span>{t('detail.streetLabel')}</span>
+              <strong>{street}</strong>
+            </div>
+            <div className="detail-row">
+              <span>{t('detail.actorSeat')}</span>
+              <strong>{actorSeatNo ?? '-'}</strong>
+            </div>
+            <div className="detail-row">
+              <span>{t('detail.seats')}</span>
+              <strong>{selectedTable.seats?.length || 0}</strong>
+            </div>
+          </div>
+          <div className="table-felt">
+            <div className="table-felt__rail" />
+            <SeatLayout
+              seats={displaySeats}
+              actorSeatNo={actorSeatNo}
+              dealerSeat={handDealerSeat}
+              smallBlindSeat={smallBlindSeat}
+              bigBlindSeat={bigBlindSeat}
+            />
+            <div className="table-center">
+              <div className="cards-panel">
+                <div className="cards-panel__row">
+                  <div className="cards-panel__head">
+                    <h3>{t('detail.board')}</h3>
+                    <span className="muted">{board?.length || 0} / 5</span>
+                  </div>
+                  <div className="card-row">
+                    {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map(
+                      (card, idx) => (
+                        <Card key={`board-${idx}`} value={card} faceDown={!card} />
+                      ),
+                    )}
+                  </div>
+                  <div className="cards-panel__meta">
+                    <div className="detail-row">
+                      <span>{t('detail.potLabel')}</span>
+                      <strong>{typeof pot === 'number' ? pot : 0}</strong>
+                    </div>
+                    {sidePots && sidePots.length > 0 && (
+                      <div className="detail-row detail-row--stack">
+                        <span>{t('detail.sidePots')}</span>
+                        <div className="stack">
+                          {sidePots.map((side, idx) => (
+                            <div key={`side-pot-${idx}`} className="pill pill--ghost">
+                              {t('detail.sidePotSeats', {
+                                index: idx + 1,
+                                amount: side.amount,
+                                seats: side['eligible-seat-nos'].join(', '),
+                              })}
+                            </div>
+                          ))}
+                        </div>
                       </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="cards-panel__row">
+                  <div className="cards-panel__head">
+                    <h3>{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
+                    <span className="muted">{seatHoleCards?.length || 0} / 2</span>
+                  </div>
+                  <div className="card-row">
+                    {(seatHoleCards && seatHoleCards.length > 0
+                      ? seatHoleCards
+                      : Array.from({ length: 2 }).map(() => undefined)
+                    ).map((card, idx) => (
+                      <Card key={`hole-${idx}`} value={card} faceDown={!card} />
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="control-rail">
+          <div className="seat-actions">
+            <h3>{t('detail.seatActions')}</h3>
+            <div className="seat-grid">
+              <label>{t('detail.seatNo')}</label>
+              <input
+                type="number"
+                min={1}
+                value={seatNo}
+                onChange={(e) => setSeatNo(Number(e.target.value))}
+              />
+              <label>{t('detail.stack')}</label>
+              <input
+                type="number"
+                min={0}
+                value={seatStack}
+                onChange={(e) => setSeatStack(Number(e.target.value))}
+              />
+              <label>{t('detail.buyIn')}</label>
+              <input
+                type="number"
+                min={0}
+                value={buyInAmount}
+                onChange={(e) => setBuyInAmount(Number(e.target.value))}
+              />
+            </div>
+            <div className="actions">
+              <button
+                className="btn btn--small"
+                onClick={handleJoinSeat}
+                disabled={joinSeatDisabled}
+                title={joinSeatDisabledReason}
+              >
+                {t('detail.joinSeat')}
+              </button>
+              <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>{t('detail.buyInAction')}</button>
+              <button className="btn btn--ghost btn--small" onClick={handleLeaveSeat} disabled={!token}>{t('detail.leaveSeat')}</button>
+              <button
+                className="btn btn--ghost btn--small"
+                onClick={handleRemovePlayer}
+                disabled={!canRemovePlayer}
+                title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
+              >
+                {t('detail.removePlayer')}
+              </button>
+              <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</button>
+              <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</button>
+            </div>
+          </div>
+
+          <div className="seat-actions">
+            <h3>{t('detail.tableControls')}</h3>
+            <div className="actions">
+              <button
+                className="btn btn--small"
+                onClick={handleOpenTable}
+                disabled={openTableDisabled}
+                title={openTableDisabledReason}
+              >
+                {t('detail.openTable')}
+              </button>
+              <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</button>
+            </div>
+          </div>
+
+          <div className="seat-actions">
+            <h3>{t('detail.handControls')}</h3>
+            <div className="seat-grid">
+              <label>{t('detail.dealerSeat')}</label>
+              <input
+                type="number"
+                min={1}
+                value={dealerSeat}
+                onChange={(e) => setDealerSeat(Number(e.target.value))}
+              />
+            </div>
+            <div className="actions">
+              <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</button>
+              <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</button>
+              <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</button>
+              <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</button>
+            </div>
+          </div>
+
+          <div className="seat-actions">
+            <h3>{t('detail.yourTurn')}</h3>
+            {hasSeatConflict && (
+              <p className="error">{t('detail.seatConflict')}</p>
+            )}
+            {!mySeatNo && !hasSeatConflict && (
+              <p className="muted">{t('detail.joinToPlay')}</p>
+            )}
+            {mySeatNo && !isMyTurn && (
+              <p className="muted">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
+            )}
+            <div className="seat-grid">
+              <label>{t('detail.yourSeat')}</label>
+              <input type="text" value={mySeatNo ?? '—'} disabled />
+              <label>{t('detail.amount')}</label>
+              <input
+                type="number"
+                min={0}
+                value={actionAmount}
+                onChange={(e) => setActionAmount(Number(e.target.value))}
+                disabled={!(canBet || canRaise || canAllIn) || !isMyTurn || hasSeatConflict}
+              />
+            </div>
+            <div className="actions">
+              {legalForSeat && legalForSeat.length > 0 ? (
+                legalForSeat.map((action) => (
+                  <button
+                    key={action}
+                    className={`btn btn--small ${action === 'bet' || action === 'raise' || action === 'all-in' ? 'btn--ghost' : ''}`}
+                    onClick={() => submitAction(action)}
+                    disabled={!token || !isMyTurn || hasSeatConflict}
+                  >
+                    {action === 'all-in' ? 'All-in' : action.charAt(0).toUpperCase() + action.slice(1)}
+                  </button>
+                ))
+              ) : (
+                <span className="muted">{t('detail.noLegalActions')}</span>
               )}
             </div>
-          </div>
-
-          <div className="cards-panel__row">
-            <div className="cards-panel__head">
-              <h3>{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
-              <span className="muted">{seatHoleCards?.length || 0} / 2</span>
-            </div>
-            <div className="card-row">
-              {(seatHoleCards && seatHoleCards.length > 0
-                ? seatHoleCards
-                : Array.from({ length: 2 }).map(() => undefined)
-              ).map((card, idx) => (
-                <Card key={`hole-${idx}`} value={card} faceDown={!card} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="seat-actions">
-          <h3>{t('detail.seatActions')}</h3>
-          <div className="seat-grid">
-            <label>{t('detail.seatNo')}</label>
-            <input
-              type="number"
-              min={1}
-              value={seatNo}
-              onChange={(e) => setSeatNo(Number(e.target.value))}
-            />
-            <label>{t('detail.stack')}</label>
-            <input
-              type="number"
-              min={0}
-              value={seatStack}
-              onChange={(e) => setSeatStack(Number(e.target.value))}
-            />
-            <label>{t('detail.buyIn')}</label>
-            <input
-              type="number"
-              min={0}
-              value={buyInAmount}
-              onChange={(e) => setBuyInAmount(Number(e.target.value))}
-            />
-          </div>
-          <div className="actions">
-            <button
-              className="btn btn--small"
-              onClick={handleJoinSeat}
-              disabled={joinSeatDisabled}
-              title={joinSeatDisabledReason}
-            >
-              {t('detail.joinSeat')}
-            </button>
-            <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>{t('detail.buyInAction')}</button>
-            <button className="btn btn--ghost btn--small" onClick={handleLeaveSeat} disabled={!token}>{t('detail.leaveSeat')}</button>
-            <button
-              className="btn btn--ghost btn--small"
-              onClick={handleRemovePlayer}
-              disabled={!canRemovePlayer}
-              title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
-            >
-              {t('detail.removePlayer')}
-            </button>
-            <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</button>
-            <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</button>
-          </div>
-        </div>
-
-        <div className="seat-actions">
-          <h3>{t('detail.tableControls')}</h3>
-          <div className="actions">
-            <button
-              className="btn btn--small"
-              onClick={handleOpenTable}
-              disabled={openTableDisabled}
-              title={openTableDisabledReason}
-            >
-              {t('detail.openTable')}
-            </button>
-            <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</button>
-          </div>
-        </div>
-
-        <div className="seat-actions">
-          <h3>{t('detail.handControls')}</h3>
-          <div className="seat-grid">
-            <label>{t('detail.dealerSeat')}</label>
-            <input
-              type="number"
-              min={1}
-              value={dealerSeat}
-              onChange={(e) => setDealerSeat(Number(e.target.value))}
-            />
-          </div>
-          <div className="actions">
-            <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</button>
-            <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</button>
-            <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</button>
-            <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</button>
-          </div>
-        </div>
-
-        <div className="seat-actions">
-          <h3>{t('detail.yourTurn')}</h3>
-          {hasSeatConflict && (
-            <p className="error">{t('detail.seatConflict')}</p>
-          )}
-          {!mySeatNo && !hasSeatConflict && (
-            <p className="muted">{t('detail.joinToPlay')}</p>
-          )}
-          {mySeatNo && !isMyTurn && (
-            <p className="muted">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
-          )}
-          <div className="seat-grid">
-            <label>{t('detail.yourSeat')}</label>
-            <input type="text" value={mySeatNo ?? '—'} disabled />
-            <label>{t('detail.amount')}</label>
-            <input
-              type="number"
-              min={0}
-              value={actionAmount}
-              onChange={(e) => setActionAmount(Number(e.target.value))}
-              disabled={!(canBet || canRaise || canAllIn) || !isMyTurn || hasSeatConflict}
-            />
-          </div>
-          <div className="actions">
-            {legalForSeat && legalForSeat.length > 0 ? (
-              legalForSeat.map((action) => (
-                <button
-                  key={action}
-                  className={`btn btn--small ${action === 'bet' || action === 'raise' || action === 'all-in' ? 'btn--ghost' : ''}`}
-                  onClick={() => submitAction(action)}
-                  disabled={!token || !isMyTurn || hasSeatConflict}
-                >
-                  {action === 'all-in' ? 'All-in' : action.charAt(0).toUpperCase() + action.slice(1)}
-                </button>
-              ))
-            ) : (
-              <span className="muted">{t('detail.noLegalActions')}</span>
+            {legalForSeat && (
+              <p className="muted">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
             )}
           </div>
-          {legalForSeat && (
-            <p className="muted">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
-          )}
-        </div>
 
-        <details className="seat-actions">
-          <summary className="summary">{t('detail.adminDebug')}</summary>
-          <div className="seat-grid">
-            <label>{t('detail.boardCards')}</label>
-            <input
-              placeholder={t('detail.boardCardsPlaceholder')}
-              value={boardText}
-              onChange={(e) => setBoardText(e.target.value)}
-            />
-            <label>{t('detail.holeCardsSeatInput')}</label>
-            <input
-              placeholder={t('detail.holeCardsPlaceholder')}
-              value={holeText}
-              onChange={(e) => setHoleText(e.target.value)}
-            />
-          </div>
-          <div className="actions">
-            <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</button>
-          </div>
-          <p className="muted">{t('detail.manualCardInjection')}</p>
-        </details>
+          <details className="seat-actions">
+            <summary className="summary">{t('detail.adminDebug')}</summary>
+            <div className="seat-grid">
+              <label>{t('detail.boardCards')}</label>
+              <input
+                placeholder={t('detail.boardCardsPlaceholder')}
+                value={boardText}
+                onChange={(e) => setBoardText(e.target.value)}
+              />
+              <label>{t('detail.holeCardsSeatInput')}</label>
+              <input
+                placeholder={t('detail.holeCardsPlaceholder')}
+                value={holeText}
+                onChange={(e) => setHoleText(e.target.value)}
+              />
+            </div>
+            <div className="actions">
+              <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</button>
+            </div>
+            <p className="muted">{t('detail.manualCardInjection')}</p>
+          </details>
+        </div>
       </div>
     </section>
   )

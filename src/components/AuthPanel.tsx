@@ -21,6 +21,13 @@ export const AuthPanel = () => {
   const [password, setPassword] = useState('Secret123!')
   const [generatedUser, setGeneratedUser] = useState<{ email: string; password: string } | null>(null)
 
+  const handleUseGeneratedUser = () => {
+    if (!generatedUser) return
+    setEmail(generatedUser.email)
+    setPassword(generatedUser.password)
+    setStatus(t('auth.credentialsLoaded'))
+  }
+
   const handleLogin = async () => {
     setStatus('')
     try {
@@ -85,6 +92,7 @@ export const AuthPanel = () => {
   return (
     <section className="panel">
       <h2>{t('auth.title')}</h2>
+      <p className="panel__hint">{t('auth.helper')}</p>
       <div className="field">
         <label>{t('auth.email')}</label>
         <input value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -113,6 +121,9 @@ export const AuthPanel = () => {
           <p>{t('auth.testUserCreated')}</p>
           <strong>{generatedUser.email}</strong>
           <p className="muted">{t('auth.password')}: {generatedUser.password}</p>
+          <button className="btn btn--ghost btn--small" onClick={handleUseGeneratedUser}>
+            {t('auth.useGeneratedUser')}
+          </button>
         </div>
       )}
       {status && <p className="error">{status}</p>}
