@@ -668,6 +668,16 @@ h1 {
   color: var(--muted);
 }
 
+.seat-card__user {
+  font-size: 0.88rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .seat-card.is-actor {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px rgba(217, 177, 95, 0.38), 0 18px 32px rgba(0, 0, 0, 0.24);
@@ -708,19 +718,21 @@ h1 {
 
 .events {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .event {
   border: 1px solid var(--line);
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 12px;
   background: rgba(9, 19, 14, 0.45);
 }
 
 .event__summary {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
 }
 
 .error {
@@ -747,6 +759,33 @@ h1 {
   background:
     radial-gradient(circle at top, rgba(217, 177, 95, 0.08), transparent 18%),
     rgba(19, 29, 22, 0.88);
+}
+
+.panel--events-compact {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.panel--events-compact h2 {
+  margin-bottom: 12px;
+}
+
+.panel--events-compact .events {
+  gap: 8px;
+}
+
+.panel--events-compact .event {
+  padding: 8px 10px;
+}
+
+.panel--events-compact .pill {
+  padding: 3px 8px;
+  font-size: 0.7rem;
+}
+
+.panel--events-compact .event__summary {
+  margin-top: 4px;
+  font-size: 0.8rem;
 }
 
 .table-arena {

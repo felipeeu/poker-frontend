@@ -22,7 +22,7 @@ export const TableView = () => {
           : undefined
       return event.table?.id === tableId || payloadTableId === tableId
     })
-    .slice(0, 5)
+    .slice(0, 4)
   const formatEvent = (event: typeof events[number]) => {
     if (event.type === 'hand.action') {
       const payload = event.payload as
@@ -84,7 +84,7 @@ export const TableView = () => {
         </div>
       </section>
       <TableDetail />
-      <section className="panel panel--detail">
+      <section className="panel panel--detail panel--events-compact">
         <h2>{t('table.recentEvents')}</h2>
         <div className="events">
           {tableEvents.map((event, idx) => (

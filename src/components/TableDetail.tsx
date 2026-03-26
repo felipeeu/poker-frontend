@@ -17,6 +17,7 @@ export const TableDetail = () => {
   const setStatus = useAppStore((state) => state.setStatus)
   const mergeSelectedTable = useAppStore((state) => state.mergeSelectedTable)
   const [seatNo, setSeatNo] = useState(1)
+  const [seatName, setSeatName] = useState('')
   const [seatStack, setSeatStack] = useState(1000)
   const [buyInAmount, setBuyInAmount] = useState(500)
   const [dealerSeat, setDealerSeat] = useState(1)
@@ -107,6 +108,7 @@ export const TableDetail = () => {
   const isSeatOccupied = Boolean(selectedSeatUserId)
   const hasOwnedSeat = ownedSeats.length > 0
   const hasValidSeatNo = Number.isFinite(seatNo) && seatNo > 0
+  const hasValidSeatName = seatName.trim().length > 0
   const hasValidSeatStack = Number.isFinite(seatStack) && seatStack > 0
   const joinSeatDisabled =
     !token ||
@@ -116,6 +118,7 @@ export const TableDetail = () => {
     isSeatOccupied ||
     hasOwnedSeat ||
     !hasValidSeatNo ||
+    !hasValidSeatName ||
     !hasValidSeatStack
   const joinSeatDisabledReason = (() => {
     switch (true) {
@@ -133,6 +136,8 @@ export const TableDetail = () => {
         return t('detail.alreadySeated')
       case !hasValidSeatNo:
         return t('detail.validSeatNumber')
+      case !hasValidSeatName:
+        return t('detail.nameRequired')
       case !hasValidSeatStack:
         return t('detail.validStack')
       default:
@@ -170,14 +175,20 @@ export const TableDetail = () => {
 
   const handleJoinSeat = async () => {
     if (!selectedTable) return
+    const trimmedSeatName = seatName.trim()
+    if (!trimmedSeatName) {
+      setStatus(t('detail.nameRequired'))
+      return
+    }
     setStatus('')
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/join`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo, stack: seatStack }),
+        body: JSON.stringify({ 'seat-no': seatNo, name: trimmedSeatName, stack: seatStack }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
+      setSeatName('')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -524,6 +535,17 @@ export const TableDetail = () => {
                 value={seatNo}
                 onChange={(e) => setSeatNo(Number(e.target.value))}
               />
+              {!hasOwnedSeat && (
+                <>
+                  <label>{t('detail.playerName')}</label>
+                  <input
+                    type="text"
+                    value={seatName}
+                    onChange={(e) => setSeatName(e.target.value)}
+                    placeholder={t('detail.playerNamePlaceholder')}
+                  />
+                </>
+              )}
               <label>{t('detail.stack')}</label>
               <input
                 type="number"
@@ -696,6 +718,7 @@ const SeatLayout = ({
       {seats.map((seat) => {
       const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
       const user = seat['user-id'] ?? seat.user_id ?? t('detail.emptySeatUser')
+      const displayName = seat.name ?? user
       const stack = seat.stack ?? 0
       const committed = (seat as Seat & { 'committed-total'?: number; committed_total?: number })[
         'committed-total'
@@ -721,7 +744,7 @@ const SeatLayout = ({
               {isBigBlind && <span className="pill pill--blind">BB</span>}
             </div>
           </div>
-          <strong>{user}</strong>
+          <strong className="seat-card__user" title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}>{displayName}</strong>
           <span className="muted">{t('detail.stackValue', { value: stack })}</span>
           <span className="muted">{t('detail.committedValue', { value: committed })}</span>
           {sittingOut && <span className="pill pill--ghost">{t('detail.sittingOut')}</span>}

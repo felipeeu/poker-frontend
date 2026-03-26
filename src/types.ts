@@ -1,6 +1,7 @@
 export type Seat = {
   'seat-no'?: number
   seat_no?: number
+  name?: string | null
   user_id?: string | null
   'user-id'?: string | null
   stack?: number
