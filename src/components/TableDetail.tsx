@@ -65,9 +65,10 @@ export const TableDetail = () => {
   const isMyTurn = Boolean(mySeatNo != null && actorSeatNo === mySeatNo)
   const hasSeatConflict = ownedSeats.length > 1
   const tableStatus = (selectedTable?.status ?? '').toLowerCase()
+  const finishedHandStatuses = ['complete', 'finished', 'resolved']
   const isTableOpen = ['open', 'opened', 'active', 'running', 'waiting'].includes(tableStatus)
-  const isHandFinished = ['finished', 'resolved'].includes(handStatus)
-  const hasHandInProgress = currentHand != null && !['idle', 'waiting', 'finished', 'resolved'].includes(handStatus)
+  const isHandFinished = finishedHandStatuses.includes(handStatus)
+  const hasHandInProgress = currentHand != null && !['idle', 'waiting', ...finishedHandStatuses].includes(handStatus)
   const openTableDisabled = !token || !selectedTable || isTableOpen || hasHandInProgress
   const openTableDisabledReason = (() => {
     switch (true) {
@@ -84,7 +85,6 @@ export const TableDetail = () => {
     }
   })()
 
-
   const displaySeats = useMemo(() => {
     const seats = selectedTable?.seats ?? []
     return [...seats].sort((a, b) => {
@@ -93,6 +93,13 @@ export const TableDetail = () => {
       return aNo - bNo
     })
   }, [selectedTable])
+  const activeSeats = displaySeats.filter((seat) => {
+    const seatUserId = seat['user-id'] ?? seat.user_id
+    const seatStack = seat.stack ?? 0
+    const sittingOut = Boolean(seat['sitting-out?'] ?? seat.sitting_out)
+    return Boolean(seatUserId) && !sittingOut && seatStack > 0
+  })
+  const activeSeatCount = activeSeats.length
   const selectedSeat = displaySeats.find((seat) => (seat['seat-no'] ?? seat.seat_no) === seatNo)
   const selectedSeatUserId = selectedSeat?.['user-id'] ?? selectedSeat?.user_id ?? ''
   const isSeatOccupied = Boolean(selectedSeatUserId)
@@ -131,6 +138,33 @@ export const TableDetail = () => {
     }
   })()
   const canRemovePlayer = Boolean(token && selectedTable && selectedSeatUserId)
+  const nextStepMessage = (() => {
+    if (!token) return t('detail.loginToControlTable')
+    if (!isTableOpen) return t('detail.tableClosedHint')
+    if (isHandFinished) {
+      if (activeSeatCount < 2) return t('detail.handCompleteNeedPlayers')
+      return t('detail.handCompleteReadyNext')
+    }
+    if (!currentHand) {
+      if (activeSeatCount < 2) return t('detail.needTwoActivePlayers')
+      return t('detail.readyToStartHand')
+    }
+    if (handStatus === 'showdown') return t('detail.readyToResolveShowdown')
+    if (isMyTurn) return t('detail.yourTurnToAct')
+    if (actorSeatNo != null) return t('detail.waitingForActorSeat', { seat: actorSeatNo })
+    return t('detail.handInProgressHint')
+  })()
+  const actionMessage = (() => {
+    if (!token) return t('detail.loginRequired')
+    if (hasSeatConflict) return t('detail.seatConflict')
+    if (mySeatNo == null) return t('detail.joinToPlay')
+    if (!currentHand) return t('detail.startHandToReceiveActions')
+    if (isHandFinished) return t('detail.handAlreadyFinished')
+    if (handStatus === 'showdown') return t('detail.waitingForShowdownResolution')
+    if (!isMyTurn) return t('detail.waitingForActorSeat', { seat: actorSeatNo ?? '-' })
+    if (!legalForSeat || legalForSeat.length === 0) return t('detail.noLegalActionsYet')
+    return t('detail.chooseActionPrompt')
+  })()
 
   const handleJoinSeat = async () => {
     if (!selectedTable) return
@@ -373,6 +407,16 @@ export const TableDetail = () => {
       <h2>{t('detail.title')}</h2>
       <div className="table-detail">
         <div className="table-arena">
+          <div className="table-guidance">
+            <div className="table-guidance__card">
+              <strong>{t('detail.nextStepTitle')}</strong>
+              <p>{nextStepMessage}</p>
+            </div>
+            <div className="table-guidance__card table-guidance__card--subtle">
+              <strong>{t('detail.activePlayersLabel')}</strong>
+              <p>{t('detail.activePlayersValue', { count: activeSeatCount })}</p>
+            </div>
+          </div>
           <div className="table-status">
             <div className="pill">{t('detail.status', { status: selectedTable.status || t('tables.unknown') })}</div>
             <div className="pill pill--ghost">{t('detail.hand', { status: handStatus })}</div>
@@ -515,6 +559,7 @@ export const TableDetail = () => {
               <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</button>
               <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</button>
             </div>
+            {joinSeatDisabled && <p className="inline-hint">{joinSeatDisabledReason}</p>}
           </div>
 
           <div className="seat-actions">
@@ -530,6 +575,7 @@ export const TableDetail = () => {
               </button>
               <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</button>
             </div>
+            {openTableDisabled && <p className="inline-hint">{openTableDisabledReason}</p>}
           </div>
 
           <div className="seat-actions">
@@ -590,6 +636,7 @@ export const TableDetail = () => {
                 <span className="muted">{t('detail.noLegalActions')}</span>
               )}
             </div>
+            <p className="inline-hint">{actionMessage}</p>
             {legalForSeat && (
               <p className="muted">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
             )}
