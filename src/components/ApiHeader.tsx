@@ -3,10 +3,7 @@ import { useI18n } from '../i18n'
 
 export const ApiHeader = () => {
   const apiBase = useAppStore((state) => state.apiBase)
-  const locale = useAppStore((state) => state.locale)
   const wsStatus = useAppStore((state) => state.wsStatus)
-  const setApiBase = useAppStore((state) => state.setApiBase)
-  const setLocale = useAppStore((state) => state.setLocale)
   const { t } = useI18n()
   const wsStatusLabel = t(`ws.${wsStatus}`)
   const apiHost = (() => {
@@ -34,19 +31,7 @@ export const ApiHeader = () => {
           </div>
         </div>
       </div>
-      <div className="api-input control-deck">
-        <div className="control-deck__head">
-          <span className="eyebrow">{t('header.controlDesk')}</span>
-          <span className={`ws-badge ws-badge--${wsStatus}`}>{wsStatusLabel}</span>
-        </div>
-        <label>{t('header.apiBase')}</label>
-        <input value={apiBase} onChange={(e) => setApiBase(e.target.value)} />
-        <label>{t('lang.label')}</label>
-        <select value={locale} onChange={(e) => setLocale(e.target.value as 'en' | 'pt-BR')}>
-          <option value="en">{t('lang.en')}</option>
-          <option value="pt-BR">{t('lang.pt-BR')}</option>
-        </select>
-      </div>
+      <span className={`ws-badge ws-badge--${wsStatus}`}>{wsStatusLabel}</span>
     </header>
   )
 }

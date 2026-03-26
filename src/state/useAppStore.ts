@@ -39,7 +39,7 @@ export const useAppStore = create<AppStore>((set) => ({
   apiBase: DEFAULT_API,
   token: readLocal('poker_token'),
   userId: readLocal('poker_user_id'),
-  locale: (readLocal('poker_locale') as Locale) || 'en',
+  locale: 'en', //(readLocal('poker_locale') as Locale) || 'en-US',
   tables: [],
   selectedTable: null,
   events: [],
