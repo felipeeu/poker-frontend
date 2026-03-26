@@ -1,7 +1,9 @@
 import './App.css'
+import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ApiHeader } from './components/ApiHeader'
 import { AuthPanel } from './components/AuthPanel'
+import { useApi } from './api/useApi'
 import { useTableEvents } from './hooks/useTableEvents'
 import { TableView } from './pages/TableView'
 import { TablesDashboard } from './pages/TablesDashboard'
@@ -19,8 +21,33 @@ function App() {
 }
 
 const AppLayout = () => {
+  const api = useApi()
   const location = useLocation()
+  const token = useAppStore((state) => state.token)
+  const userId = useAppStore((state) => state.userId)
+  const role = useAppStore((state) => state.role)
+  const setAuth = useAppStore((state) => state.setAuth)
   const isTableRoute = location.pathname.startsWith('/tables/')
+
+  useEffect(() => {
+    if (!token || role) return
+
+    let cancelled = false
+
+    api
+      .request<{ 'user-id'?: string; role?: string }>('/api/me')
+      .then((body) => {
+        if (cancelled) return
+        setAuth(token, body['user-id'] || userId, body.role || '')
+      })
+      .catch(() => {
+        // Leave existing auth state untouched when role hydration fails.
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [api, role, setAuth, token, userId])
 
   return (
     <div className="app">

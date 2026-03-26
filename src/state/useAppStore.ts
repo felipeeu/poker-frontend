@@ -8,6 +8,7 @@ type AppStore = {
   apiBase: string
   token: string
   userId: string
+  role: string
   locale: Locale
   tables: Table[]
   selectedTable: Table | null
@@ -16,7 +17,7 @@ type AppStore = {
   wsStatus: WsStatus
   setApiBase: (value: string) => void
   setStatus: (value: string) => void
-  setAuth: (token: string, userId: string) => void
+  setAuth: (token: string, userId: string, role?: string) => void
   setLocale: (locale: Locale) => void
   clearAuth: () => void
   setTables: (tables: Table[]) => void
@@ -39,6 +40,7 @@ export const useAppStore = create<AppStore>((set) => ({
   apiBase: DEFAULT_API,
   token: readLocal('poker_token'),
   userId: readLocal('poker_user_id'),
+  role: readLocal('poker_role'),
   locale: 'en', //(readLocal('poker_locale') as Locale) || 'en-US',
   tables: [],
   selectedTable: null,
@@ -47,14 +49,15 @@ export const useAppStore = create<AppStore>((set) => ({
   wsStatus: 'disconnected',
   setApiBase: (value) => set({ apiBase: value }),
   setStatus: (value) => set({ status: value }),
-  setAuth: (token, userId) => {
+  setAuth: (token, userId, role = '') => {
     try {
       localStorage.setItem('poker_token', token)
       localStorage.setItem('poker_user_id', userId)
+      localStorage.setItem('poker_role', role)
     } catch {
       // ignore storage errors
     }
-    set({ token, userId })
+    set({ token, userId, role })
   },
   setLocale: (locale) => {
     try {
@@ -68,10 +71,11 @@ export const useAppStore = create<AppStore>((set) => ({
     try {
       localStorage.removeItem('poker_token')
       localStorage.removeItem('poker_user_id')
+      localStorage.removeItem('poker_role')
     } catch {
       // ignore storage errors
     }
-    set({ token: '', userId: '', selectedTable: null })
+    set({ token: '', userId: '', role: '', selectedTable: null })
   },
   setTables: (tables) => set({ tables }),
   updateTable: (table) =>

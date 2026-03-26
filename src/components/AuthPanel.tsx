@@ -6,6 +6,7 @@ import { useAppStore } from '../state/useAppStore'
 type AuthResponse = {
   'access-token'?: string
   'user-id'?: string
+  role?: string
 }
 
 export const AuthPanel = () => {
@@ -35,7 +36,7 @@ export const AuthPanel = () => {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
-      setAuth(body['access-token'] || '', body['user-id'] || '')
+      setAuth(body['access-token'] || '', body['user-id'] || '', body.role || '')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -82,7 +83,7 @@ export const AuthPanel = () => {
         method: 'POST',
         body: JSON.stringify({ email: nextEmail, password: nextPassword }),
       })
-      setAuth(body['access-token'] || '', body['user-id'] || '')
+      setAuth(body['access-token'] || '', body['user-id'] || '', body.role || '')
       setGeneratedUser({ email: nextEmail, password: nextPassword })
     } catch (err) {
       setStatus((err as Error).message)

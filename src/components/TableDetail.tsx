@@ -11,6 +11,7 @@ export const TableDetail = () => {
   const selectedTable = useAppStore((state) => state.selectedTable)
   const token = useAppStore((state) => state.token)
   const userId = useAppStore((state) => state.userId)
+  const role = useAppStore((state) => state.role)
   const updateTable = useAppStore((state) => state.updateTable)
   const setSelectedTable = useAppStore((state) => state.setSelectedTable)
   const setStatus = useAppStore((state) => state.setStatus)
@@ -62,6 +63,7 @@ export const TableDetail = () => {
   const canBet = Boolean(legalForSeat?.includes('bet'))
   const canRaise = Boolean(legalForSeat?.includes('raise'))
   const canAllIn = Boolean(legalForSeat?.includes('all-in'))
+  const isAdmin = role === 'admin'
   const isMyTurn = Boolean(mySeatNo != null && actorSeatNo === mySeatNo)
   const hasSeatConflict = ownedSeats.length > 1
   const tableStatus = (selectedTable?.status ?? '').toLowerCase()
@@ -578,24 +580,26 @@ export const TableDetail = () => {
             {openTableDisabled && <p className="inline-hint">{openTableDisabledReason}</p>}
           </div>
 
-          <div className="seat-actions">
-            <h3>{t('detail.handControls')}</h3>
-            <div className="seat-grid">
-              <label>{t('detail.dealerSeat')}</label>
-              <input
-                type="number"
-                min={1}
-                value={dealerSeat}
-                onChange={(e) => setDealerSeat(Number(e.target.value))}
-              />
+          {isAdmin && (
+            <div className="seat-actions">
+              <h3>{t('detail.handControls')}</h3>
+              <div className="seat-grid">
+                <label>{t('detail.dealerSeat')}</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={dealerSeat}
+                  onChange={(e) => setDealerSeat(Number(e.target.value))}
+                />
+              </div>
+              <div className="actions">
+                <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</button>
+                <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</button>
+                <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</button>
+                <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</button>
+              </div>
             </div>
-            <div className="actions">
-              <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</button>
-              <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</button>
-              <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</button>
-              <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</button>
-            </div>
-          </div>
+          )}
 
           <div className="seat-actions">
             <h3>{t('detail.yourTurn')}</h3>
@@ -642,27 +646,29 @@ export const TableDetail = () => {
             )}
           </div>
 
-          <details className="seat-actions">
-            <summary className="summary">{t('detail.adminDebug')}</summary>
-            <div className="seat-grid">
-              <label>{t('detail.boardCards')}</label>
-              <input
-                placeholder={t('detail.boardCardsPlaceholder')}
-                value={boardText}
-                onChange={(e) => setBoardText(e.target.value)}
-              />
-              <label>{t('detail.holeCardsSeatInput')}</label>
-              <input
-                placeholder={t('detail.holeCardsPlaceholder')}
-                value={holeText}
-                onChange={(e) => setHoleText(e.target.value)}
-              />
-            </div>
-            <div className="actions">
-              <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</button>
-            </div>
-            <p className="muted">{t('detail.manualCardInjection')}</p>
-          </details>
+          {isAdmin && (
+            <details className="seat-actions">
+              <summary className="summary">{t('detail.adminDebug')}</summary>
+              <div className="seat-grid">
+                <label>{t('detail.boardCards')}</label>
+                <input
+                  placeholder={t('detail.boardCardsPlaceholder')}
+                  value={boardText}
+                  onChange={(e) => setBoardText(e.target.value)}
+                />
+                <label>{t('detail.holeCardsSeatInput')}</label>
+                <input
+                  placeholder={t('detail.holeCardsPlaceholder')}
+                  value={holeText}
+                  onChange={(e) => setHoleText(e.target.value)}
+                />
+              </div>
+              <div className="actions">
+                <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</button>
+              </div>
+              <p className="muted">{t('detail.manualCardInjection')}</p>
+            </details>
+          )}
         </div>
       </div>
     </section>
