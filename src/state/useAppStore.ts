@@ -37,17 +37,24 @@ const readLocal = (key: string) => {
 }
 
 export const useAppStore = create<AppStore>((set) => ({
-  apiBase: DEFAULT_API,
+  apiBase: readLocal('poker_api_base') || DEFAULT_API,
   token: readLocal('poker_token'),
   userId: readLocal('poker_user_id'),
   role: readLocal('poker_role'),
-  locale: 'en', //(readLocal('poker_locale') as Locale) || 'en-US',
+  locale: (readLocal('poker_locale') as Locale) || 'en',
   tables: [],
   selectedTable: null,
   events: [],
   status: '',
   wsStatus: 'disconnected',
-  setApiBase: (value) => set({ apiBase: value }),
+  setApiBase: (value) => {
+    try {
+      localStorage.setItem('poker_api_base', value)
+    } catch {
+      // ignore storage errors
+    }
+    set({ apiBase: value })
+  },
   setStatus: (value) => set({ status: value }),
   setAuth: (token, userId, role = '') => {
     try {

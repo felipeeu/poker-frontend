@@ -1,48 +1,73 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
-:root {
-  font-family: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
-  line-height: 1.6;
-  font-weight: 400;
-  color: #f7f1d5;
-  background-color: #0b1b16;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  --ink: #f7f1d5;
-  --muted: #b4b08d;
-  --panel: rgba(24, 34, 24, 0.84);
-  --line: rgba(213, 179, 108, 0.2);
-  --input: rgba(16, 29, 21, 0.96);
-  --accent: #d9b15f;
-  --shadow: 0 24px 60px rgba(3, 10, 7, 0.45);
+@theme {
+  --font-sans: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --color-background: #09110d;
+  --color-background-elevated: #10261f;
+  --color-foreground: #f7f1d5;
+  --color-muted: #b4b08d;
+  --color-panel: rgba(24, 34, 24, 0.84);
+  --color-input: rgba(16, 29, 21, 0.96);
+  --color-border: rgba(213, 179, 108, 0.2);
+  --color-border-strong: rgba(242, 229, 187, 0.12);
+  --color-accent: #d9b15f;
+  --color-accent-foreground: #20150a;
+  --color-danger: #dc2626;
+  --color-ring: rgba(244, 212, 143, 0.72);
+  --shadow-panel: 0 24px 60px rgba(3, 10, 7, 0.45);
+  --ink: var(--color-foreground);
+  --muted: var(--color-muted);
+  --panel: var(--color-panel);
+  --line: var(--color-border);
+  --input: var(--color-input);
+  --accent: var(--color-accent);
+  --shadow: var(--shadow-panel);
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-a {
-  color: inherit;
-}
+  :root {
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(217, 177, 95, 0.12), transparent 28%),
-    radial-gradient(circle at 80% 10%, rgba(34, 197, 94, 0.16), transparent 25%),
-    linear-gradient(180deg, #10261f 0%, #09110d 100%);
-}
+  html {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    font-weight: 400;
+  }
 
-#root {
-  min-height: 100vh;
-}
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(217, 177, 95, 0.12), transparent 28%),
+      radial-gradient(circle at 80% 10%, rgba(34, 197, 94, 0.16), transparent 25%),
+      linear-gradient(180deg, #10261f 0%, #09110d 100%);
+    color: var(--color-foreground);
+  }
 
-input,
-button,
-textarea {
-  font-family: inherit;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
 }

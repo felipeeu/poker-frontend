@@ -381,6 +381,22 @@ export const TableDetail = () => {
     }
   }
 
+  const handleLoadDemoSeats = () => {
+    if (!selectedTable) return
+    const demoSeats: Seat[] = [
+      { 'seat-no': 1, 'user-id': 'demo-1', name: 'Felipe', stack: 1280, 'sitting-out?': false },
+      { 'seat-no': 2, 'user-id': 'demo-2', name: 'Ana', stack: 940, 'sitting-out?': false },
+      { 'seat-no': 3, 'user-id': 'demo-3', name: 'Bruno', stack: 1510, 'sitting-out?': false },
+      { 'seat-no': 4, 'user-id': 'demo-4', name: 'Carol', stack: 770, 'sitting-out?': false },
+      { 'seat-no': 5, 'user-id': 'demo-5', name: 'Davi', stack: 1120, 'sitting-out?': false },
+      { 'seat-no': 6, 'user-id': 'demo-6', name: 'Ellen', stack: 860, 'sitting-out?': false },
+    ]
+    const table = { ...selectedTable, seats: demoSeats, 'current-hand': undefined, current_hand: undefined }
+    updateTable(table as Table)
+    setSelectedTable(table as Table)
+    setStatus(t('detail.demoSeatsLoaded'))
+  }
+
   const submitAction = async (type: string) => {
     if (!selectedTable) return
     if (mySeatNo == null) {
@@ -671,6 +687,11 @@ export const TableDetail = () => {
           {isAdmin && (
             <details className="seat-actions">
               <summary className="summary">{t('detail.adminDebug')}</summary>
+              <div className="actions">
+                <button className="btn btn--ghost btn--small" onClick={handleLoadDemoSeats}>
+                  {t('detail.loadDemoSeats')}
+                </button>
+              </div>
               <div className="seat-grid">
                 <label>{t('detail.boardCards')}</label>
                 <input
@@ -711,6 +732,7 @@ const SeatLayout = ({
   bigBlindSeat?: number
 }) => {
   const { t } = useI18n()
+  const positions = seatPositions(seats.length)
 
   return (
     <div className="seat-layout">
@@ -729,28 +751,94 @@ const SeatLayout = ({
       const isDealer = dealerSeat === seatNo
       const isSmallBlind = smallBlindSeat === seatNo
       const isBigBlind = bigBlindSeat === seatNo
+      const position = positions[seatNo - 1] ?? positions[0] ?? { x: 50, y: 50 }
+      const shortName = truncateSeatName(displayName)
+      const avatarLabel = seatAvatarLabel(displayName)
+      const slotClasses = ['seat-slot']
+      if (position.y <= 20) slotClasses.push('seat-slot--far')
+      else if (position.y >= 82) slotClasses.push('seat-slot--near')
+      else slotClasses.push('seat-slot--mid')
       return (
         <div
           key={seatNo}
-          className={`seat-card ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}
+          className={slotClasses.join(' ')}
+          style={{ left: `${position.x}%`, top: `${position.y}%` }}
         >
-          <div className="seat-card__head">
-            <span>{t('detail.seatTag', { seat: seatNo })}</span>
-            <div className="pill-row">
-              {isMine && <span className="pill pill--accent">{t('detail.you')}</span>}
-              {isActor && <span className="pill">{t('detail.acting')}</span>}
-              {isDealer && <span className="pill pill--dealer">D</span>}
-              {isSmallBlind && <span className="pill pill--blind">SB</span>}
-              {isBigBlind && <span className="pill pill--blind">BB</span>}
+          <div
+            className={`seat-chip ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}
+          >
+            <div className="seat-chip__head">
+              <span className="seat-chip__seat">{t('detail.seatTag', { seat: seatNo })}</span>
+              <div className="pill-row">
+                {isMine && <span className="pill pill--accent">{t('detail.you')}</span>}
+                {isActor && <span className="pill">{t('detail.acting')}</span>}
+                {isDealer && <span className="pill pill--dealer">D</span>}
+                {isSmallBlind && <span className="pill pill--blind">SB</span>}
+                {isBigBlind && <span className="pill pill--blind">BB</span>}
+              </div>
             </div>
+            <div className="seat-chip__body" title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}>
+              <span className="seat-chip__avatar" aria-hidden="true">{avatarLabel}</span>
+              <div className="seat-chip__info">
+                <strong className="seat-chip__user">{shortName}</strong>
+                <span className="seat-chip__stack">{t('detail.stackShort', { value: stack })}</span>
+              </div>
+            </div>
+            {(sittingOut || committed > 0) && (
+              <div className="seat-chip__meta">
+                {sittingOut && <span className="pill pill--ghost">{t('detail.sittingOut')}</span>}
+                {committed > 0 && <span className="seat-chip__committed">{t('detail.committedShort', { value: committed })}</span>}
+              </div>
+            )}
           </div>
-          <strong className="seat-card__user" title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}>{displayName}</strong>
-          <span className="muted">{t('detail.stackValue', { value: stack })}</span>
-          <span className="muted">{t('detail.committedValue', { value: committed })}</span>
-          {sittingOut && <span className="pill pill--ghost">{t('detail.sittingOut')}</span>}
         </div>
       )
       })}
     </div>
   )
+}
+
+const seatPositions = (count: number) => {
+  switch (count) {
+    case 2:
+      return [{ x: 50, y: 88 }, { x: 50, y: 12 }]
+    case 3:
+      return [{ x: 50, y: 88 }, { x: 14, y: 24 }, { x: 86, y: 24 }]
+    case 4:
+      return [{ x: 50, y: 88 }, { x: 12, y: 50 }, { x: 50, y: 12 }, { x: 88, y: 50 }]
+    case 5:
+      return [{ x: 50, y: 89 }, { x: 14, y: 68 }, { x: 18, y: 18 }, { x: 82, y: 18 }, { x: 86, y: 68 }]
+    case 6:
+      return [
+        { x: 50, y: 89 },
+        { x: 16, y: 72 },
+        { x: 14, y: 18 },
+        { x: 86, y: 18 },
+        { x: 84, y: 72 },
+        { x: 50, y: 10 },
+      ]
+    default:
+      return Array.from({ length: count }, (_, index) => {
+        const angle = ((Math.PI * 2) / Math.max(count, 1)) * index - Math.PI / 2
+        return {
+          x: 50 + Math.cos(angle) * 38,
+          y: 50 + Math.sin(angle) * 38,
+        }
+      })
+  }
+}
+
+const truncateSeatName = (name: string) => {
+  if (name.length <= 10) return name
+  return `${name.slice(0, 9)}…`
+}
+
+const seatAvatarLabel = (name: string) => {
+  const words = name
+    .split(/\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+  if (words.length === 0) return '?'
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return `${words[0][0] ?? ''}${words[1][0] ?? ''}`.toUpperCase()
 }

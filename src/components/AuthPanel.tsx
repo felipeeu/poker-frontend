@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
+import { Button } from '../shared/ui/button'
+import { Input } from '../shared/ui/input'
+import { Panel } from '../shared/ui/panel'
 
 type AuthResponse = {
   'access-token'?: string
@@ -91,43 +94,43 @@ export const AuthPanel = () => {
   }
 
   return (
-    <section className="panel">
-      <h2>{t('auth.title')}</h2>
-      <p className="panel__hint">{t('auth.helper')}</p>
-      <div className="field">
-        <label>{t('auth.email')}</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} />
+    <Panel className="h-fit">
+      <h2 className="m-0 text-2xl font-semibold">{t('auth.title')}</h2>
+      <p className="mb-5 mt-2 text-sm text-[var(--color-muted)]">{t('auth.helper')}</p>
+      <div className="mb-4 grid gap-2">
+        <label className="text-sm font-medium">{t('auth.email')}</label>
+        <Input value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
-      <div className="field">
-        <label>{t('auth.password')}</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <div className="mb-5 grid gap-2">
+        <label className="text-sm font-medium">{t('auth.password')}</label>
+        <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
-      <div className="actions">
-        <button className="btn" onClick={handleLogin}>{t('auth.login')}</button>
-        <button className="btn btn--ghost" onClick={handleSignup}>{t('auth.signup')}</button>
-        <button className="btn btn--ghost" onClick={handleCreateTestUser}>{t('auth.createTestUser')}</button>
-        <button className="btn btn--ghost" onClick={handleCreateAndLoginTestUser}>
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={handleLogin}>{t('auth.login')}</Button>
+        <Button variant="ghost" onClick={handleSignup}>{t('auth.signup')}</Button>
+        <Button variant="ghost" onClick={handleCreateTestUser}>{t('auth.createTestUser')}</Button>
+        <Button variant="ghost" onClick={handleCreateAndLoginTestUser}>
           {t('auth.createAndLoginTestUser')}
-        </button>
+        </Button>
       </div>
       {token && (
-        <div className="token">
-          <p>{t('auth.loggedInAs')}</p>
-          <strong>{userId || t('auth.unknown')}</strong>
-          <button className="link" onClick={clearAuth}>{t('auth.logout')}</button>
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
+          <strong className="mt-2 block text-sm">{userId || t('auth.unknown')}</strong>
+          <Button className="mt-4" variant="ghost" size="sm" onClick={clearAuth}>{t('auth.logout')}</Button>
         </div>
       )}
       {generatedUser && (
-        <div className="token">
-          <p>{t('auth.testUserCreated')}</p>
-          <strong>{generatedUser.email}</strong>
-          <p className="muted">{t('auth.password')}: {generatedUser.password}</p>
-          <button className="btn btn--ghost btn--small" onClick={handleUseGeneratedUser}>
+        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.testUserCreated')}</p>
+          <strong className="mt-2 block text-sm">{generatedUser.email}</strong>
+          <p className="mt-2 text-sm text-[var(--color-muted)]">{t('auth.password')}: {generatedUser.password}</p>
+          <Button className="mt-4" variant="ghost" size="sm" onClick={handleUseGeneratedUser}>
             {t('auth.useGeneratedUser')}
-          </button>
+          </Button>
         </div>
       )}
-      {status && <p className="error">{status}</p>}
-    </section>
+      {status && <p className="mt-4 text-sm text-rose-200">{status}</p>}
+    </Panel>
   )
 }

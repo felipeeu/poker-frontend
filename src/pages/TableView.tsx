@@ -5,6 +5,8 @@ import { useApi } from '../api/useApi'
 import { TableDetail } from '../components/TableDetail'
 import { useAppStore } from '../state/useAppStore'
 import type { Table } from '../types'
+import { Badge } from '../shared/ui/badge'
+import { Panel } from '../shared/ui/panel'
 
 export const TableView = () => {
   const { tableId } = useParams()
@@ -72,30 +74,33 @@ export const TableView = () => {
 
   return (
     <>
-      <section className="panel panel--detail table-view__nav">
-        <div className="table-view__nav-row">
+      <Panel className="min-h-0">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2>{t('table.navTitle')}</h2>
-            <p className="muted">{tableId || t('table.loading')}</p>
+            <h2 className="m-0 text-2xl font-semibold">{t('table.navTitle')}</h2>
+            <p className="mt-1 text-sm text-[var(--color-muted)]">{tableId || t('table.loading')}</p>
           </div>
-          <Link className="btn btn--ghost" to="/tables">
+          <Link
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-border-strong)] bg-white/5 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10"
+            to="/tables"
+          >
             {t('table.backToTables')}
           </Link>
         </div>
-      </section>
+      </Panel>
       <TableDetail />
-      <section className="panel panel--detail panel--events-compact">
-        <h2>{t('table.recentEvents')}</h2>
-        <div className="events">
+      <Panel className="min-h-0">
+        <h2 className="m-0 text-2xl font-semibold">{t('table.recentEvents')}</h2>
+        <div className="mt-5 grid gap-3">
           {tableEvents.map((event, idx) => (
-            <div key={idx} className="event">
-              <span className="pill pill--ghost">{event.type}</span>
-              <p className="event__summary">{formatEvent(event)}</p>
+            <div key={idx} className="rounded-2xl border border-white/8 bg-black/15 p-4">
+              <Badge>{event.type}</Badge>
+              <p className="mt-3 text-sm text-[var(--color-foreground)]">{formatEvent(event)}</p>
             </div>
           ))}
-          {tableEvents.length === 0 && <p className="muted">{t('events.none')}</p>}
+          {tableEvents.length === 0 && <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p>}
         </div>
-      </section>
+      </Panel>
     </>
   )
 }

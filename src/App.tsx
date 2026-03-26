@@ -9,6 +9,8 @@ import { TableView } from './pages/TableView'
 import { TablesDashboard } from './pages/TablesDashboard'
 import { useAppStore } from './state/useAppStore'
 import { useI18n } from './i18n'
+import { Button } from './shared/ui/button'
+import { Panel } from './shared/ui/panel'
 
 function App() {
   useTableEvents()
@@ -50,10 +52,16 @@ const AppLayout = () => {
   }, [api, role, setAuth, token, userId])
 
   return (
-    <div className="app">
+    <div className="min-h-screen px-5 py-8 text-[var(--color-foreground)] sm:px-8 lg:px-14 lg:py-12">
       <ApiHeader />
       <GlobalStatus />
-      <main className={`layout ${isTableRoute ? 'layout--table' : ''}`}>
+      <main
+        className={
+          isTableRoute
+            ? 'grid grid-cols-1 gap-6'
+            : 'grid grid-cols-1 gap-6 xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)_minmax(300px,360px)]'
+        }
+      >
         {!isTableRoute && <AuthPanel />}
         <Routes>
           <Route path="/" element={<Navigate to="/tables" replace />} />
@@ -74,15 +82,21 @@ const GlobalStatus = () => {
   if (!status) return null
 
   return (
-    <section className="status-banner" role="status" aria-live="polite">
+    <Panel
+      className="mb-5 flex flex-col gap-4 border-sky-300/25 bg-[linear-gradient(135deg,rgba(96,165,250,0.16),rgba(15,23,42,0.78))] sm:flex-row sm:items-center sm:justify-between"
+      role="status"
+      aria-live="polite"
+    >
       <div>
-        <strong>{t('status.title')}</strong>
-        <p>{status}</p>
+        <strong className="block text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
+          {t('status.title')}
+        </strong>
+        <p className="m-0 text-sm text-[var(--color-foreground)]">{status}</p>
       </div>
-      <button className="btn btn--ghost btn--small" onClick={() => setStatus('')}>
+      <Button variant="ghost" size="sm" onClick={() => setStatus('')}>
         {t('status.dismiss')}
-      </button>
-    </section>
+      </Button>
+    </Panel>
   )
 }
 

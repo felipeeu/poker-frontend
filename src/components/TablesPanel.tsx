@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
 import type { Table } from '../types'
+import { Badge } from '../shared/ui/badge'
+import { Button } from '../shared/ui/button'
+import { Input } from '../shared/ui/input'
+import { Panel } from '../shared/ui/panel'
 
 type TablesResponse = {
   tables: Table[]
@@ -69,50 +73,60 @@ export const TablesPanel = () => {
   }, [token])
 
   return (
-    <section className="panel">
-      <div className="panel__header">
-        <h2>{t('tables.title')}</h2>
-        <button className="btn btn--small" onClick={loadTables}>{t('tables.refresh')}</button>
+    <Panel className="h-fit">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h2 className="m-0 text-2xl font-semibold">{t('tables.title')}</h2>
+        <Button size="sm" onClick={loadTables}>{t('tables.refresh')}</Button>
       </div>
-      <div className="info-grid">
-        <div className="info-card">
-          <span className="muted">{t('tables.countLabel')}</span>
-          <strong>{tableCount}</strong>
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
+          <span className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('tables.countLabel')}</span>
+          <strong className="mt-2 block text-3xl">{tableCount}</strong>
         </div>
-        <div className="info-card">
-          <span className="muted">{t('tables.selectedLabel')}</span>
-          <strong>{selectedTableName}</strong>
+        <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
+          <span className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('tables.selectedLabel')}</span>
+          <strong className="mt-2 block text-lg">{selectedTableName}</strong>
         </div>
       </div>
-      <div className="create-table">
-        <p className="panel__hint">{t('tables.helper')}</p>
-        <div className="field">
-          <label>{t('tables.tableId')}</label>
-          <input value={newTableId} onChange={(e) => setNewTableId(e.target.value)} />
+      <div className="mb-6 rounded-[24px] border border-[var(--color-border)] bg-[rgba(16,29,21,0.66)] p-5">
+        <p className="mb-4 text-sm text-[var(--color-muted)]">{t('tables.helper')}</p>
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">{t('tables.tableId')}</label>
+            <Input value={newTableId} onChange={(e) => setNewTableId(e.target.value)} />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">{t('tables.name')}</label>
+            <Input value={newTableName} onChange={(e) => setNewTableName(e.target.value)} />
+          </div>
         </div>
-        <div className="field">
-          <label>{t('tables.name')}</label>
-          <input value={newTableName} onChange={(e) => setNewTableName(e.target.value)} />
-        </div>
-        <button className="btn" onClick={handleCreateTable} disabled={!token}>{t('tables.create')}</button>
+        <Button className="mt-4" onClick={handleCreateTable} disabled={!token}>{t('tables.create')}</Button>
       </div>
-      <ul className="table-list">
+      <ul className="grid gap-3 p-0">
         {tables.map((table) => (
-          <li key={table.id}>
+          <li key={table.id} className="list-none">
             <button
-              className={`table-card ${selectedTable?.id === table.id ? 'is-active' : ''}`}
+              className={
+                selectedTable?.id === table.id
+                  ? 'flex w-full items-center justify-between gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent)_35%,transparent)] bg-[color-mix(in_oklab,var(--color-accent)_12%,transparent)] p-4 text-left shadow-[0_10px_30px_rgba(3,10,7,0.24)]'
+                  : 'flex w-full items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/5 p-4 text-left transition-colors hover:bg-white/8'
+              }
               onClick={() => loadTable(table.id)}
             >
               <div>
-                <strong>{table.name || table.id}</strong>
-                <span className="muted">{table.id}</span>
+                <strong className="block text-sm sm:text-base">{table.name || table.id}</strong>
+                <span className="text-sm text-[var(--color-muted)]">{table.id}</span>
               </div>
-              <span className="pill">{table.status || t('tables.unknown')}</span>
+              <Badge>{table.status || t('tables.unknown')}</Badge>
             </button>
           </li>
         ))}
       </ul>
-      {tables.length === 0 && <p className="empty-state">{t(token ? 'tables.empty' : 'tables.emptyLoggedOut')}</p>}
-    </section>
+      {tables.length === 0 && (
+        <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-white/4 px-4 py-5 text-sm text-[var(--color-muted)]">
+          {t(token ? 'tables.empty' : 'tables.emptyLoggedOut')}
+        </p>
+      )}
+    </Panel>
   )
 }
