@@ -16,6 +16,16 @@ import {
 import { TableSummary } from './table-detail/table-summary'
 import { useAppStore } from '../state/useAppStore'
 import type { CurrentHand, Seat, Table } from '../types'
+import { Button } from '../shared/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../shared/ui/dialog'
 import { Panel } from '../shared/ui/panel'
 
 export const TableDetail = () => {
@@ -37,6 +47,7 @@ export const TableDetail = () => {
   const [actionAmount, setActionAmount] = useState(20)
   const [boardText, setBoardText] = useState('')
   const [holeText, setHoleText] = useState('')
+  const [isRemovePlayerDialogOpen, setIsRemovePlayerDialogOpen] = useState(false)
 
   const currentHand = useMemo(() => {
     if (!selectedTable) return null
@@ -267,11 +278,13 @@ export const TableDetail = () => {
     }
   }
 
+  const handleRequestRemovePlayer = () => {
+    if (!selectedTable || !selectedSeatUserId) return
+    setIsRemovePlayerDialogOpen(true)
+  }
+
   const handleRemovePlayer = async () => {
     if (!selectedTable || !selectedSeatUserId) return
-    const confirmed = window.confirm(t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: seatNo }))
-    if (!confirmed) return
-
     setStatus('')
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/leave`, {
@@ -280,6 +293,7 @@ export const TableDetail = () => {
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
+      setIsRemovePlayerDialogOpen(false)
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -502,7 +516,7 @@ export const TableDetail = () => {
             joinSeatDisabledReason={joinSeatDisabledReason}
             onBuyIn={handleBuyIn}
             onLeaveSeat={handleLeaveSeat}
-            onRemovePlayer={handleRemovePlayer}
+            onRemovePlayer={handleRequestRemovePlayer}
             canRemovePlayer={canRemovePlayer}
             onSitOut={handleSitOut}
             onSitIn={handleSitIn}
@@ -561,6 +575,24 @@ export const TableDetail = () => {
           )}
         </div>
       </div>
+      <Dialog open={isRemovePlayerDialogOpen} onOpenChange={setIsRemovePlayerDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('detail.removePlayerConfirmTitle')}</DialogTitle>
+            <DialogDescription>
+              {t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: seatNo })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="ghost">{t('dialog.cancel')}</Button>
+            </DialogClose>
+            <Button variant="danger" onClick={handleRemovePlayer}>
+              {t('dialog.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Panel>
   )
 }
