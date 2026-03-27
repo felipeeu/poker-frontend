@@ -1,5 +1,6 @@
 import { useI18n } from '../../i18n'
 import { Badge } from '../../shared/ui/badge'
+import { InfoCard } from '../../shared/ui/info-card'
 
 type TableSummaryProps = {
   nextStepMessage: string
@@ -48,26 +49,11 @@ export const TableSummary = ({
         {isHandFinished ? <Badge variant="success">{t('detail.gameFinished')}</Badge> : null}
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2 max-[1024px]:grid-cols-1">
-        <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
-          <span>{t('detail.id')}</span>
-          <strong>{tableId}</strong>
-        </div>
-        <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
-          <span>{t('detail.handLabel')}</span>
-          <strong>{handStatus}</strong>
-        </div>
-        <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
-          <span>{t('detail.streetLabel')}</span>
-          <strong>{street}</strong>
-        </div>
-        <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
-          <span>{t('detail.actorSeat')}</span>
-          <strong>{actorSeatNo ?? '-'}</strong>
-        </div>
-        <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
-          <span>{t('detail.seats')}</span>
-          <strong>{seatCount}</strong>
-        </div>
+        <InfoCard label={t('detail.id')} value={tableId} />
+        <InfoCard label={t('detail.handLabel')} value={handStatus} />
+        <InfoCard label={t('detail.streetLabel')} value={street} />
+        <InfoCard label={t('detail.actorSeat')} value={actorSeatNo ?? '-'} />
+        <InfoCard label={t('detail.seats')} value={seatCount} />
       </div>
     </>
   )

@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n'
 import { Button } from '../../shared/ui/button'
 import { ControlSection } from '../../shared/ui/control-section'
+import { FieldGroup, FieldLabel } from '../../shared/ui/field-group'
 import { Input } from '../../shared/ui/input'
 
 type AdminTableControlsSectionProps = {
@@ -63,17 +64,17 @@ export const AdminHandControlsSection = ({
 }: AdminHandControlsSectionProps) => {
   const { t } = useI18n()
 
-  return (
+    return (
     <ControlSection title={t('detail.handControls')} className="mt-4">
-      <div className="mb-3 grid grid-cols-1 gap-1.5">
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.dealerSeat')}</label>
+      <FieldGroup className="mb-3">
+        <FieldLabel>{t('detail.dealerSeat')}</FieldLabel>
         <Input
           type="number"
           min={1}
           value={dealerSeat}
           onChange={(e) => onDealerSeatChange(Number(e.target.value))}
         />
-      </div>
+      </FieldGroup>
       <div className="flex flex-wrap gap-3">
         <Button size="sm" onClick={onStartHand} disabled={disabled}>{t('detail.startHand')}</Button>
         <Button variant="ghost" size="sm" onClick={onResolve} disabled={disabled}>{t('detail.resolveShowdown')}</Button>
@@ -133,8 +134,8 @@ export const PlayerControlsSection = ({
 
   return (
     <ControlSection title={t('detail.seatActions')} className="mt-4">
-      <div className="mb-3 grid grid-cols-1 gap-1.5">
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.seatNo')}</label>
+      <FieldGroup className="mb-3">
+        <FieldLabel>{t('detail.seatNo')}</FieldLabel>
         <Input
           type="number"
           min={1}
@@ -143,7 +144,7 @@ export const PlayerControlsSection = ({
         />
         {!hasOwnedSeat ? (
           <>
-            <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.playerName')}</label>
+            <FieldLabel>{t('detail.playerName')}</FieldLabel>
             <Input
               type="text"
               value={seatName}
@@ -152,21 +153,21 @@ export const PlayerControlsSection = ({
             />
           </>
         ) : null}
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.stack')}</label>
+        <FieldLabel>{t('detail.stack')}</FieldLabel>
         <Input
           type="number"
           min={0}
           value={seatStack}
           onChange={(e) => onSeatStackChange(Number(e.target.value))}
         />
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.buyIn')}</label>
+        <FieldLabel>{t('detail.buyIn')}</FieldLabel>
         <Input
           type="number"
           min={0}
           value={buyInAmount}
           onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
         />
-      </div>
+      </FieldGroup>
       <div className="flex flex-wrap gap-3 [&>button]:min-w-[calc(50%-6px)]">
         <Button
           size="sm"
@@ -243,10 +244,10 @@ export const TurnActionsSection = ({
       {mySeatNo && !isMyTurn ? (
         <p className="text-sm text-[var(--color-muted)]">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
       ) : null}
-      <div className="mb-3 grid grid-cols-1 gap-1.5">
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.yourSeat')}</label>
+      <FieldGroup className="mb-3">
+        <FieldLabel>{t('detail.yourSeat')}</FieldLabel>
         <Input type="text" value={mySeatNo ?? '—'} disabled />
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.amount')}</label>
+        <FieldLabel>{t('detail.amount')}</FieldLabel>
         <Input
           type="number"
           min={0}
@@ -254,7 +255,7 @@ export const TurnActionsSection = ({
           onChange={(e) => onActionAmountChange(Number(e.target.value))}
           disabled={!(canBet || canRaise || canAllIn) || !isMyTurn || hasSeatConflict}
         />
-      </div>
+      </FieldGroup>
       <div className="flex flex-wrap gap-3">
         {legalForSeat && legalForSeat.length > 0 ? (
           legalForSeat.map((action) => (
@@ -309,20 +310,20 @@ export const AdminDebugSection = ({
           {t('detail.loadDemoSeats')}
         </Button>
       </div>
-      <div className="mb-3 grid grid-cols-1 gap-1.5">
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.boardCards')}</label>
+      <FieldGroup className="mb-3">
+        <FieldLabel>{t('detail.boardCards')}</FieldLabel>
         <Input
           placeholder={t('detail.boardCardsPlaceholder')}
           value={boardText}
           onChange={(e) => onBoardTextChange(e.target.value)}
         />
-        <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.holeCardsSeatInput')}</label>
+        <FieldLabel>{t('detail.holeCardsSeatInput')}</FieldLabel>
         <Input
           placeholder={t('detail.holeCardsPlaceholder')}
           value={holeText}
           onChange={(e) => onHoleTextChange(e.target.value)}
         />
-      </div>
+      </FieldGroup>
       <div className="flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onSetCards} disabled={disabled}>{t('detail.setCards')}</Button>
       </div>
