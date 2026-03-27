@@ -8,9 +8,7 @@ import { useTableEvents } from './hooks/useTableEvents'
 import { TableView } from './pages/TableView'
 import { TablesDashboard } from './pages/TablesDashboard'
 import { useAppStore } from './state/useAppStore'
-import { useI18n } from './i18n'
-import { Button } from './shared/ui/button'
-import { Panel } from './shared/ui/panel'
+import { ToastViewport } from './shared/ui/toast'
 
 function App() {
   useTableEvents()
@@ -54,8 +52,9 @@ const AppLayout = () => {
 
   return (
     <div className="min-h-screen px-5 py-8 text-[var(--color-foreground)] sm:px-8 lg:px-14 lg:py-12">
+      <ToastViewport />
+      <StatusToastBridge />
       <ApiHeader />
-      <GlobalStatus />
       <main
         className={
           isTableRoute
@@ -75,30 +74,18 @@ const AppLayout = () => {
   )
 }
 
-const GlobalStatus = () => {
+const StatusToastBridge = () => {
   const status = useAppStore((state) => state.status)
+  const pushToast = useAppStore((state) => state.pushToast)
   const setStatus = useAppStore((state) => state.setStatus)
-  const { t } = useI18n()
 
-  if (!status) return null
+  useEffect(() => {
+    if (!status) return
+    pushToast(status.message, status.tone)
+    setStatus('')
+  }, [pushToast, setStatus, status])
 
-  return (
-    <Panel
-      className="mb-5 flex flex-col gap-4 border-sky-300/25 bg-[linear-gradient(135deg,rgba(96,165,250,0.16),rgba(15,23,42,0.78))] sm:flex-row sm:items-center sm:justify-between"
-      role="status"
-      aria-live="polite"
-    >
-      <div>
-        <strong className="block text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
-          {t('status.title')}
-        </strong>
-        <p className="m-0 text-sm text-[var(--color-foreground)]">{status}</p>
-      </div>
-      <Button variant="ghost" size="sm" onClick={() => setStatus('')}>
-        {t('status.dismiss')}
-      </Button>
-    </Panel>
-  )
+  return null
 }
 
 export default App

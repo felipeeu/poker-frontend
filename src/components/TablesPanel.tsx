@@ -22,6 +22,7 @@ export const TablesPanel = () => {
   const setTables = useAppStore((state) => state.setTables)
   const updateTable = useAppStore((state) => state.updateTable)
   const setSelectedTable = useAppStore((state) => state.setSelectedTable)
+  const pushToast = useAppStore((state) => state.pushToast)
   const setStatus = useAppStore((state) => state.setStatus)
   const [newTableId, setNewTableId] = useState('table-1')
   const [newTableName, setNewTableName] = useState('Main Table')
@@ -61,6 +62,7 @@ export const TablesPanel = () => {
       })
       updateTable(table)
       setSelectedTable(table)
+      pushToast(t('tables.createSuccess', { table: table.name || table.id }), 'success')
       navigate(`/tables/${table.id}`)
     } catch (err) {
       setStatus((err as Error).message)

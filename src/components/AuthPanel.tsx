@@ -20,9 +20,9 @@ export const AuthPanel = () => {
   const token = useAppStore((state) => state.token)
   const refreshToken = useAppStore((state) => state.refreshToken)
   const userId = useAppStore((state) => state.userId)
-  const status = useAppStore((state) => state.status)
   const setAuth = useAppStore((state) => state.setAuth)
   const clearAuth = useAppStore((state) => state.clearAuth)
+  const pushToast = useAppStore((state) => state.pushToast)
   const setStatus = useAppStore((state) => state.setStatus)
   const [email, setEmail] = useState('admin@example.com')
   const [password, setPassword] = useState('Secret123!')
@@ -33,7 +33,7 @@ export const AuthPanel = () => {
     if (!generatedUser) return
     setEmail(generatedUser.email)
     setPassword(generatedUser.password)
-    setStatus(t('auth.credentialsLoaded'))
+    setStatus(t('auth.credentialsLoaded'), 'success')
   }
 
   const handleLogin = async () => {
@@ -44,6 +44,7 @@ export const AuthPanel = () => {
         body: JSON.stringify({ email, password }),
       })
       setAuth(body['access-token'] || '', body['refresh-token'] || '', body['user-id'] || '', body.role || '')
+      pushToast(t('auth.loginSuccess'), 'success')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -72,6 +73,7 @@ export const AuthPanel = () => {
         body: JSON.stringify({ email: nextEmail, password: nextPassword }),
       })
       setGeneratedUser({ email: nextEmail, password: nextPassword })
+      pushToast(t('auth.testUserCreated'), 'success')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -92,6 +94,7 @@ export const AuthPanel = () => {
       })
       setAuth(body['access-token'] || '', body['refresh-token'] || '', body['user-id'] || '', body.role || '')
       setGeneratedUser({ email: nextEmail, password: nextPassword })
+      pushToast(t('auth.loginSuccess'), 'success')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -99,6 +102,7 @@ export const AuthPanel = () => {
 
   const handleLogout = async () => {
     setStatus('')
+    let revoked = false
     try {
       if (refreshToken) {
         await api.request('/api/auth/logout', {
@@ -106,10 +110,14 @@ export const AuthPanel = () => {
           body: JSON.stringify({ 'refresh-token': refreshToken }),
         })
       }
+      revoked = true
     } catch (err) {
       setStatus((err as Error).message)
     } finally {
       clearAuth()
+      if (revoked || !refreshToken) {
+        pushToast(t('auth.logoutSuccess'), 'success')
+      }
     }
   }
 
@@ -154,7 +162,6 @@ export const AuthPanel = () => {
           </Button>
         </div>
       )}
-      {status && <p className="mt-4 text-sm text-rose-200">{status}</p>}
       <ConfirmDialog
         open={isLogoutDialogOpen}
         onOpenChange={setIsLogoutDialogOpen}

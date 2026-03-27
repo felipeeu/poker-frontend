@@ -193,7 +193,7 @@ export const TableDetail = () => {
     if (!selectedTable) return
     const trimmedSeatName = seatName.trim()
     if (!trimmedSeatName) {
-      setStatus(t('detail.nameRequired'))
+      setStatus(t('detail.nameRequired'), 'info')
       return
     }
     setStatus('')
@@ -419,13 +419,13 @@ export const TableDetail = () => {
     const table = { ...selectedTable, seats: demoSeats, 'current-hand': undefined, current_hand: undefined }
     updateTable(table as Table)
     setSelectedTable(table as Table)
-    setStatus(t('detail.demoSeatsLoaded'))
+    setStatus(t('detail.demoSeatsLoaded'), 'success')
   }
 
   const submitAction = async (type: string) => {
     if (!selectedTable) return
     if (mySeatNo == null) {
-      setStatus(t('detail.notSeated'))
+      setStatus(t('detail.notSeated'), 'info')
       return
     }
     setStatus('')
