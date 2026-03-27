@@ -552,36 +552,40 @@ export const TableDetail = () => {
               </Button>
               <Button variant="ghost" size="sm" onClick={handleBuyIn} disabled={!token}>{t('detail.buyInAction')}</Button>
               <Button variant="ghost" size="sm" onClick={handleLeaveSeat} disabled={!token}>{t('detail.leaveSeat')}</Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRemovePlayer}
-                disabled={!canRemovePlayer}
-                title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
-              >
-                {t('detail.removePlayer')}
-              </Button>
+              {isAdmin && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRemovePlayer}
+                  disabled={!canRemovePlayer}
+                  title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
+                >
+                  {t('detail.removePlayer')}
+                </Button>
+              )}
               <Button variant="ghost" size="sm" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</Button>
               <Button variant="ghost" size="sm" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</Button>
             </div>
             {joinSeatDisabled && <p className="mt-2.5 text-sm text-[var(--color-muted)]">{joinSeatDisabledReason}</p>}
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
-            <h3>{t('detail.tableControls')}</h3>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                size="sm"
-                onClick={handleOpenTable}
-                disabled={openTableDisabled}
-                title={openTableDisabledReason}
-              >
-                {t('detail.openTable')}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</Button>
+          {isAdmin && (
+            <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
+              <h3>{t('detail.tableControls')}</h3>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  size="sm"
+                  onClick={handleOpenTable}
+                  disabled={openTableDisabled}
+                  title={openTableDisabledReason}
+                >
+                  {t('detail.openTable')}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</Button>
+              </div>
+              {openTableDisabled && <p className="mt-2.5 text-sm text-[var(--color-muted)]">{openTableDisabledReason}</p>}
             </div>
-            {openTableDisabled && <p className="mt-2.5 text-sm text-[var(--color-muted)]">{openTableDisabledReason}</p>}
-          </div>
+          )}
 
           {isAdmin && (
             <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
