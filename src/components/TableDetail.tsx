@@ -16,16 +16,7 @@ import {
 import { TableSummary } from './table-detail/table-summary'
 import { useAppStore } from '../state/useAppStore'
 import type { CurrentHand, Seat, Table } from '../types'
-import { Button } from '../shared/ui/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '../shared/ui/dialog'
+import { ConfirmDialog } from '../shared/ui/confirm-dialog'
 import { Panel } from '../shared/ui/panel'
 
 export const TableDetail = () => {
@@ -48,6 +39,7 @@ export const TableDetail = () => {
   const [boardText, setBoardText] = useState('')
   const [holeText, setHoleText] = useState('')
   const [isRemovePlayerDialogOpen, setIsRemovePlayerDialogOpen] = useState(false)
+  const [isCloseTableDialogOpen, setIsCloseTableDialogOpen] = useState(false)
 
   const currentHand = useMemo(() => {
     if (!selectedTable) return null
@@ -322,9 +314,15 @@ export const TableDetail = () => {
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
+      setIsCloseTableDialogOpen(false)
     } catch (err) {
       setStatus((err as Error).message)
     }
+  }
+
+  const handleRequestCloseTable = () => {
+    if (!selectedTable) return
+    setIsCloseTableDialogOpen(true)
   }
 
   const handleTimeout = async () => {
@@ -529,7 +527,7 @@ export const TableDetail = () => {
               openTableDisabled={openTableDisabled}
               openTableDisabledReason={openTableDisabledReason}
               onOpenTable={handleOpenTable}
-              onCloseTable={handleCloseTable}
+              onCloseTable={handleRequestCloseTable}
               closeTableDisabled={!token}
             />
           )}
@@ -575,24 +573,24 @@ export const TableDetail = () => {
           )}
         </div>
       </div>
-      <Dialog open={isRemovePlayerDialogOpen} onOpenChange={setIsRemovePlayerDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('detail.removePlayerConfirmTitle')}</DialogTitle>
-            <DialogDescription>
-              {t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: seatNo })}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="ghost">{t('dialog.cancel')}</Button>
-            </DialogClose>
-            <Button variant="danger" onClick={handleRemovePlayer}>
-              {t('dialog.confirm')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={isRemovePlayerDialogOpen}
+        onOpenChange={setIsRemovePlayerDialogOpen}
+        title={t('detail.removePlayerConfirmTitle')}
+        description={t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: seatNo })}
+        cancelLabel={t('dialog.cancel')}
+        confirmLabel={t('dialog.confirm')}
+        onConfirm={handleRemovePlayer}
+      />
+      <ConfirmDialog
+        open={isCloseTableDialogOpen}
+        onOpenChange={setIsCloseTableDialogOpen}
+        title={t('detail.confirmCloseTableTitle')}
+        description={t('detail.confirmCloseTable', { table: selectedTable?.name || selectedTable?.id || '' })}
+        cancelLabel={t('dialog.cancel')}
+        confirmLabel={t('dialog.confirm')}
+        onConfirm={handleCloseTable}
+      />
     </Panel>
   )
 }

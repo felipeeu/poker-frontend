@@ -1,0 +1,49 @@
+import { Button } from './button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog'
+
+type ConfirmDialogProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description: string
+  confirmLabel: string
+  cancelLabel: string
+  onConfirm: () => void
+  confirmVariant?: 'primary' | 'ghost' | 'danger'
+}
+
+export const ConfirmDialog = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel,
+  cancelLabel,
+  onConfirm,
+  confirmVariant = 'danger',
+}: ConfirmDialogProps) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>{title}</DialogTitle>
+        <DialogDescription>{description}</DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button variant="ghost">{cancelLabel}</Button>
+        </DialogClose>
+        <Button variant={confirmVariant} onClick={onConfirm}>
+          {confirmLabel}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+)

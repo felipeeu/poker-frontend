@@ -3,6 +3,7 @@ import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
 import { Button } from '../shared/ui/button'
+import { ConfirmDialog } from '../shared/ui/confirm-dialog'
 import { Input } from '../shared/ui/input'
 import { Panel } from '../shared/ui/panel'
 
@@ -26,6 +27,7 @@ export const AuthPanel = () => {
   const [email, setEmail] = useState('admin@example.com')
   const [password, setPassword] = useState('Secret123!')
   const [generatedUser, setGeneratedUser] = useState<{ email: string; password: string } | null>(null)
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
 
   const handleUseGeneratedUser = () => {
     if (!generatedUser) return
@@ -111,6 +113,10 @@ export const AuthPanel = () => {
     }
   }
 
+  const handleRequestLogout = () => {
+    setIsLogoutDialogOpen(true)
+  }
+
   return (
     <Panel className="h-fit">
       <h2 className="m-0 text-2xl font-semibold">{t('auth.title')}</h2>
@@ -135,7 +141,7 @@ export const AuthPanel = () => {
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
           <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
           <strong className="mt-2 block text-sm">{userId || t('auth.unknown')}</strong>
-          <Button className="mt-4" variant="ghost" size="sm" onClick={handleLogout}>{t('auth.logout')}</Button>
+          <Button className="mt-4" variant="ghost" size="sm" onClick={handleRequestLogout}>{t('auth.logout')}</Button>
         </div>
       )}
       {generatedUser && (
@@ -149,6 +155,15 @@ export const AuthPanel = () => {
         </div>
       )}
       {status && <p className="mt-4 text-sm text-rose-200">{status}</p>}
+      <ConfirmDialog
+        open={isLogoutDialogOpen}
+        onOpenChange={setIsLogoutDialogOpen}
+        title={t('auth.confirmLogoutTitle')}
+        description={t('auth.confirmLogoutDescription')}
+        cancelLabel={t('dialog.cancel')}
+        confirmLabel={t('dialog.confirm')}
+        onConfirm={handleLogout}
+      />
     </Panel>
   )
 }
