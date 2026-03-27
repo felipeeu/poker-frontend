@@ -41,3 +41,25 @@ Update:
 
 Update:
 - Reworked the header into a more game-like lobby bar with a brand mark, live status chips, and a compact control deck for API/language settings.
+
+Update:
+- Refined mobile seat-chip styling so player badges read as compact table tokens instead of just scaled-down desktop cards.
+- Tightened chip width, padding, avatar sizing, and status pill sizing at phone breakpoints, and stacked the optional meta row vertically when space gets tight.
+
+Update:
+- Focused on mobile table styling in src/App.css.
+- Gave the felt a stable minimum height and reserved center spacing so seats stay around the board on phones.
+- Tightened phone-scale seat chip transforms and widths, and centered the card rows for narrower layouts.
+
+Update:
+- Split the table presentation into desktop and mobile layouts in TableDetail.
+- Kept the existing absolute seat ring for desktop and added a mobile top-center-bottom seat flow around the shared table-center content.
+- Reworked the mobile CSS so chips render in flexible rows above and below the cards instead of overlapping them.
+
+Update:
+- Extended the mobile/tablet table layout breakpoint to 1024px so seat chips stop overlapping the center cards in the 1024-760 range.
+
+Update:
+- Started the Tailwind migration on TableDetail.
+- Replaced the old panel/button/input/status/control-card class stack with shared Tailwind UI primitives.
+- Removed the matching unused table/control CSS from App.css; the felt, cards, and seat-chip visuals remain on legacy CSS for the next pass.

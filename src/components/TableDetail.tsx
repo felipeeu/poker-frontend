@@ -4,6 +4,10 @@ import { useApi } from '../api/useApi'
 import { Card } from './Card'
 import { useAppStore } from '../state/useAppStore'
 import type { CurrentHand, Seat, Table } from '../types'
+import { Panel } from '../shared/ui/panel'
+import { Button } from '../shared/ui/button'
+import { Input } from '../shared/ui/input'
+import { Badge } from '../shared/ui/badge'
 
 export const TableDetail = () => {
   const api = useApi()
@@ -424,128 +428,88 @@ export const TableDetail = () => {
 
   if (!selectedTable) {
     return (
-      <section className="panel panel--detail">
+      <Panel className="min-h-[420px]">
         <h2>{t('detail.title')}</h2>
-        <p className="muted">{t('detail.empty')}</p>
-      </section>
+        <p className="text-sm text-[var(--color-muted)]">{t('detail.empty')}</p>
+      </Panel>
     )
   }
 
   return (
-    <section className="panel panel--detail panel--table">
+    <Panel className="min-h-[420px] bg-[radial-gradient(circle_at_top,rgba(217,177,95,0.08),transparent_18%),rgba(19,29,22,0.88)]">
       <h2>{t('detail.title')}</h2>
-      <div className="table-detail">
-        <div className="table-arena">
-          <div className="table-guidance">
-            <div className="table-guidance__card">
+      <div className="grid gap-[18px]">
+        <div className="grid gap-[18px]">
+          <div className="grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)] max-[1024px]:grid-cols-1">
+            <div className="rounded-2xl border border-[rgba(217,177,95,0.18)] bg-[linear-gradient(135deg,rgba(217,177,95,0.12),rgba(15,23,42,0.62))] px-4 py-3.5">
               <strong>{t('detail.nextStepTitle')}</strong>
-              <p>{nextStepMessage}</p>
+              <p className="m-0 mt-1.5">{nextStepMessage}</p>
             </div>
-            <div className="table-guidance__card table-guidance__card--subtle">
+            <div className="rounded-2xl border border-[var(--color-border)] bg-[rgba(8,18,13,0.56)] px-4 py-3.5">
               <strong>{t('detail.activePlayersLabel')}</strong>
-              <p>{t('detail.activePlayersValue', { count: activeSeatCount })}</p>
+              <p className="m-0 mt-1.5">{t('detail.activePlayersValue', { count: activeSeatCount })}</p>
             </div>
           </div>
-          <div className="table-status">
-            <div className="pill">{t('detail.status', { status: selectedTable.status || t('tables.unknown') })}</div>
-            <div className="pill pill--ghost">{t('detail.hand', { status: handStatus })}</div>
-            <div className="pill pill--ghost">{t('detail.street', { street })}</div>
-            <div className="pill pill--ghost">{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</div>
-            {isHandFinished && <div className="pill pill--accent">{t('detail.gameFinished')}</div>}
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Badge variant="accent">{t('detail.status', { status: selectedTable.status || t('tables.unknown') })}</Badge>
+            <Badge>{t('detail.hand', { status: handStatus })}</Badge>
+            <Badge>{t('detail.street', { street })}</Badge>
+            <Badge>{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</Badge>
+            {isHandFinished && <Badge variant="success">{t('detail.gameFinished')}</Badge>}
           </div>
-          <div className="table-meta">
-            <div className="detail-row">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-2 max-[1024px]:grid-cols-1">
+            <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
               <span>{t('detail.id')}</span>
               <strong>{selectedTable.id}</strong>
             </div>
-            <div className="detail-row">
+            <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
               <span>{t('detail.handLabel')}</span>
               <strong>{handStatus}</strong>
             </div>
-            <div className="detail-row">
+            <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
               <span>{t('detail.streetLabel')}</span>
               <strong>{street}</strong>
             </div>
-            <div className="detail-row">
+            <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
               <span>{t('detail.actorSeat')}</span>
               <strong>{actorSeatNo ?? '-'}</strong>
             </div>
-            <div className="detail-row">
+            <div className="detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5">
               <span>{t('detail.seats')}</span>
               <strong>{selectedTable.seats?.length || 0}</strong>
             </div>
           </div>
           <div className="table-felt">
             <div className="table-felt__rail" />
-            <SeatLayout
+            <DesktopSeatLayout
               seats={displaySeats}
               actorSeatNo={actorSeatNo}
               dealerSeat={handDealerSeat}
               smallBlindSeat={smallBlindSeat}
               bigBlindSeat={bigBlindSeat}
             />
-            <div className="table-center">
-              <div className="cards-panel">
-                <div className="cards-panel__row">
-                  <div className="cards-panel__head">
-                    <h3>{t('detail.board')}</h3>
-                    <span className="muted">{board?.length || 0} / 5</span>
-                  </div>
-                  <div className="card-row">
-                    {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map(
-                      (card, idx) => (
-                        <Card key={`board-${idx}`} value={card} faceDown={!card} />
-                      ),
-                    )}
-                  </div>
-                  <div className="cards-panel__meta">
-                    <div className="detail-row">
-                      <span>{t('detail.potLabel')}</span>
-                      <strong>{typeof pot === 'number' ? pot : 0}</strong>
-                    </div>
-                    {sidePots && sidePots.length > 0 && (
-                      <div className="detail-row detail-row--stack">
-                        <span>{t('detail.sidePots')}</span>
-                        <div className="stack">
-                          {sidePots.map((side, idx) => (
-                            <div key={`side-pot-${idx}`} className="pill pill--ghost">
-                              {t('detail.sidePotSeats', {
-                                index: idx + 1,
-                                amount: side.amount,
-                                seats: side['eligible-seat-nos'].join(', '),
-                              })}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="cards-panel__row">
-                  <div className="cards-panel__head">
-                    <h3>{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
-                    <span className="muted">{seatHoleCards?.length || 0} / 2</span>
-                  </div>
-                  <div className="card-row">
-                    {(seatHoleCards && seatHoleCards.length > 0
-                      ? seatHoleCards
-                      : Array.from({ length: 2 }).map(() => undefined)
-                    ).map((card, idx) => (
-                      <Card key={`hole-${idx}`} value={card} faceDown={!card} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TableCenter
+              board={board}
+              pot={pot}
+              sidePots={sidePots}
+              mySeatNo={mySeatNo}
+              seatHoleCards={seatHoleCards}
+            />
+            <MobileSeatLayout
+              seats={displaySeats}
+              actorSeatNo={actorSeatNo}
+              dealerSeat={handDealerSeat}
+              smallBlindSeat={smallBlindSeat}
+              bigBlindSeat={bigBlindSeat}
+            />
           </div>
         </div>
-        <div className="control-rail">
-          <div className="seat-actions">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))] max-[1024px]:grid-cols-1">
+          <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
             <h3>{t('detail.seatActions')}</h3>
-            <div className="seat-grid">
-              <label>{t('detail.seatNo')}</label>
-              <input
+            <div className="mb-3 grid grid-cols-1 gap-1.5">
+              <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.seatNo')}</label>
+              <Input
                 type="number"
                 min={1}
                 value={seatNo}
@@ -553,8 +517,8 @@ export const TableDetail = () => {
               />
               {!hasOwnedSeat && (
                 <>
-                  <label>{t('detail.playerName')}</label>
-                  <input
+                  <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.playerName')}</label>
+                  <Input
                     type="text"
                     value={seatName}
                     onChange={(e) => setSeatName(e.target.value)}
@@ -562,99 +526,100 @@ export const TableDetail = () => {
                   />
                 </>
               )}
-              <label>{t('detail.stack')}</label>
-              <input
+              <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.stack')}</label>
+              <Input
                 type="number"
                 min={0}
                 value={seatStack}
                 onChange={(e) => setSeatStack(Number(e.target.value))}
               />
-              <label>{t('detail.buyIn')}</label>
-              <input
+              <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.buyIn')}</label>
+              <Input
                 type="number"
                 min={0}
                 value={buyInAmount}
                 onChange={(e) => setBuyInAmount(Number(e.target.value))}
               />
             </div>
-            <div className="actions">
-              <button
-                className="btn btn--small"
+            <div className="flex flex-wrap gap-3 [&>button]:min-w-[calc(50%-6px)]">
+              <Button
+                size="sm"
                 onClick={handleJoinSeat}
                 disabled={joinSeatDisabled}
                 title={joinSeatDisabledReason}
               >
                 {t('detail.joinSeat')}
-              </button>
-              <button className="btn btn--ghost btn--small" onClick={handleBuyIn} disabled={!token}>{t('detail.buyInAction')}</button>
-              <button className="btn btn--ghost btn--small" onClick={handleLeaveSeat} disabled={!token}>{t('detail.leaveSeat')}</button>
-              <button
-                className="btn btn--ghost btn--small"
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleBuyIn} disabled={!token}>{t('detail.buyInAction')}</Button>
+              <Button variant="ghost" size="sm" onClick={handleLeaveSeat} disabled={!token}>{t('detail.leaveSeat')}</Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleRemovePlayer}
                 disabled={!canRemovePlayer}
                 title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
               >
                 {t('detail.removePlayer')}
-              </button>
-              <button className="btn btn--ghost btn--small" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</button>
-              <button className="btn btn--ghost btn--small" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</button>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleSitOut} disabled={!token}>{t('detail.sitOut')}</Button>
+              <Button variant="ghost" size="sm" onClick={handleSitIn} disabled={!token}>{t('detail.sitIn')}</Button>
             </div>
-            {joinSeatDisabled && <p className="inline-hint">{joinSeatDisabledReason}</p>}
+            {joinSeatDisabled && <p className="mt-2.5 text-sm text-[var(--color-muted)]">{joinSeatDisabledReason}</p>}
           </div>
 
-          <div className="seat-actions">
+          <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
             <h3>{t('detail.tableControls')}</h3>
-            <div className="actions">
-              <button
-                className="btn btn--small"
+            <div className="flex flex-wrap gap-3">
+              <Button
+                size="sm"
                 onClick={handleOpenTable}
                 disabled={openTableDisabled}
                 title={openTableDisabledReason}
               >
                 {t('detail.openTable')}
-              </button>
-              <button className="btn btn--ghost btn--small" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</button>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleCloseTable} disabled={!token}>{t('detail.closeTable')}</Button>
             </div>
-            {openTableDisabled && <p className="inline-hint">{openTableDisabledReason}</p>}
+            {openTableDisabled && <p className="mt-2.5 text-sm text-[var(--color-muted)]">{openTableDisabledReason}</p>}
           </div>
 
           {isAdmin && (
-            <div className="seat-actions">
+            <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
               <h3>{t('detail.handControls')}</h3>
-              <div className="seat-grid">
-                <label>{t('detail.dealerSeat')}</label>
-                <input
+              <div className="mb-3 grid grid-cols-1 gap-1.5">
+                <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.dealerSeat')}</label>
+                <Input
                   type="number"
                   min={1}
                   value={dealerSeat}
                   onChange={(e) => setDealerSeat(Number(e.target.value))}
                 />
               </div>
-              <div className="actions">
-                <button className="btn btn--small" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</button>
-                <button className="btn btn--ghost btn--small" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</button>
-                <button className="btn btn--ghost btn--small" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</button>
-                <button className="btn btn--ghost btn--small" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</button>
+              <div className="flex flex-wrap gap-3">
+                <Button size="sm" onClick={handleStartHand} disabled={!token}>{t('detail.startHand')}</Button>
+                <Button variant="ghost" size="sm" onClick={handleResolve} disabled={!token}>{t('detail.resolveShowdown')}</Button>
+                <Button variant="ghost" size="sm" onClick={handleTimeout} disabled={!token}>{t('detail.timeout')}</Button>
+                <Button variant="ghost" size="sm" onClick={handleNextHand} disabled={!token}>{t('detail.nextHand')}</Button>
               </div>
             </div>
           )}
 
-          <div className="seat-actions">
+          <div className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
             <h3>{t('detail.yourTurn')}</h3>
             {hasSeatConflict && (
-              <p className="error">{t('detail.seatConflict')}</p>
+              <p className="mt-2.5 text-[var(--color-danger)]">{t('detail.seatConflict')}</p>
             )}
             {!mySeatNo && !hasSeatConflict && (
-              <p className="muted">{t('detail.joinToPlay')}</p>
+              <p className="text-sm text-[var(--color-muted)]">{t('detail.joinToPlay')}</p>
             )}
             {mySeatNo && !isMyTurn && (
-              <p className="muted">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
+              <p className="text-sm text-[var(--color-muted)]">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
             )}
-            <div className="seat-grid">
-              <label>{t('detail.yourSeat')}</label>
-              <input type="text" value={mySeatNo ?? '—'} disabled />
-              <label>{t('detail.amount')}</label>
-              <input
+            <div className="mb-3 grid grid-cols-1 gap-1.5">
+              <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.yourSeat')}</label>
+              <Input type="text" value={mySeatNo ?? '—'} disabled />
+              <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.amount')}</label>
+              <Input
                 type="number"
                 min={0}
                 value={actionAmount}
@@ -662,63 +627,134 @@ export const TableDetail = () => {
                 disabled={!(canBet || canRaise || canAllIn) || !isMyTurn || hasSeatConflict}
               />
             </div>
-            <div className="actions">
+            <div className="flex flex-wrap gap-3">
               {legalForSeat && legalForSeat.length > 0 ? (
                 legalForSeat.map((action) => (
-                  <button
+                  <Button
                     key={action}
-                    className={`btn btn--small ${action === 'bet' || action === 'raise' || action === 'all-in' ? 'btn--ghost' : ''}`}
+                    variant={action === 'bet' || action === 'raise' || action === 'all-in' ? 'ghost' : 'primary'}
+                    size="sm"
                     onClick={() => submitAction(action)}
                     disabled={!token || !isMyTurn || hasSeatConflict}
                   >
                     {action === 'all-in' ? 'All-in' : action.charAt(0).toUpperCase() + action.slice(1)}
-                  </button>
+                  </Button>
                 ))
               ) : (
-                <span className="muted">{t('detail.noLegalActions')}</span>
+                <span className="text-sm text-[var(--color-muted)]">{t('detail.noLegalActions')}</span>
               )}
             </div>
-            <p className="inline-hint">{actionMessage}</p>
+            <p className="mt-2.5 text-sm text-[var(--color-muted)]">{actionMessage}</p>
             {legalForSeat && (
-              <p className="muted">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
+              <p className="text-sm text-[var(--color-muted)]">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
             )}
           </div>
 
           {isAdmin && (
-            <details className="seat-actions">
-              <summary className="summary">{t('detail.adminDebug')}</summary>
-              <div className="actions">
-                <button className="btn btn--ghost btn--small" onClick={handleLoadDemoSeats}>
+            <details className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
+              <summary className="mb-3 cursor-pointer font-semibold marker:text-[var(--color-muted)]">{t('detail.adminDebug')}</summary>
+              <div className="flex flex-wrap gap-3">
+                <Button variant="ghost" size="sm" onClick={handleLoadDemoSeats}>
                   {t('detail.loadDemoSeats')}
-                </button>
+                </Button>
               </div>
-              <div className="seat-grid">
-                <label>{t('detail.boardCards')}</label>
-                <input
+              <div className="mb-3 grid grid-cols-1 gap-1.5">
+                <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.boardCards')}</label>
+                <Input
                   placeholder={t('detail.boardCardsPlaceholder')}
                   value={boardText}
                   onChange={(e) => setBoardText(e.target.value)}
                 />
-                <label>{t('detail.holeCardsSeatInput')}</label>
-                <input
+                <label className="text-sm font-medium text-[var(--color-foreground)]">{t('detail.holeCardsSeatInput')}</label>
+                <Input
                   placeholder={t('detail.holeCardsPlaceholder')}
                   value={holeText}
                   onChange={(e) => setHoleText(e.target.value)}
                 />
               </div>
-              <div className="actions">
-                <button className="btn btn--ghost btn--small" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</button>
+              <div className="flex flex-wrap gap-3">
+                <Button variant="ghost" size="sm" onClick={handleSetCards} disabled={!token}>{t('detail.setCards')}</Button>
               </div>
-              <p className="muted">{t('detail.manualCardInjection')}</p>
+              <p className="text-sm text-[var(--color-muted)]">{t('detail.manualCardInjection')}</p>
             </details>
           )}
         </div>
       </div>
-    </section>
+    </Panel>
   )
 }
 
-const SeatLayout = ({
+const TableCenter = ({
+  board,
+  pot,
+  sidePots,
+  mySeatNo,
+  seatHoleCards,
+}: {
+  board?: string[]
+  pot?: number
+  sidePots?: Array<{ amount: number; 'eligible-seat-nos': number[] }>
+  mySeatNo?: number
+  seatHoleCards?: string[]
+}) => {
+  const { t } = useI18n()
+
+  return (
+    <div className="table-center">
+      <div className="cards-panel">
+        <div className="cards-panel__row">
+          <div className="cards-panel__head">
+            <h3>{t('detail.board')}</h3>
+            <span className="muted">{board?.length || 0} / 5</span>
+          </div>
+          <div className="card-row">
+            {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map((card, idx) => (
+              <Card key={`board-${idx}`} value={card} faceDown={!card} />
+            ))}
+          </div>
+          <div className="cards-panel__meta">
+            <div className="detail-row">
+              <span>{t('detail.potLabel')}</span>
+              <strong>{typeof pot === 'number' ? pot : 0}</strong>
+            </div>
+            {sidePots && sidePots.length > 0 && (
+              <div className="detail-row detail-row--stack">
+                <span>{t('detail.sidePots')}</span>
+                <div className="stack">
+                  {sidePots.map((side, idx) => (
+                    <div key={`side-pot-${idx}`} className="pill pill--ghost">
+                      {t('detail.sidePotSeats', {
+                        index: idx + 1,
+                        amount: side.amount,
+                        seats: side['eligible-seat-nos'].join(', '),
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="cards-panel__row">
+          <div className="cards-panel__head">
+            <h3>{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
+            <span className="muted">{seatHoleCards?.length || 0} / 2</span>
+          </div>
+          <div className="card-row">
+            {(seatHoleCards && seatHoleCards.length > 0 ? seatHoleCards : Array.from({ length: 2 }).map(() => undefined)).map(
+              (card, idx) => (
+                <Card key={`hole-${idx}`} value={card} faceDown={!card} />
+              ),
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const DesktopSeatLayout = ({
   seats,
   actorSeatNo,
   dealerSeat,
@@ -735,65 +771,141 @@ const SeatLayout = ({
   const positions = seatPositions(seats.length)
 
   return (
-    <div className="seat-layout">
+    <div className="seat-layout seat-layout--desktop">
       {seats.length === 0 && <p className="muted">{t('detail.noSeatsYet')}</p>}
       {seats.map((seat) => {
-      const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
-      const user = seat['user-id'] ?? seat.user_id ?? t('detail.emptySeatUser')
-      const displayName = seat.name ?? user
-      const stack = seat.stack ?? 0
-      const committed = (seat as Seat & { 'committed-total'?: number; committed_total?: number })[
-        'committed-total'
-      ] ?? (seat as Seat & { committed_total?: number }).committed_total ?? 0
-      const sittingOut = Boolean(seat['sitting-out?'] ?? seat.sitting_out)
-      const isActor = actorSeatNo === seatNo
-      const isMine = user !== t('detail.emptySeatUser') && user === useAppStore.getState().userId
-      const isDealer = dealerSeat === seatNo
-      const isSmallBlind = smallBlindSeat === seatNo
-      const isBigBlind = bigBlindSeat === seatNo
-      const position = positions[seatNo - 1] ?? positions[0] ?? { x: 50, y: 50 }
-      const shortName = truncateSeatName(displayName)
-      const avatarLabel = seatAvatarLabel(displayName)
-      const slotClasses = ['seat-slot']
-      if (position.y <= 20) slotClasses.push('seat-slot--far')
-      else if (position.y >= 82) slotClasses.push('seat-slot--near')
-      else slotClasses.push('seat-slot--mid')
-      return (
-        <div
-          key={seatNo}
-          className={slotClasses.join(' ')}
-          style={{ left: `${position.x}%`, top: `${position.y}%` }}
-        >
+        const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
+        const position = positions[seatNo - 1] ?? positions[0] ?? { x: 50, y: 50 }
+        const slotClasses = ['seat-slot']
+        if (position.y <= 20) slotClasses.push('seat-slot--far')
+        else if (position.y >= 82) slotClasses.push('seat-slot--near')
+        else slotClasses.push('seat-slot--mid')
+
+        return (
           <div
-            className={`seat-chip ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}
+            key={seatNo}
+            className={slotClasses.join(' ')}
+            style={{ left: `${position.x}%`, top: `${position.y}%` }}
           >
-            <div className="seat-chip__head">
-              <span className="seat-chip__seat">{t('detail.seatTag', { seat: seatNo })}</span>
-              <div className="pill-row">
-                {isMine && <span className="pill pill--accent">{t('detail.you')}</span>}
-                {isActor && <span className="pill">{t('detail.acting')}</span>}
-                {isDealer && <span className="pill pill--dealer">D</span>}
-                {isSmallBlind && <span className="pill pill--blind">SB</span>}
-                {isBigBlind && <span className="pill pill--blind">BB</span>}
-              </div>
-            </div>
-            <div className="seat-chip__body" title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}>
-              <span className="seat-chip__avatar" aria-hidden="true">{avatarLabel}</span>
-              <div className="seat-chip__info">
-                <strong className="seat-chip__user">{shortName}</strong>
-                <span className="seat-chip__stack">{t('detail.stackShort', { value: stack })}</span>
-              </div>
-            </div>
-            {(sittingOut || committed > 0) && (
-              <div className="seat-chip__meta">
-                {sittingOut && <span className="pill pill--ghost">{t('detail.sittingOut')}</span>}
-                {committed > 0 && <span className="seat-chip__committed">{t('detail.committedShort', { value: committed })}</span>}
-              </div>
-            )}
+            <SeatChip
+              seat={seat}
+              actorSeatNo={actorSeatNo}
+              dealerSeat={dealerSeat}
+              smallBlindSeat={smallBlindSeat}
+              bigBlindSeat={bigBlindSeat}
+            />
           </div>
-        </div>
-      )
+        )
       })}
+    </div>
+  )
+}
+
+const MobileSeatLayout = ({
+  seats,
+  actorSeatNo,
+  dealerSeat,
+  smallBlindSeat,
+  bigBlindSeat,
+}: {
+  seats: Seat[]
+  actorSeatNo?: number
+  dealerSeat?: number
+  smallBlindSeat?: number
+  bigBlindSeat?: number
+}) => {
+  const { topSeats, bottomSeats } = useMemo(() => splitSeatsForMobile(seats), [seats])
+  const { t } = useI18n()
+
+  return (
+    <div className="seat-layout-mobile">
+      <div className="seat-layout-mobile__row seat-layout-mobile__row--top">
+        {topSeats.length > 0 ? (
+          topSeats.map((seat) => (
+            <SeatChip
+              key={seat['seat-no'] ?? seat.seat_no}
+              seat={seat}
+              actorSeatNo={actorSeatNo}
+              dealerSeat={dealerSeat}
+              smallBlindSeat={smallBlindSeat}
+              bigBlindSeat={bigBlindSeat}
+            />
+          ))
+        ) : (
+          <p className="muted">{t('detail.noSeatsYet')}</p>
+        )}
+      </div>
+      <div className="seat-layout-mobile__row seat-layout-mobile__row--bottom">
+        {bottomSeats.map((seat) => (
+          <SeatChip
+            key={seat['seat-no'] ?? seat.seat_no}
+            seat={seat}
+            actorSeatNo={actorSeatNo}
+            dealerSeat={dealerSeat}
+            smallBlindSeat={smallBlindSeat}
+            bigBlindSeat={bigBlindSeat}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+const SeatChip = ({
+  seat,
+  actorSeatNo,
+  dealerSeat,
+  smallBlindSeat,
+  bigBlindSeat,
+}: {
+  seat: Seat
+  actorSeatNo?: number
+  dealerSeat?: number
+  smallBlindSeat?: number
+  bigBlindSeat?: number
+}) => {
+  const { t } = useI18n()
+  const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
+  const user = seat['user-id'] ?? seat.user_id ?? t('detail.emptySeatUser')
+  const displayName = seat.name ?? user
+  const stack = seat.stack ?? 0
+  const committed = (seat as Seat & { 'committed-total'?: number; committed_total?: number })['committed-total'] ??
+    (seat as Seat & { committed_total?: number }).committed_total ??
+    0
+  const sittingOut = Boolean(seat['sitting-out?'] ?? seat.sitting_out)
+  const isActor = actorSeatNo === seatNo
+  const isMine = user !== t('detail.emptySeatUser') && user === useAppStore.getState().userId
+  const isDealer = dealerSeat === seatNo
+  const isSmallBlind = smallBlindSeat === seatNo
+  const isBigBlind = bigBlindSeat === seatNo
+  const shortName = truncateSeatName(displayName)
+  const avatarLabel = seatAvatarLabel(displayName)
+
+  return (
+    <div className={`seat-chip ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}>
+      <div className="seat-chip__head">
+        <span className="seat-chip__seat">{t('detail.seatTag', { seat: seatNo })}</span>
+        <div className="pill-row">
+          {isMine && <Badge variant="success" className="px-2 py-0.5 text-[9px] tracking-[0.14em]">{t('detail.you')}</Badge>}
+          {isActor && <Badge className="px-2 py-0.5 text-[9px] tracking-[0.14em]">{t('detail.acting')}</Badge>}
+          {isDealer && <Badge variant="accent" className="px-2 py-0.5 text-[9px] tracking-[0.14em]">D</Badge>}
+          {isSmallBlind && <Badge variant="warning" className="px-2 py-0.5 text-[9px] tracking-[0.14em]">SB</Badge>}
+          {isBigBlind && <Badge variant="warning" className="px-2 py-0.5 text-[9px] tracking-[0.14em]">BB</Badge>}
+        </div>
+      </div>
+      <div className="seat-chip__body" title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}>
+        <span className="seat-chip__avatar" aria-hidden="true">{avatarLabel}</span>
+        <div className="seat-chip__info">
+          <strong className="seat-chip__user">{shortName}</strong>
+          <span className="seat-chip__stack">{t('detail.stackShort', { value: stack })}</span>
+        </div>
+      </div>
+      {(sittingOut || committed > 0) && (
+        <div className="seat-chip__meta">
+          {sittingOut && <Badge className="px-2 py-0.5 text-[9px] tracking-[0.14em]">{t('detail.sittingOut')}</Badge>}
+          {committed > 0 && <span className="seat-chip__committed">{t('detail.committedShort', { value: committed })}</span>}
+        </div>
+      )}
     </div>
   )
 }
@@ -825,6 +937,26 @@ const seatPositions = (count: number) => {
           y: 50 + Math.sin(angle) * 38,
         }
       })
+  }
+}
+
+const splitSeatsForMobile = (seats: Seat[]) => {
+  const positions = seatPositions(seats.length)
+  const mappedSeats = seats.map((seat) => {
+    const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
+    const position = positions[Math.max(seatNo - 1, 0)] ?? { x: 50, y: 50 }
+    return { seat, position }
+  })
+
+  return {
+    topSeats: mappedSeats
+      .filter(({ position }) => position.y <= 50)
+      .sort((a, b) => a.position.x - b.position.x)
+      .map(({ seat }) => seat),
+    bottomSeats: mappedSeats
+      .filter(({ position }) => position.y > 50)
+      .sort((a, b) => a.position.x - b.position.x)
+      .map(({ seat }) => seat),
   }
 }
 
