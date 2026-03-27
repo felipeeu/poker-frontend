@@ -8,6 +8,7 @@ import { Panel } from '../shared/ui/panel'
 
 type AuthResponse = {
   'access-token'?: string
+  'refresh-token'?: string
   'user-id'?: string
   role?: string
 }
@@ -16,6 +17,7 @@ export const AuthPanel = () => {
   const api = useApi()
   const { t } = useI18n()
   const token = useAppStore((state) => state.token)
+  const refreshToken = useAppStore((state) => state.refreshToken)
   const userId = useAppStore((state) => state.userId)
   const status = useAppStore((state) => state.status)
   const setAuth = useAppStore((state) => state.setAuth)
@@ -39,7 +41,7 @@ export const AuthPanel = () => {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       })
-      setAuth(body['access-token'] || '', body['user-id'] || '', body.role || '')
+      setAuth(body['access-token'] || '', body['refresh-token'] || '', body['user-id'] || '', body.role || '')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -86,10 +88,26 @@ export const AuthPanel = () => {
         method: 'POST',
         body: JSON.stringify({ email: nextEmail, password: nextPassword }),
       })
-      setAuth(body['access-token'] || '', body['user-id'] || '', body.role || '')
+      setAuth(body['access-token'] || '', body['refresh-token'] || '', body['user-id'] || '', body.role || '')
       setGeneratedUser({ email: nextEmail, password: nextPassword })
     } catch (err) {
       setStatus((err as Error).message)
+    }
+  }
+
+  const handleLogout = async () => {
+    setStatus('')
+    try {
+      if (refreshToken) {
+        await api.request('/api/auth/logout', {
+          method: 'POST',
+          body: JSON.stringify({ 'refresh-token': refreshToken }),
+        })
+      }
+    } catch (err) {
+      setStatus((err as Error).message)
+    } finally {
+      clearAuth()
     }
   }
 
@@ -117,7 +135,7 @@ export const AuthPanel = () => {
         <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
           <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
           <strong className="mt-2 block text-sm">{userId || t('auth.unknown')}</strong>
-          <Button className="mt-4" variant="ghost" size="sm" onClick={clearAuth}>{t('auth.logout')}</Button>
+          <Button className="mt-4" variant="ghost" size="sm" onClick={handleLogout}>{t('auth.logout')}</Button>
         </div>
       )}
       {generatedUser && (

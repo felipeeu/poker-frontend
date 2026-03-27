@@ -7,6 +7,7 @@ const DEFAULT_API = 'http://localhost:8080'
 type AppStore = {
   apiBase: string
   token: string
+  refreshToken: string
   userId: string
   role: string
   locale: Locale
@@ -17,7 +18,7 @@ type AppStore = {
   wsStatus: WsStatus
   setApiBase: (value: string) => void
   setStatus: (value: string) => void
-  setAuth: (token: string, userId: string, role?: string) => void
+  setAuth: (token: string, refreshToken: string, userId: string, role?: string) => void
   setLocale: (locale: Locale) => void
   clearAuth: () => void
   setTables: (tables: Table[]) => void
@@ -39,6 +40,7 @@ const readLocal = (key: string) => {
 export const useAppStore = create<AppStore>((set) => ({
   apiBase: readLocal('poker_api_base') || DEFAULT_API,
   token: readLocal('poker_token'),
+  refreshToken: readLocal('poker_refresh_token'),
   userId: readLocal('poker_user_id'),
   role: readLocal('poker_role'),
   locale: (readLocal('poker_locale') as Locale) || 'en',
@@ -56,15 +58,16 @@ export const useAppStore = create<AppStore>((set) => ({
     set({ apiBase: value })
   },
   setStatus: (value) => set({ status: value }),
-  setAuth: (token, userId, role = '') => {
+  setAuth: (token, refreshToken, userId, role = '') => {
     try {
       localStorage.setItem('poker_token', token)
+      localStorage.setItem('poker_refresh_token', refreshToken)
       localStorage.setItem('poker_user_id', userId)
       localStorage.setItem('poker_role', role)
     } catch {
       // ignore storage errors
     }
-    set({ token, userId, role })
+    set({ token, refreshToken, userId, role })
   },
   setLocale: (locale) => {
     try {
@@ -77,12 +80,13 @@ export const useAppStore = create<AppStore>((set) => ({
   clearAuth: () => {
     try {
       localStorage.removeItem('poker_token')
+      localStorage.removeItem('poker_refresh_token')
       localStorage.removeItem('poker_user_id')
       localStorage.removeItem('poker_role')
     } catch {
       // ignore storage errors
     }
-    set({ token: '', userId: '', role: '', selectedTable: null })
+    set({ token: '', refreshToken: '', userId: '', role: '', selectedTable: null })
   },
   setTables: (tables) => set({ tables }),
   updateTable: (table) =>

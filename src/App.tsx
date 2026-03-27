@@ -26,6 +26,7 @@ const AppLayout = () => {
   const api = useApi()
   const location = useLocation()
   const token = useAppStore((state) => state.token)
+  const refreshToken = useAppStore((state) => state.refreshToken)
   const userId = useAppStore((state) => state.userId)
   const role = useAppStore((state) => state.role)
   const setAuth = useAppStore((state) => state.setAuth)
@@ -40,7 +41,7 @@ const AppLayout = () => {
       .request<{ 'user-id'?: string; role?: string }>('/api/me')
       .then((body) => {
         if (cancelled) return
-        setAuth(token, body['user-id'] || userId, body.role || '')
+        setAuth(token, refreshToken, body['user-id'] || userId, body.role || '')
       })
       .catch(() => {
         // Leave existing auth state untouched when role hydration fails.
@@ -49,7 +50,7 @@ const AppLayout = () => {
     return () => {
       cancelled = true
     }
-  }, [api, role, setAuth, token, userId])
+  }, [api, refreshToken, role, setAuth, token, userId])
 
   return (
     <div className="min-h-screen px-5 py-8 text-[var(--color-foreground)] sm:px-8 lg:px-14 lg:py-12">
