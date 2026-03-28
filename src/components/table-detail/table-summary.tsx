@@ -37,7 +37,7 @@ export const TableSummary = ({
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={phaseTone}>{t('detail.street', { street })}</Badge>
             <Badge variant={actorSeatNo != null ? 'warning' : 'neutral'}>
-              {actorSeatNo != null ? t('detail.actorSeat', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
+              {actorSeatNo != null ? t('detail.actorSeatValue', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
             </Badge>
           </div>
           <strong className="mt-3 block">{t('detail.nextStepTitle')}</strong>

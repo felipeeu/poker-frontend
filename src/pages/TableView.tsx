@@ -91,9 +91,11 @@ export const TableView = () => {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="m-0 text-2xl font-semibold">{t('table.recentEvents')}</h2>
-            <p className="mt-1 text-sm text-[var(--color-muted)]">
-              {tableEvents.length > 0 ? t('table.recentEventsCount', { count: tableEvents.length }) : t('events.none')}
-            </p>
+            {tableEvents.length > 0 ? (
+              <p className="mt-1 text-sm text-[var(--color-muted)]">
+                {t('table.recentEventsCount', { count: tableEvents.length })}
+              </p>
+            ) : null}
           </div>
           {tableEvents.length > 0 ? <Badge variant="accent">{tableEvents[0]?.type}</Badge> : null}
         </div>

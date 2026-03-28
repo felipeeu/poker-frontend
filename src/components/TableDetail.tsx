@@ -530,6 +530,7 @@ export const TableDetail = () => {
               onOpenTable={handleOpenTable}
               onCloseTable={handleRequestCloseTable}
               closeTableDisabled={!token}
+              tableControlsDescription={isTableOpen ? t('detail.tableAlreadyOpen') : t('detail.tableClosedHint')}
             />
           )}
 

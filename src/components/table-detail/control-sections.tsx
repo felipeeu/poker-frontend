@@ -11,6 +11,7 @@ type AdminTableControlsSectionProps = {
   onOpenTable: () => void
   onCloseTable: () => void
   closeTableDisabled: boolean
+  tableControlsDescription?: string
 }
 
 export const AdminTableControlsSection = ({
@@ -19,13 +20,15 @@ export const AdminTableControlsSection = ({
   onOpenTable,
   onCloseTable,
   closeTableDisabled,
+  tableControlsDescription,
 }: AdminTableControlsSectionProps) => {
   const { t } = useI18n()
+  const showDisabledReason = openTableDisabled && openTableDisabledReason !== tableControlsDescription
 
   return (
     <ControlSection
       title={t('detail.tableControls')}
-      description={t('detail.tableClosedHint')}
+      description={tableControlsDescription}
       className="mt-4 border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
       <div className="flex flex-wrap gap-3">
@@ -41,7 +44,7 @@ export const AdminTableControlsSection = ({
           {t('detail.closeTable')}
         </Button>
       </div>
-      {openTableDisabled ? (
+      {showDisabledReason ? (
         <p className="mt-2.5 text-sm text-[var(--color-muted)]">{openTableDisabledReason}</p>
       ) : null}
     </ControlSection>
@@ -284,9 +287,7 @@ export const TurnActionsSection = ({
             disabled={!canSetAmount}
           />
         </FieldGroup>
-        <p className="text-sm text-[var(--color-muted)]">
-          {canSetAmount ? t('detail.chooseActionPrompt') : t('detail.noLegalActionsYet')}
-        </p>
+        {!canSetAmount ? <p className="text-sm text-[var(--color-muted)]">{t('detail.noLegalActionsYet')}</p> : null}
       </div>
       {legalForSeat && legalForSeat.length > 0 ? (
         <div className="grid gap-4">
