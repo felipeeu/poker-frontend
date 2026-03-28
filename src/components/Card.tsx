@@ -1,3 +1,5 @@
+import './poker-card.css'
+
 const SUIT_SYMBOLS: Record<string, string> = {
   S: '♠',
   H: '♥',

@@ -121,3 +121,22 @@ Update:
 TODOs / notes:
 - The remaining question is whether we want to keep the card visuals in CSS, which is reasonable, or migrate those too for complete consistency.
 - The generated CSS bundle continues to grow slightly as more utility classes replace handcrafted CSS; that tradeoff is expected.
+
+Update:
+- Extracted the remaining playing-card styles from `src/App.css` into `src/components/poker-card.css`.
+- `src/components/Card.tsx` now imports the dedicated card stylesheet directly.
+- `src/App.css` is now effectively just the global heading override.
+- `npm run build` still passes after the stylesheet split.
+
+TODOs / notes:
+- The UI migration track is effectively complete. Next work should probably return to product/UI behavior instead of more structural refactoring.
+
+Update:
+- Improved table-screen UX around action clarity and state visibility.
+- Reworked the turn-actions section to show a stronger status header, separate quick actions from amount-based actions, and tie the amount input more clearly to bet/raise/all-in flows.
+- Refined the table summary cards to surface street, actor seat, active players, pot, and seat count more prominently.
+- Tightened the recent-events panel presentation so entries read more like a compact match log.
+- `npm run build` still passes after the UX pass.
+
+TODOs / notes:
+- The next useful product pass would be visual verification in-browser and then polishing any spacing/hierarchy issues exposed by the new control grouping.

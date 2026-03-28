@@ -1,4 +1,5 @@
 import { useI18n } from '../../i18n'
+import { Badge } from '../../components/ui/badge'
 import { Button } from '../../components/ui/button'
 import { FieldGroup, FieldLabel } from '../../components/ui/field-group'
 import { Input } from '../../components/ui/input'
@@ -22,7 +23,11 @@ export const AdminTableControlsSection = ({
   const { t } = useI18n()
 
   return (
-    <ControlSection title={t('detail.tableControls')} className="mt-4">
+    <ControlSection
+      title={t('detail.tableControls')}
+      description={t('detail.tableClosedHint')}
+      className="mt-4 border-white/8 bg-[rgba(12,22,17,0.62)]"
+    >
       <div className="flex flex-wrap gap-3">
         <Button
           size="sm"
@@ -64,8 +69,12 @@ export const AdminHandControlsSection = ({
 }: AdminHandControlsSectionProps) => {
   const { t } = useI18n()
 
-    return (
-    <ControlSection title={t('detail.handControls')} className="mt-4">
+  return (
+    <ControlSection
+      title={t('detail.handControls')}
+      description={t('detail.handControlsAdminOnly')}
+      className="mt-4 border-white/8 bg-[rgba(12,22,17,0.62)]"
+    >
       <FieldGroup className="mb-3">
         <FieldLabel>{t('detail.dealerSeat')}</FieldLabel>
         <Input
@@ -133,7 +142,11 @@ export const PlayerControlsSection = ({
   const { t } = useI18n()
 
   return (
-    <ControlSection title={t('detail.seatActions')} className="mt-4">
+    <ControlSection
+      title={t('detail.seatActions')}
+      description={hasOwnedSeat ? t('detail.alreadySeated') : t('detail.joinToPlay')}
+      className="mt-4"
+    >
       <FieldGroup className="mb-3">
         <FieldLabel>{t('detail.seatNo')}</FieldLabel>
         <Input
@@ -168,21 +181,21 @@ export const PlayerControlsSection = ({
           onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
         />
       </FieldGroup>
-      <div className="flex flex-wrap gap-3 [&>button]:min-w-[calc(50%-6px)]">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Button
-          size="sm"
+          className="w-full"
           onClick={onJoinSeat}
           disabled={joinSeatDisabled}
           title={joinSeatDisabledReason}
         >
           {t('detail.joinSeat')}
         </Button>
-        <Button variant="ghost" size="sm" onClick={onBuyIn} disabled={!hasToken}>{t('detail.buyInAction')}</Button>
-        <Button variant="ghost" size="sm" onClick={onLeaveSeat} disabled={!hasToken}>{t('detail.leaveSeat')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onBuyIn} disabled={!hasToken}>{t('detail.buyInAction')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onLeaveSeat} disabled={!hasToken}>{t('detail.leaveSeat')}</Button>
         {isAdmin ? (
           <Button
+            className="w-full"
             variant="ghost"
-            size="sm"
             onClick={onRemovePlayer}
             disabled={!canRemovePlayer}
             title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
@@ -190,8 +203,8 @@ export const PlayerControlsSection = ({
             {t('detail.removePlayer')}
           </Button>
         ) : null}
-        <Button variant="ghost" size="sm" onClick={onSitOut} disabled={!hasToken}>{t('detail.sitOut')}</Button>
-        <Button variant="ghost" size="sm" onClick={onSitIn} disabled={!hasToken}>{t('detail.sitIn')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onSitOut} disabled={!hasToken}>{t('detail.sitOut')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onSitIn} disabled={!hasToken}>{t('detail.sitIn')}</Button>
       </div>
       {joinSeatDisabled ? (
         <p className="mt-2.5 text-sm text-[var(--color-muted)]">{joinSeatDisabledReason}</p>
@@ -232,9 +245,25 @@ export const TurnActionsSection = ({
   actionMessage,
 }: TurnActionsSectionProps) => {
   const { t } = useI18n()
+  const amountActions = ['bet', 'raise', 'all-in'] as const
+  const canSetAmount = (canBet || canRaise || canAllIn) && isMyTurn && !hasSeatConflict
+  const primaryActions = legalForSeat?.filter((action) =>
+    amountActions.includes(action as (typeof amountActions)[number]),
+  ) ?? []
+  const quickActions = legalForSeat?.filter((action) => !primaryActions.includes(action)) ?? []
 
   return (
-    <ControlSection title={t('detail.yourTurn')} className="mt-4">
+    <ControlSection title={t('detail.yourTurn')} className="mt-4 border-[rgba(217,177,95,0.22)] bg-[linear-gradient(180deg,rgba(23,35,27,0.92),rgba(15,23,42,0.58))]">
+      <div className="mb-4 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant={isMyTurn ? 'accent' : 'neutral'}>
+            {isMyTurn ? t('detail.yourTurnToAct') : t('detail.waitingForActorSeat', { seat: actorSeatNo ?? '-' })}
+          </Badge>
+          {mySeatNo ? <Badge variant="success">{t('detail.yourSeat')}: {mySeatNo}</Badge> : null}
+          {hasSeatConflict ? <Badge variant="danger">{t('detail.seatConflict')}</Badge> : null}
+        </div>
+        <p className="mt-3 text-sm text-[var(--color-muted)]">{actionMessage}</p>
+      </div>
       {hasSeatConflict ? (
         <p className="mt-2.5 text-[var(--color-danger)]">{t('detail.seatConflict')}</p>
       ) : null}
@@ -244,38 +273,68 @@ export const TurnActionsSection = ({
       {mySeatNo && !isMyTurn ? (
         <p className="text-sm text-[var(--color-muted)]">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
       ) : null}
-      <FieldGroup className="mb-3">
-        <FieldLabel>{t('detail.yourSeat')}</FieldLabel>
-        <Input type="text" value={mySeatNo ?? '—'} disabled />
-        <FieldLabel>{t('detail.amount')}</FieldLabel>
-        <Input
-          type="number"
-          min={0}
-          value={actionAmount}
-          onChange={(e) => onActionAmountChange(Number(e.target.value))}
-          disabled={!(canBet || canRaise || canAllIn) || !isMyTurn || hasSeatConflict}
-        />
-      </FieldGroup>
-      <div className="flex flex-wrap gap-3">
-        {legalForSeat && legalForSeat.length > 0 ? (
-          legalForSeat.map((action) => (
-            <Button
-              key={action}
-              variant={action === 'bet' || action === 'raise' || action === 'all-in' ? 'ghost' : 'primary'}
-              size="sm"
-              onClick={() => onSubmitAction(action)}
-              disabled={!hasToken || !isMyTurn || hasSeatConflict}
-            >
-              {action === 'all-in' ? 'All-in' : action.charAt(0).toUpperCase() + action.slice(1)}
-            </Button>
-          ))
-        ) : (
-          <span className="text-sm text-[var(--color-muted)]">{t('detail.noLegalActions')}</span>
-        )}
+      <div className="mb-4 grid gap-3 rounded-2xl border border-white/8 bg-white/4 p-4">
+        <FieldGroup>
+          <FieldLabel>{t('detail.amount')}</FieldLabel>
+          <Input
+            type="number"
+            min={0}
+            value={actionAmount}
+            onChange={(e) => onActionAmountChange(Number(e.target.value))}
+            disabled={!canSetAmount}
+          />
+        </FieldGroup>
+        <p className="text-sm text-[var(--color-muted)]">
+          {canSetAmount ? t('detail.chooseActionPrompt') : t('detail.noLegalActionsYet')}
+        </p>
       </div>
-      <p className="mt-2.5 text-sm text-[var(--color-muted)]">{actionMessage}</p>
+      {legalForSeat && legalForSeat.length > 0 ? (
+        <div className="grid gap-4">
+          {quickActions.length > 0 ? (
+            <div className="grid gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                {t('detail.yourTurn')}
+              </span>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {quickActions.map((action) => (
+                  <Button
+                    key={action}
+                    className="w-full"
+                    onClick={() => onSubmitAction(action)}
+                    disabled={!hasToken || !isMyTurn || hasSeatConflict}
+                  >
+                    {formatActionLabel(action)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {primaryActions.length > 0 ? (
+            <div className="grid gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                {t('detail.amount')}
+              </span>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {primaryActions.map((action) => (
+                  <Button
+                    key={action}
+                    className="w-full"
+                    variant="ghost"
+                    onClick={() => onSubmitAction(action)}
+                    disabled={!hasToken || !isMyTurn || hasSeatConflict}
+                  >
+                    {formatActionLabel(action)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <span className="text-sm text-[var(--color-muted)]">{t('detail.noLegalActions')}</span>
+      )}
       {legalForSeat ? (
-        <p className="text-sm text-[var(--color-muted)]">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
+        <p className="mt-3 text-sm text-[var(--color-muted)]">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
       ) : null}
     </ControlSection>
   )
@@ -303,7 +362,7 @@ export const AdminDebugSection = ({
   const { t } = useI18n()
 
   return (
-    <details className="mt-4 rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5">
+    <details className="mt-4 rounded-2xl border border-white/8 bg-[rgba(15,23,42,0.38)] p-3.5">
       <summary className="mb-3 cursor-pointer font-semibold marker:text-[var(--color-muted)]">{t('detail.adminDebug')}</summary>
       <div className="flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onLoadDemoSeats}>
@@ -330,4 +389,9 @@ export const AdminDebugSection = ({
       <p className="text-sm text-[var(--color-muted)]">{t('detail.manualCardInjection')}</p>
     </details>
   )
+}
+
+const formatActionLabel = (action: string) => {
+  if (action === 'all-in') return 'All-in'
+  return action.charAt(0).toUpperCase() + action.slice(1)
 }

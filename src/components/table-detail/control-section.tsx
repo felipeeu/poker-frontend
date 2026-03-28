@@ -15,12 +15,12 @@ export const ControlSection = ({
 }: ControlSectionProps) => (
   <div
     className={cn(
-      'rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-3.5',
+      'rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]',
       className,
     )}
     {...props}
   >
-    <h3>{title}</h3>
+    <h3 className="m-0 text-base font-semibold text-[var(--color-foreground)]">{title}</h3>
     {description ? <p className="mt-2.5 text-sm text-[var(--color-muted)]">{description}</p> : null}
     {children}
   </div>

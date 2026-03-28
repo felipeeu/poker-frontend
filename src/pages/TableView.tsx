@@ -88,12 +88,25 @@ export const TableView = () => {
       </Panel>
       <TableDetail />
       <Panel className="min-h-0">
-        <h2 className="m-0 text-2xl font-semibold">{t('table.recentEvents')}</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="m-0 text-2xl font-semibold">{t('table.recentEvents')}</h2>
+            <p className="mt-1 text-sm text-[var(--color-muted)]">
+              {tableEvents.length > 0 ? t('table.recentEventsCount', { count: tableEvents.length }) : t('events.none')}
+            </p>
+          </div>
+          {tableEvents.length > 0 ? <Badge variant="accent">{tableEvents[0]?.type}</Badge> : null}
+        </div>
         <div className="mt-5 grid gap-3">
           {tableEvents.map((event, idx) => (
-            <div key={idx} className="rounded-2xl border border-white/8 bg-black/15 p-4">
-              <Badge>{event.type}</Badge>
-              <p className="mt-3 text-sm text-[var(--color-foreground)]">{formatEvent(event)}</p>
+            <div key={idx} className="rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Badge>{event.type}</Badge>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                  #{String(idx + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-[var(--color-foreground)]">{formatEvent(event)}</p>
             </div>
           ))}
           {tableEvents.length === 0 && <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p>}

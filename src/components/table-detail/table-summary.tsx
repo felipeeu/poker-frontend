@@ -28,17 +28,38 @@ export const TableSummary = ({
   seatCount,
 }: TableSummaryProps) => {
   const { t } = useI18n()
+  const phaseTone = handStatus === 'showdown' || isHandFinished ? 'success' : actorSeatNo != null ? 'accent' : 'neutral'
 
   return (
     <>
-      <div className="grid gap-3 md:grid-cols-[minmax(0,2fr)_minmax(220px,1fr)] max-[1024px]:grid-cols-1">
-        <div className="rounded-2xl border border-[rgba(217,177,95,0.18)] bg-[linear-gradient(135deg,rgba(217,177,95,0.12),rgba(15,23,42,0.62))] px-4 py-3.5">
-          <strong>{t('detail.nextStepTitle')}</strong>
-          <p className="m-0 mt-1.5">{nextStepMessage}</p>
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1.6fr)_minmax(240px,1fr)] max-[1024px]:grid-cols-1">
+        <div className="rounded-2xl border border-[rgba(217,177,95,0.18)] bg-[linear-gradient(135deg,rgba(217,177,95,0.14),rgba(15,23,42,0.62))] px-4 py-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={phaseTone}>{t('detail.street', { street })}</Badge>
+            <Badge variant={actorSeatNo != null ? 'warning' : 'neutral'}>
+              {actorSeatNo != null ? t('detail.actorSeat', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
+            </Badge>
+          </div>
+          <strong className="mt-3 block">{t('detail.nextStepTitle')}</strong>
+          <p className="m-0 mt-1.5 text-[15px] leading-6">{nextStepMessage}</p>
         </div>
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[rgba(8,18,13,0.56)] px-4 py-3.5">
-          <strong>{t('detail.activePlayersLabel')}</strong>
-          <p className="m-0 mt-1.5">{t('detail.activePlayersValue', { count: activeSeatCount })}</p>
+        <div className="rounded-2xl border border-[var(--color-border)] bg-[rgba(8,18,13,0.56)] px-4 py-4">
+          <strong className="block">{t('detail.activePlayersLabel')}</strong>
+          <p className="m-0 mt-1.5 text-[15px]">{t('detail.activePlayersValue', { count: activeSeatCount })}</p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-white/8 bg-white/5 px-3 py-2">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                {t('detail.potLabel')}
+              </span>
+              <strong className="mt-1 block text-lg">{typeof pot === 'number' ? pot : 0}</strong>
+            </div>
+            <div className="rounded-xl border border-white/8 bg-white/5 px-3 py-2">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                {t('detail.seats')}
+              </span>
+              <strong className="mt-1 block text-lg">{seatCount}</strong>
+            </div>
+          </div>
         </div>
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
