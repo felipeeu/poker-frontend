@@ -64,7 +64,6 @@ export const TableSummary = ({
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
         <Badge variant="accent">{t('detail.status', { status: tableStatus || t('tables.unknown') })}</Badge>
-        <Badge>{t('detail.hand', { status: handStatus })}</Badge>
         <Badge>{t('detail.street', { street })}</Badge>
         <Badge>{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</Badge>
         {isHandFinished ? <Badge variant="success">{t('detail.gameFinished')}</Badge> : null}

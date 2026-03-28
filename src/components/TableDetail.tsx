@@ -163,12 +163,12 @@ export const TableDetail = () => {
   const canRemovePlayer = Boolean(token && selectedTable && selectedSeatUserId)
   const nextStepMessage = (() => {
     if (!token) return t('detail.loginToControlTable')
-    if (!isTableOpen) return t('detail.tableClosedHint')
     if (isHandFinished) {
       if (activeSeatCount < 2) return t('detail.handCompleteNeedPlayers')
       return t('detail.handCompleteReadyNext')
     }
     if (!currentHand) {
+      if (!isTableOpen) return t('detail.tableClosedHint')
       if (activeSeatCount < 2) return t('detail.needTwoActivePlayers')
       return t('detail.readyToStartHand')
     }
@@ -546,7 +546,13 @@ export const TableDetail = () => {
               onOpenTable={handleOpenTable}
               onCloseTable={handleRequestCloseTable}
               closeTableDisabled={!token}
-              tableControlsDescription={isTableOpen ? t('detail.tableAlreadyOpen') : t('detail.tableClosedHint')}
+              tableControlsDescription={
+                hasHandInProgress
+                  ? t('detail.cannotOpenDuringHand')
+                  : isTableOpen
+                    ? t('detail.tableAlreadyOpen')
+                    : t('detail.tableClosedHint')
+              }
             />
           )}
 

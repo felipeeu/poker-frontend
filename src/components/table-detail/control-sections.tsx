@@ -262,10 +262,14 @@ export const TurnActionsSection = ({
     amountActions.includes(action as (typeof amountActions)[number]),
   ) ?? []
   const quickActions = legalForSeat?.filter((action) => !primaryActions.includes(action)) ?? []
+  const hasAnyActions = quickActions.length > 0 || primaryActions.length > 0
+  const showAmountBox = primaryActions.length > 0
+  const showEmptyState = hasSeatConflict || !mySeatNo || !isMyTurn || !hasAnyActions
+  const infoOnlyState = showEmptyState && !hasAnyActions
 
   return (
     <ControlSection title={t('detail.yourTurn')} className="border-[rgba(217,177,95,0.22)] bg-[linear-gradient(180deg,rgba(23,35,27,0.92),rgba(15,23,42,0.58))] shadow-[0_16px_40px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="mb-4 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
+      <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isMyTurn ? 'accent' : 'neutral'}>
             {isMyTurn ? t('detail.yourTurnToAct') : t('detail.waitingForActorSeat', { seat: actorSeatNo ?? '-' })}
@@ -275,29 +279,22 @@ export const TurnActionsSection = ({
         </div>
         <p className="mt-3 text-sm text-[var(--color-muted)]">{actionMessage}</p>
       </div>
-      {hasSeatConflict ? (
-        <p className="mt-2.5 text-[var(--color-danger)]">{t('detail.seatConflict')}</p>
+      {infoOnlyState ? null : <div className="mb-4" />}
+      {showAmountBox ? (
+        <div className="mb-4 grid gap-3 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-white/4 p-4">
+          <FieldGroup>
+            <FieldLabel>{t('detail.amount')}</FieldLabel>
+            <Input
+              type="number"
+              min={0}
+              value={actionAmount}
+              onChange={(e) => onActionAmountChange(Number(e.target.value))}
+              disabled={!canSetAmount}
+            />
+          </FieldGroup>
+        </div>
       ) : null}
-      {!mySeatNo && !hasSeatConflict ? (
-        <p className="text-sm text-[var(--color-muted)]">{t('detail.joinToPlay')}</p>
-      ) : null}
-      {mySeatNo && !isMyTurn ? (
-        <p className="text-sm text-[var(--color-muted)]">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
-      ) : null}
-      <div className="mb-4 grid gap-3 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-white/4 p-4">
-        <FieldGroup>
-          <FieldLabel>{t('detail.amount')}</FieldLabel>
-          <Input
-            type="number"
-            min={0}
-            value={actionAmount}
-            onChange={(e) => onActionAmountChange(Number(e.target.value))}
-            disabled={!canSetAmount}
-          />
-        </FieldGroup>
-        {!canSetAmount ? <p className="text-sm text-[var(--color-muted)]">{t('detail.noLegalActionsYet')}</p> : null}
-      </div>
-      {legalForSeat && legalForSeat.length > 0 ? (
+      {!showEmptyState ? (
         <div className="grid gap-4">
           {quickActions.length > 0 ? (
             <div className="grid gap-2">
@@ -318,7 +315,7 @@ export const TurnActionsSection = ({
               </div>
             </div>
           ) : null}
-          {primaryActions.length > 0 ? (
+          {showAmountBox ? (
             <div className="grid gap-2">
               <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                 {t('detail.amount')}
@@ -339,10 +336,8 @@ export const TurnActionsSection = ({
             </div>
           ) : null}
         </div>
-      ) : (
-        <span className="text-sm text-[var(--color-muted)]">{t('detail.noLegalActions')}</span>
-      )}
-      {legalForSeat ? (
+      ) : null}
+      {hasAnyActions && legalForSeat ? (
         <p className="mt-3 text-sm text-[var(--color-muted)]">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
       ) : null}
     </ControlSection>
@@ -371,14 +366,14 @@ export const AdminDebugSection = ({
   const { t } = useI18n()
 
   return (
-    <details className="rounded-2xl border border-white/8 bg-[rgba(15,23,42,0.24)] p-3.5 opacity-80">
-      <summary className="mb-3 cursor-pointer font-semibold marker:text-[var(--color-muted)]">{t('detail.adminDebug')}</summary>
-      <div className="flex flex-wrap gap-3">
+    <details className="rounded-2xl border border-white/6 bg-[rgba(9,16,13,0.26)] px-3 py-2.5 text-[rgba(247,236,214,0.86)] opacity-75 transition-opacity open:opacity-90">
+      <summary className="cursor-pointer text-sm font-semibold marker:text-[rgba(247,236,214,0.4)]">{t('detail.adminDebug')}</summary>
+      <div className="mt-3 flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onLoadDemoSeats}>
           {t('detail.loadDemoSeats')}
         </Button>
       </div>
-      <FieldGroup className="mb-3">
+      <FieldGroup className="mb-3 mt-3 gap-2.5">
         <FieldLabel>{t('detail.boardCards')}</FieldLabel>
         <Input
           placeholder={t('detail.boardCardsPlaceholder')}
@@ -395,7 +390,7 @@ export const AdminDebugSection = ({
       <div className="flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onSetCards} disabled={disabled}>{t('detail.setCards')}</Button>
       </div>
-      <p className="text-sm text-[var(--color-muted)]">{t('detail.manualCardInjection')}</p>
+      <p className="mt-3 text-sm text-[var(--color-muted)]">{t('detail.manualCardInjection')}</p>
     </details>
   )
 }

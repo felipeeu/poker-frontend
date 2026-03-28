@@ -140,3 +140,9 @@ Update:
 
 TODOs / notes:
 - The next useful product pass would be visual verification in-browser and then polishing any spacing/hierarchy issues exposed by the new control grouping.
+
+Handoff note:
+- Current focus is visual polish on the table screen, especially the seat chips and lower control rail.
+- Recent changes tightened the control rail hierarchy, shortened seat-chip labels (`#1`, `YOU`, `ACT`), reduced chip width a bit, and softened active-state glow.
+- Before doing more blind polish, the next step should be a quick visual review of the table screen and seat ring in-browser.
+- Resume by checking `git status`, the latest commits, and this file, then decide whether to keep polishing seat chips or move back to product behavior work.
