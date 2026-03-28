@@ -473,8 +473,9 @@ export const TableDetail = () => {
             actorSeatNo={actorSeatNo}
             seatCount={selectedTable.seats?.length || 0}
           />
-          <div className="table-felt">
-            <div className="table-felt__rail" />
+          <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[40px] border-[10px] border-[#57351c] bg-[radial-gradient(circle_at_50%_40%,rgba(52,122,78,0.92),rgba(18,68,39,0.96)_58%,rgba(9,39,24,0.98)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[inset_0_0_0_3px_rgba(245,228,177,0.18),inset_0_-18px_36px_rgba(0,0,0,0.25),0_28px_50px_rgba(0,0,0,0.3)] max-[1024px]:min-h-0 max-[1024px]:gap-[18px] max-[1024px]:rounded-[28px] max-[1024px]:border-[8px] max-[1024px]:px-3 max-[1024px]:py-[22px] max-[520px]:gap-[14px] max-[520px]:rounded-[24px] max-[520px]:border-[7px] max-[520px]:px-2 max-[520px]:py-4">
+            <div className="pointer-events-none absolute inset-4 rounded-[999px] border-2 border-[rgba(242,229,187,0.14)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
+            <div className="pointer-events-none absolute inset-[10px] rounded-[999px] border border-[rgba(28,13,4,0.4)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
             <DesktopSeatLayout
               seats={displaySeats}
               actorSeatNo={actorSeatNo}

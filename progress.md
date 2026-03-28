@@ -102,3 +102,22 @@ Update:
 TODOs / notes:
 - Remaining CSS-heavy areas are mostly the poker-card face rendering and seat-chip responsive styling. Those can stay CSS-backed unless we want a deeper rewrite.
 - `table-felt` itself is still CSS-backed, which is probably reasonable unless we want to fully inline the visual treatment.
+
+Update:
+- Moved the `SeatChip` structure and responsive sizing from `App.css` into `table-visuals.tsx` utility classes.
+- `App.css` is now down to 256 lines and mostly contains only the playing-card skin, seat-slot scaling, and table felt visuals.
+- `npm run build` still passes after the seat-chip migration.
+
+TODOs / notes:
+- The remaining legacy CSS is now basically the true custom visuals: poker cards, felt/rail, and desktop seat-slot scaling.
+- The generated CSS bundle got a bit larger after shifting chip styles into utilities; that is expected and not necessarily a problem.
+
+Update:
+- Moved the felt container and inner ring styling into `TableDetail.tsx`.
+- Replaced desktop seat-slot scale classes with computed inline transforms in `table-visuals.tsx`.
+- `src/App.css` is now down to 151 lines and is effectively just the playing-card skin plus responsive card sizing.
+- `npm run build` still passes after the final structural migration.
+
+TODOs / notes:
+- The remaining question is whether we want to keep the card visuals in CSS, which is reasonable, or migrate those too for complete consistency.
+- The generated CSS bundle continues to grow slightly as more utility classes replace handcrafted CSS; that tradeoff is expected.
