@@ -146,3 +146,17 @@ Handoff note:
 - Recent changes tightened the control rail hierarchy, shortened seat-chip labels (`#1`, `YOU`, `ACT`), reduced chip width a bit, and softened active-state glow.
 - Before doing more blind polish, the next step should be a quick visual review of the table screen and seat ring in-browser.
 - Resume by checking `git status`, the latest commits, and this file, then decide whether to keep polishing seat chips or move back to product behavior work.
+
+Update:
+- Shifted the table page further toward a mobile-first gameplay flow.
+- Added a compact status strip above the felt and moved the full table summary below the table on desktop.
+- On mobile, the full table summary now lives in a collapsed accordion below the turn-actions card instead of above the felt.
+- Compressed the top `TableView` nav panel on phones and moved recent events into a mobile accordion so gameplay stays primary in the scroll.
+- Strengthened disabled button styling and quieted the admin/debug panel while keeping the action rail readable.
+- Verified the mobile layout with Playwright using a mocked `/tables/mock-table` route and a 390x844 viewport. Fresh artifacts are under `output/web-game/mobile-table/`.
+- `npm run build` passes after the mobile-first layout pass.
+
+TODOs / notes:
+- Decide whether the mobile details accordion is still needed at all, or whether the compact status strip above the felt is enough.
+- Evaluate the sticky `Your Turn` rail on a real touch device to confirm it does not cover too much of the felt when the software keyboard is open.
+- Temporary verification helpers now live in `.codex-tmp/verify-mobile-table.mjs`, `.codex-tmp/web_game_playwright_client.js`, and `.codex-tmp/noop-actions.json`; keep or remove them intentionally.

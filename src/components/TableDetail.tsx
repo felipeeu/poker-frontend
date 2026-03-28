@@ -17,6 +17,7 @@ import { TableSummary } from './table-detail/table-summary'
 import { useAppStore } from '../state/useAppStore'
 import type { CurrentHand, Seat, Table } from '../types'
 import { ConfirmDialog } from '../components/ui/confirm-dialog'
+import { Badge } from '../components/ui/badge'
 import { Panel } from '../components/ui/panel'
 
 export const TableDetail = () => {
@@ -188,6 +189,7 @@ export const TableDetail = () => {
     if (!legalForSeat || legalForSeat.length === 0) return t('detail.noLegalActionsYet')
     return t('detail.chooseActionPrompt')
   })()
+  const hasAvailableTurnActions = isMyTurn && !hasSeatConflict && Boolean(legalForSeat?.length)
 
   const handleJoinSeat = async () => {
     if (!selectedTable) return
@@ -461,18 +463,24 @@ export const TableDetail = () => {
       <h2>{t('detail.title')}</h2>
       <div className="grid gap-[18px]">
         <div className="grid gap-[18px]">
-          <TableSummary
-            nextStepMessage={nextStepMessage}
-            activeSeatCount={activeSeatCount}
-            tableStatus={selectedTable.status}
-            handStatus={handStatus}
-            street={street}
-            pot={pot}
-            isHandFinished={isHandFinished}
-            tableId={selectedTable.id}
-            actorSeatNo={actorSeatNo}
-            seatCount={selectedTable.seats?.length || 0}
-          />
+          <div className="grid gap-3 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-[linear-gradient(135deg,rgba(19,29,22,0.88),rgba(14,24,20,0.72))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:px-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant={isHandFinished ? 'success' : actorSeatNo != null ? 'accent' : 'neutral'}>
+                {t('detail.street', { street })}
+              </Badge>
+              <Badge variant={actorSeatNo != null ? 'warning' : 'neutral'}>
+                {actorSeatNo != null ? t('detail.actorSeatValue', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
+              </Badge>
+              <Badge>{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</Badge>
+              <Badge>{t('detail.seats', { count: selectedTable.seats?.length || 0 })}</Badge>
+            </div>
+            <div className="grid gap-1.5">
+              <strong className="text-[0.82rem] font-bold uppercase tracking-[0.16em] text-[var(--color-muted)]">
+                {t('detail.nextStepTitle')}
+              </strong>
+              <p className="m-0 text-[15px] leading-6">{nextStepMessage}</p>
+            </div>
+          </div>
           <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[40px] border-[10px] border-[#57351c] bg-[radial-gradient(circle_at_50%_40%,rgba(52,122,78,0.92),rgba(18,68,39,0.96)_58%,rgba(9,39,24,0.98)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[inset_0_0_0_3px_rgba(245,228,177,0.18),inset_0_-18px_36px_rgba(0,0,0,0.25),0_28px_50px_rgba(0,0,0,0.3)] max-[1024px]:min-h-0 max-[1024px]:gap-[18px] max-[1024px]:rounded-[28px] max-[1024px]:border-[8px] max-[1024px]:px-3 max-[1024px]:py-[22px] max-[520px]:gap-[14px] max-[520px]:rounded-[24px] max-[520px]:border-[7px] max-[520px]:px-2 max-[520px]:py-4">
             <div className="pointer-events-none absolute inset-4 rounded-[999px] border-2 border-[rgba(242,229,187,0.14)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
             <div className="pointer-events-none absolute inset-[10px] rounded-[999px] border border-[rgba(28,13,4,0.4)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
@@ -498,23 +506,58 @@ export const TableDetail = () => {
               bigBlindSeat={bigBlindSeat}
             />
           </div>
+          <div className="hidden min-[1025px]:block">
+            <TableSummary
+              nextStepMessage={nextStepMessage}
+              activeSeatCount={activeSeatCount}
+              tableStatus={selectedTable.status}
+              handStatus={handStatus}
+              street={street}
+              pot={pot}
+              isHandFinished={isHandFinished}
+              tableId={selectedTable.id}
+              actorSeatNo={actorSeatNo}
+              seatCount={selectedTable.seats?.length || 0}
+            />
+          </div>
         </div>
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_repeat(3,minmax(240px,1fr))] max-[1279px]:grid-cols-2 max-[1024px]:grid-cols-1">
-          <TurnActionsSection
-            hasSeatConflict={hasSeatConflict}
-            mySeatNo={mySeatNo}
-            isMyTurn={isMyTurn}
-            actorSeatNo={actorSeatNo}
-            actionAmount={actionAmount}
-            onActionAmountChange={setActionAmount}
-            canBet={canBet}
-            canRaise={canRaise}
-            canAllIn={canAllIn}
-            legalForSeat={legalForSeat}
-            onSubmitAction={submitAction}
-            hasToken={Boolean(token)}
-            actionMessage={actionMessage}
-          />
+          <div className={hasAvailableTurnActions ? 'max-[1024px]:sticky max-[1024px]:bottom-3 max-[1024px]:z-10' : ''}>
+            <TurnActionsSection
+              hasSeatConflict={hasSeatConflict}
+              mySeatNo={mySeatNo}
+              isMyTurn={isMyTurn}
+              actorSeatNo={actorSeatNo}
+              actionAmount={actionAmount}
+              onActionAmountChange={setActionAmount}
+              canBet={canBet}
+              canRaise={canRaise}
+              canAllIn={canAllIn}
+              legalForSeat={legalForSeat}
+              onSubmitAction={submitAction}
+              hasToken={Boolean(token)}
+              actionMessage={actionMessage}
+            />
+          </div>
+          <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)] min-[1025px]:hidden">
+            <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
+              {t('detail.title')}
+            </summary>
+            <div className="mt-3">
+              <TableSummary
+                nextStepMessage={nextStepMessage}
+                activeSeatCount={activeSeatCount}
+                tableStatus={selectedTable.status}
+                handStatus={handStatus}
+                street={street}
+                pot={pot}
+                isHandFinished={isHandFinished}
+                tableId={selectedTable.id}
+                actorSeatNo={actorSeatNo}
+                seatCount={selectedTable.seats?.length || 0}
+              />
+            </div>
+          </details>
 
           <PlayerControlsSection
             seatNo={seatNo}

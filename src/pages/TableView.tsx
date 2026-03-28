@@ -75,19 +75,19 @@ export const TableView = () => {
 
   return (
     <>
-      <Panel className="min-h-0">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <Panel className="min-h-0 p-4 sm:p-6">
+        <div className="flex items-start justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h2 className="m-0 text-2xl font-semibold">{t('table.navTitle')}</h2>
-            <p className="mt-1 text-sm text-[var(--color-muted)]">{tableId || t('table.loading')}</p>
+            <h2 className="m-0 text-xl font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
+            <p className="mt-1 text-xs text-[var(--color-muted)] sm:text-sm">{tableId || t('table.loading')}</p>
           </div>
-          <ButtonLink variant="ghost" to="/tables">
+          <ButtonLink className="min-h-10 px-3 py-2 text-xs sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm" variant="ghost" to="/tables">
             {t('table.backToTables')}
           </ButtonLink>
         </div>
       </Panel>
       <TableDetail />
-      <Panel className="min-h-0">
+      <Panel className="hidden min-h-0 min-[1025px]:block">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="m-0 text-2xl font-semibold">{t('table.recentEvents')}</h2>
@@ -114,6 +114,26 @@ export const TableView = () => {
           {tableEvents.length === 0 && <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p>}
         </div>
       </Panel>
+      <details className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 shadow-[var(--shadow-panel)] backdrop-blur-md min-[1025px]:hidden">
+        <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
+          {t('table.recentEvents')}
+        </summary>
+        <div className="mt-4 grid gap-3">
+          {tableEvents.length > 0 ? <Badge variant="accent">{tableEvents[0]?.type}</Badge> : null}
+          {tableEvents.map((event, idx) => (
+            <div key={idx} className="rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Badge>{event.type}</Badge>
+                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                  #{String(idx + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-[var(--color-foreground)]">{formatEvent(event)}</p>
+            </div>
+          ))}
+          {tableEvents.length === 0 ? <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p> : null}
+        </div>
+      </details>
     </>
   )
 }
