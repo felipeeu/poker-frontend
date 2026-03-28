@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
-import { Button } from '../shared/ui/button'
-import { ConfirmDialog } from '../shared/ui/confirm-dialog'
-import { Input } from '../shared/ui/input'
-import { Panel } from '../shared/ui/panel'
+import { Button } from '../components/ui/button'
+import { ConfirmDialog } from '../components/ui/confirm-dialog'
+import { Input } from '../components/ui/input'
+import { Panel } from '../components/ui/panel'
 
 type AuthResponse = {
   'access-token'?: string

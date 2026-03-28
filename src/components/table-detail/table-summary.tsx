@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n'
-import { Badge } from '../../shared/ui/badge'
-import { InfoCard } from '../../shared/ui/info-card'
+import { Badge } from '../../components/ui/badge'
+import { InfoCard } from './info-card'
 
 type TableSummaryProps = {
   nextStepMessage: string

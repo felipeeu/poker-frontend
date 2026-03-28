@@ -1,10 +1,10 @@
 import type { Locale } from '../i18n'
 import { useAppStore } from '../state/useAppStore'
 import { useI18n } from '../i18n'
-import { Badge } from '../shared/ui/badge'
-import { Input } from '../shared/ui/input'
-import { Panel } from '../shared/ui/panel'
-import { Select } from '../shared/ui/select'
+import { Badge } from '../components/ui/badge'
+import { Input } from '../components/ui/input'
+import { Panel } from '../components/ui/panel'
+import { Select } from '../components/ui/select'
 
 export const ApiHeader = () => {
   const apiBase = useAppStore((state) => state.apiBase)

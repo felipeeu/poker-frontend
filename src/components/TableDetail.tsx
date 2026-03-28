@@ -16,8 +16,8 @@ import {
 import { TableSummary } from './table-detail/table-summary'
 import { useAppStore } from '../state/useAppStore'
 import type { CurrentHand, Seat, Table } from '../types'
-import { ConfirmDialog } from '../shared/ui/confirm-dialog'
-import { Panel } from '../shared/ui/panel'
+import { ConfirmDialog } from '../components/ui/confirm-dialog'
+import { Panel } from '../components/ui/panel'
 
 export const TableDetail = () => {
   const api = useApi()

@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react'
-import { cn } from '../lib/cn'
+import { cn } from '../../lib/cn'
 
 type InfoCardProps = HTMLAttributes<HTMLDivElement> & {
   label: ReactNode
@@ -9,12 +9,12 @@ type InfoCardProps = HTMLAttributes<HTMLDivElement> & {
 export const InfoCard = ({ label, value, className, ...props }: InfoCardProps) => (
   <div
     className={cn(
-      'detail-row rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5',
+      'flex justify-between gap-3 rounded-[14px] border border-[rgba(242,229,187,0.06)] bg-[rgba(8,18,13,0.5)] px-3 py-2.5',
       className,
     )}
     {...props}
   >
     <span>{label}</span>
-    <strong>{value}</strong>
+    <strong className="capitalize">{value}</strong>
   </div>
 )

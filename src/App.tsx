@@ -8,7 +8,7 @@ import { useTableEvents } from './hooks/useTableEvents'
 import { TableView } from './pages/TableView'
 import { TablesDashboard } from './pages/TablesDashboard'
 import { useAppStore } from './state/useAppStore'
-import { ToastViewport } from './shared/ui/toast'
+import { ToastViewport } from './components/ui/toast'
 
 function App() {
   useTableEvents()

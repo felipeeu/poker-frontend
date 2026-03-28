@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
 import type { Table } from '../types'
-import { Badge } from '../shared/ui/badge'
-import { Button } from '../shared/ui/button'
-import { Input } from '../shared/ui/input'
-import { Panel } from '../shared/ui/panel'
+import { Badge } from '../components/ui/badge'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Panel } from '../components/ui/panel'
 
 type TablesResponse = {
   tables: Table[]

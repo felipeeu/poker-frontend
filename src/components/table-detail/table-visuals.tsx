@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import { useI18n } from '../../i18n'
 import { useAppStore } from '../../state/useAppStore'
 import type { Seat } from '../../types'
-import { Badge } from '../../shared/ui/badge'
+import { Badge } from '../../components/ui/badge'
+import { cn } from '../../lib/cn'
 import { Card } from '../Card'
 
 type TableCenterProps = {
@@ -23,29 +24,32 @@ export const TableCenter = ({
   const { t } = useI18n()
 
   return (
-    <div className="table-center">
-      <div className="cards-panel">
-        <div className="cards-panel__row">
-          <div className="cards-panel__head">
-            <h3>{t('detail.board')}</h3>
-            <span className="muted">{board?.length || 0} / 5</span>
+    <div className="z-[2] w-full py-[132px] pb-[118px] max-[1024px]:w-[min(100%,360px)] max-[1024px]:p-0 max-[520px]:w-[min(100%,296px)]">
+      <div className="mx-auto grid w-[min(100%,560px)] gap-4 rounded-2xl border border-[rgba(242,229,187,0.08)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),rgba(7,18,12,0.5))] p-4 backdrop-blur-[4px] max-[1024px]:w-full max-[1024px]:p-3 max-[520px]:gap-3 max-[520px]:rounded-[14px] max-[520px]:p-2.5">
+        <div className="grid gap-2.5">
+          <div className="flex items-center justify-between">
+            <h3 className="m-0 text-base">{t('detail.board')}</h3>
+            <span className="text-[0.85rem] text-[var(--color-muted)]">{board?.length || 0} / 5</span>
           </div>
-          <div className="card-row">
+          <div className="flex flex-wrap gap-3 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-2">
             {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map((card, idx) => (
               <Card key={`board-${idx}`} value={card} faceDown={!card} />
             ))}
           </div>
-          <div className="cards-panel__meta">
-            <div className="detail-row">
+          <div className="grid gap-2">
+            <div className="flex justify-between gap-3 border-b border-dashed border-[var(--color-border)] py-1.5">
               <span>{t('detail.potLabel')}</span>
               <strong>{typeof pot === 'number' ? pot : 0}</strong>
             </div>
             {sidePots && sidePots.length > 0 && (
-              <div className="detail-row detail-row--stack">
+              <div className="flex justify-between gap-3 border-b border-dashed border-[var(--color-border)] py-1.5 max-[1024px]:items-start">
                 <span>{t('detail.sidePots')}</span>
-                <div className="stack">
+                <div className="flex flex-wrap gap-2">
                   {sidePots.map((side, idx) => (
-                    <div key={`side-pot-${idx}`} className="pill pill--ghost">
+                    <div
+                      key={`side-pot-${idx}`}
+                      className="rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-xs text-[var(--color-foreground)]"
+                    >
                       {t('detail.sidePotSeats', {
                         index: idx + 1,
                         amount: side.amount,
@@ -59,12 +63,12 @@ export const TableCenter = ({
           </div>
         </div>
 
-        <div className="cards-panel__row">
-          <div className="cards-panel__head">
-            <h3>{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
-            <span className="muted">{seatHoleCards?.length || 0} / 2</span>
+        <div className="grid gap-2.5">
+          <div className="flex items-center justify-between">
+            <h3 className="m-0 text-base">{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
+            <span className="text-[0.85rem] text-[var(--color-muted)]">{seatHoleCards?.length || 0} / 2</span>
           </div>
-          <div className="card-row">
+          <div className="flex flex-wrap gap-3 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-2">
             {(seatHoleCards && seatHoleCards.length > 0 ? seatHoleCards : Array.from({ length: 2 }).map(() => undefined)).map(
               (card, idx) => (
                 <Card key={`hole-${idx}`} value={card} faceDown={!card} />
@@ -96,8 +100,8 @@ export const DesktopSeatLayout = ({
   const positions = seatPositions(seats.length)
 
   return (
-    <div className="seat-layout seat-layout--desktop">
-      {seats.length === 0 && <p className="muted">{t('detail.noSeatsYet')}</p>}
+    <div className="pointer-events-none absolute inset-[14px] z-[3] hidden w-auto min-[1025px]:block">
+      {seats.length === 0 && <p className="text-[0.85rem] text-[var(--color-muted)]">{t('detail.noSeatsYet')}</p>}
       {seats.map((seat) => {
         const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
         const position = positions[seatNo - 1] ?? positions[0] ?? { x: 50, y: 50 }
@@ -137,8 +141,8 @@ export const MobileSeatLayout = ({
   const { t } = useI18n()
 
   return (
-    <div className="seat-layout-mobile">
-      <div className="seat-layout-mobile__row seat-layout-mobile__row--top">
+    <div className="z-[3] hidden w-full gap-3 max-[1024px]:grid">
+      <div className="order-[-1] flex flex-wrap justify-center gap-2">
         {topSeats.length > 0 ? (
           topSeats.map((seat) => (
             <SeatChip
@@ -151,10 +155,10 @@ export const MobileSeatLayout = ({
             />
           ))
         ) : (
-          <p className="muted">{t('detail.noSeatsYet')}</p>
+          <p className="text-[0.85rem] text-[var(--color-muted)]">{t('detail.noSeatsYet')}</p>
         )}
       </div>
-      <div className="seat-layout-mobile__row seat-layout-mobile__row--bottom">
+      <div className="flex flex-wrap justify-center gap-2">
         {bottomSeats.map((seat) => (
           <SeatChip
             key={seat['seat-no'] ?? seat.seat_no}
@@ -203,10 +207,10 @@ const SeatChip = ({
   const avatarLabel = seatAvatarLabel(displayName)
 
   return (
-    <div className={`seat-chip ${isActor ? 'is-actor' : ''} ${sittingOut ? 'is-sitting-out' : ''} ${isMine ? 'is-mine' : ''}`}>
+    <div className={cn('seat-chip', isActor && 'is-actor', sittingOut && 'is-sitting-out', isMine && 'is-mine')}>
       <div className="seat-chip__head">
         <span className="seat-chip__seat">{t('detail.seatTag', { seat: seatNo })}</span>
-        <div className="pill-row">
+        <div className="flex items-center gap-1 max-[1024px]:flex-wrap max-[1024px]:justify-end max-[1024px]:gap-[3px]">
           {isMine && <Badge variant="success" className="px-2 py-0.5 text-[9px] tracking-[0.14em]">{t('detail.you')}</Badge>}
           {isActor && <Badge className="px-2 py-0.5 text-[9px] tracking-[0.14em]">{t('detail.acting')}</Badge>}
           {isDealer && <Badge variant="accent" className="px-2 py-0.5 text-[9px] tracking-[0.14em]">D</Badge>}

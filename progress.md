@@ -63,3 +63,42 @@ Update:
 - Started the Tailwind migration on TableDetail.
 - Replaced the old panel/button/input/status/control-card class stack with shared Tailwind UI primitives.
 - Removed the matching unused table/control CSS from App.css; the felt, cards, and seat-chip visuals remain on legacy CSS for the next pass.
+
+Update:
+- Continued the cleanup after the first Tailwind pass by reducing `src/App.css` from 1107 lines to 621 lines.
+- Removed the unused legacy app/header/dashboard/event/layout selectors and kept only the live poker-table, card, chip, and shared utility styles that are still referenced.
+- `npm run build` passes after the CSS reduction, and the production CSS bundle dropped from 40.44 kB to 34.26 kB.
+
+TODOs / notes:
+- The remaining legacy CSS is concentrated in the table felt, cards panel, seat chips, and responsive seat layout; that is the next Tailwind migration slice.
+- TableView still uses a one-off styled `Link` for the back action instead of a shared primitive.
+- Playwright-based visual verification still has not been rerun in this environment.
+
+Update:
+- Moved the shared UI layer from `src/shared/ui` to `src/components/ui`.
+- Moved `cn` from `src/shared/lib/cn.ts` to `src/lib/cn.ts`.
+- Updated all imports to use the new structure and kept `Panel` as the surface component name to avoid collision with the poker `Card` component.
+- `npm run build` still passes after the move.
+
+TODOs / notes:
+- If we continue aligning with shadcn conventions, keep adding generic primitives under `src/components/ui` and avoid growing `src/shared/ui` again.
+
+Update:
+- Audited the borderline shared components and moved `ControlSection` and `InfoCard` out of `src/components/ui` into `src/components/table-detail`, since they are feature-specific.
+- Added `src/components/ui/button-link.tsx` so router links can reuse the shared button styling instead of carrying one-off inline classes.
+- Removed the now-empty `src/shared` directories.
+- `npm run build` still passes after the cleanup.
+
+TODOs / notes:
+- Next useful design-system pass is deciding whether more router-aware primitives are needed, or whether `ButtonLink` is enough.
+- The remaining big migration target is still the poker-table-specific CSS in `src/App.css`.
+
+Update:
+- Migrated the structural table-surface layout in `table-visuals.tsx` from legacy CSS classes to Tailwind utilities for the center panel, board/hole-card rows, empty states, and mobile/desktop seat wrappers.
+- Kept the genuinely custom visual CSS for the felt, poker card rendering, seat chip skin, and seat-slot scaling in `src/App.css`.
+- Removed the matching dead legacy selectors from `src/App.css`; the file is now down to 439 lines.
+- `npm run build` still passes after the table-surface cleanup.
+
+TODOs / notes:
+- Remaining CSS-heavy areas are mostly the poker-card face rendering and seat-chip responsive styling. Those can stay CSS-backed unless we want a deeper rewrite.
+- `table-felt` itself is still CSS-backed, which is probably reasonable unless we want to fully inline the visual treatment.

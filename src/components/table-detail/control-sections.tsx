@@ -1,8 +1,8 @@
 import { useI18n } from '../../i18n'
-import { Button } from '../../shared/ui/button'
-import { ControlSection } from '../../shared/ui/control-section'
-import { FieldGroup, FieldLabel } from '../../shared/ui/field-group'
-import { Input } from '../../shared/ui/input'
+import { Button } from '../../components/ui/button'
+import { FieldGroup, FieldLabel } from '../../components/ui/field-group'
+import { Input } from '../../components/ui/input'
+import { ControlSection } from './control-section'
 
 type AdminTableControlsSectionProps = {
   openTableDisabled: boolean

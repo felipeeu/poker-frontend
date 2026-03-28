@@ -1,7 +1,7 @@
 import { useAppStore } from '../state/useAppStore'
 import { useI18n } from '../i18n'
-import { Badge } from '../shared/ui/badge'
-import { Panel } from '../shared/ui/panel'
+import { Badge } from '../components/ui/badge'
+import { Panel } from '../components/ui/panel'
 
 export const EventsPanel = () => {
   const events = useAppStore((state) => state.events)

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useI18n } from '../../i18n'
 import { useAppStore, type ToastTone } from '../../state/useAppStore'
 import { Button } from './button'
-import { cn } from '../lib/cn'
+import { cn } from '../../lib/cn'
 
 type ToastItemProps = {
   id: string

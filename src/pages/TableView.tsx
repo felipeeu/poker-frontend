@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { TableDetail } from '../components/TableDetail'
 import { useAppStore } from '../state/useAppStore'
 import type { Table } from '../types'
-import { Badge } from '../shared/ui/badge'
-import { Panel } from '../shared/ui/panel'
+import { Badge } from '../components/ui/badge'
+import { ButtonLink } from '../components/ui/button-link'
+import { Panel } from '../components/ui/panel'
 
 export const TableView = () => {
   const { tableId } = useParams()
@@ -80,12 +81,9 @@ export const TableView = () => {
             <h2 className="m-0 text-2xl font-semibold">{t('table.navTitle')}</h2>
             <p className="mt-1 text-sm text-[var(--color-muted)]">{tableId || t('table.loading')}</p>
           </div>
-          <Link
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-border-strong)] bg-white/5 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-white/10"
-            to="/tables"
-          >
+          <ButtonLink variant="ghost" to="/tables">
             {t('table.backToTables')}
-          </Link>
+          </ButtonLink>
         </div>
       </Panel>
       <TableDetail />

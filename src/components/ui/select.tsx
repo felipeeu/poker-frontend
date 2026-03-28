@@ -1,5 +1,5 @@
 import type { SelectHTMLAttributes } from 'react'
-import { cn } from '../lib/cn'
+import { cn } from '../../lib/cn'
 
 export const Select = ({ className, ...props }: SelectHTMLAttributes<HTMLSelectElement>) => {
   return (
