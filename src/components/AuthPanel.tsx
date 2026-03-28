@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
+import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { ConfirmDialog } from '../components/ui/confirm-dialog'
 import { Input } from '../components/ui/input'
@@ -26,15 +27,7 @@ export const AuthPanel = () => {
   const setStatus = useAppStore((state) => state.setStatus)
   const [email, setEmail] = useState('admin@example.com')
   const [password, setPassword] = useState('Secret123!')
-  const [generatedUser, setGeneratedUser] = useState<{ email: string; password: string } | null>(null)
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
-
-  const handleUseGeneratedUser = () => {
-    if (!generatedUser) return
-    setEmail(generatedUser.email)
-    setPassword(generatedUser.password)
-    setStatus(t('auth.credentialsLoaded'), 'success')
-  }
 
   const handleLogin = async () => {
     setStatus('')
@@ -58,43 +51,6 @@ export const AuthPanel = () => {
         body: JSON.stringify({ email, password }),
       })
       await handleLogin()
-    } catch (err) {
-      setStatus((err as Error).message)
-    }
-  }
-
-  const handleCreateTestUser = async () => {
-    setStatus('')
-    const nextEmail = `player+${Date.now()}@example.com`
-    const nextPassword = 'Secret123!'
-    try {
-      await api.request('/api/auth/signup', {
-        method: 'POST',
-        body: JSON.stringify({ email: nextEmail, password: nextPassword }),
-      })
-      setGeneratedUser({ email: nextEmail, password: nextPassword })
-      pushToast(t('auth.testUserCreated'), 'success')
-    } catch (err) {
-      setStatus((err as Error).message)
-    }
-  }
-
-  const handleCreateAndLoginTestUser = async () => {
-    setStatus('')
-    const nextEmail = `player+${Date.now()}@example.com`
-    const nextPassword = 'Secret123!'
-    try {
-      await api.request('/api/auth/signup', {
-        method: 'POST',
-        body: JSON.stringify({ email: nextEmail, password: nextPassword }),
-      })
-      const body = await api.request<AuthResponse>('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ email: nextEmail, password: nextPassword }),
-      })
-      setAuth(body['access-token'] || '', body['refresh-token'] || '', body['user-id'] || '', body.role || '')
-      setGeneratedUser({ email: nextEmail, password: nextPassword })
-      pushToast(t('auth.loginSuccess'), 'success')
     } catch (err) {
       setStatus((err as Error).message)
     }
@@ -126,42 +82,56 @@ export const AuthPanel = () => {
   }
 
   return (
-    <Panel className="h-fit">
-      <h2 className="m-0 text-2xl font-semibold">{t('auth.title')}</h2>
-      <p className="mb-5 mt-2 text-sm text-[var(--color-muted)]">{t('auth.helper')}</p>
-      <div className="mb-4 grid gap-2">
-        <label className="text-sm font-medium">{t('auth.email')}</label>
-        <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-      </div>
-      <div className="mb-5 grid gap-2">
-        <label className="text-sm font-medium">{t('auth.password')}</label>
-        <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </div>
-      <div className="flex flex-wrap gap-3">
-        <Button onClick={handleLogin}>{t('auth.login')}</Button>
-        <Button variant="ghost" onClick={handleSignup}>{t('auth.signup')}</Button>
-        <Button variant="ghost" onClick={handleCreateTestUser}>{t('auth.createTestUser')}</Button>
-        <Button variant="ghost" onClick={handleCreateAndLoginTestUser}>
-          {t('auth.createAndLoginTestUser')}
-        </Button>
-      </div>
-      {token && (
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
-          <strong className="mt-2 block text-sm">{userId || t('auth.unknown')}</strong>
-          <Button className="mt-4" variant="ghost" size="sm" onClick={handleRequestLogout}>{t('auth.logout')}</Button>
+    <Panel className="h-fit bg-[linear-gradient(180deg,rgba(19,29,22,0.94),rgba(12,21,16,0.9))]">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="m-0 text-2xl font-semibold">{t('auth.title')}</h2>
+          <p className="mb-0 mt-2 max-w-md text-sm leading-6 text-[var(--color-muted)]">{t('auth.helper')}</p>
         </div>
-      )}
-      {generatedUser && (
-        <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.testUserCreated')}</p>
-          <strong className="mt-2 block text-sm">{generatedUser.email}</strong>
-          <p className="mt-2 text-sm text-[var(--color-muted)]">{t('auth.password')}: {generatedUser.password}</p>
-          <Button className="mt-4" variant="ghost" size="sm" onClick={handleUseGeneratedUser}>
-            {t('auth.useGeneratedUser')}
+        <Badge variant={token ? 'success' : 'neutral'}>
+          {token ? t('auth.loggedInAs') : t('auth.login')}
+        </Badge>
+      </div>
+
+      <div className="mt-6 grid gap-4 rounded-[24px] border border-[rgba(217,177,95,0.14)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <strong className="block text-base">{t('auth.login')}</strong>
+            <p className="m-0 mt-1 text-sm text-[var(--color-muted)]">`admin@example.com` / `Secret123!`</p>
+          </div>
+          <Badge variant="accent">Seeded</Badge>
+        </div>
+        <div className="grid gap-4">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">{t('auth.email')}</label>
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">{t('auth.password')}</label>
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Button className="w-full" onClick={handleLogin}>{t('auth.login')}</Button>
+          <Button className="w-full" variant="ghost" onClick={handleSignup}>{t('auth.signup')}</Button>
+        </div>
+      </div>
+
+      {token && (
+        <div className="mt-5 rounded-[24px] border border-[rgba(88,214,141,0.18)] bg-[linear-gradient(180deg,rgba(17,43,28,0.72),rgba(10,22,16,0.6))] p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
+              <strong className="mt-2 block text-sm">{userId || t('auth.unknown')}</strong>
+            </div>
+            <Badge variant="success">Live Session</Badge>
+          </div>
+          <Button className="mt-4 w-full sm:w-auto" variant="ghost" size="sm" onClick={handleRequestLogout}>
+            {t('auth.logout')}
           </Button>
         </div>
       )}
+
       <ConfirmDialog
         open={isLogoutDialogOpen}
         onOpenChange={setIsLogoutDialogOpen}
