@@ -75,13 +75,13 @@ export const TableView = () => {
 
   return (
     <>
-      <Panel className="min-h-0 p-4 sm:p-6">
-        <div className="flex items-start justify-between gap-3 sm:flex-row sm:items-center">
+      <Panel className="min-h-0 p-3 sm:p-6 max-[1024px]:rounded-none max-[1024px]:border-x-0 max-[1024px]:border-t-0 max-[1024px]:bg-transparent max-[1024px]:px-0 max-[1024px]:py-1 max-[1024px]:shadow-none max-[1024px]:backdrop-blur-0">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="m-0 text-xl font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
-            <p className="mt-1 text-xs text-[var(--color-muted)] sm:text-sm">{tableId || t('table.loading')}</p>
+            <h2 className="m-0 text-[12px] font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
+            <p className="mt-0 text-[9px] text-[var(--color-muted)] sm:mt-1 sm:text-sm">{tableId || t('table.loading')}</p>
           </div>
-          <ButtonLink className="min-h-10 px-3 py-2 text-xs sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm" variant="ghost" to="/tables">
+          <ButtonLink className="min-h-6 rounded-md px-2 py-0.5 text-[9px] sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm" variant="ghost" to="/tables">
             {t('table.backToTables')}
           </ButtonLink>
         </div>

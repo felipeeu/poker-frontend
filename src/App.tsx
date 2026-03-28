@@ -54,7 +54,9 @@ const AppLayout = () => {
     <div className="min-h-screen px-5 py-8 text-[var(--color-foreground)] sm:px-8 lg:px-14 lg:py-12">
       <ToastViewport />
       <StatusToastBridge />
-      <ApiHeader />
+      <div className={isTableRoute ? 'hidden min-[1025px]:block' : ''}>
+        <ApiHeader compactOnTableRoute={isTableRoute} />
+      </div>
       <main
         className={
           isTableRoute
