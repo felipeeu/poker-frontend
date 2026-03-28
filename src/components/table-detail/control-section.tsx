@@ -20,7 +20,9 @@ export const ControlSection = ({
     )}
     {...props}
   >
-    <h3 className="m-0 text-base font-semibold text-[var(--color-foreground)]">{title}</h3>
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <h3 className="m-0 text-base font-semibold text-[var(--color-foreground)]">{title}</h3>
+    </div>
     {description ? <p className="mt-2.5 text-sm text-[var(--color-muted)]">{description}</p> : null}
     {children}
   </div>

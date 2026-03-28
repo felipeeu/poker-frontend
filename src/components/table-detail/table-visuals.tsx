@@ -113,7 +113,7 @@ export const DesktopSeatLayout = ({
             style={{
               left: `${position.x}%`,
               top: `${position.y}%`,
-              transform: `translate(-50%, -50%) scale(${desktopSeatScale(position.y)})`,
+              transform: `translate(-50%, -50%) translateY(${desktopSeatOffsetY(position.y)}px) scale(${desktopSeatScale(position.y)})`,
               transformOrigin: 'center',
             }}
           >
@@ -206,26 +206,28 @@ const SeatChip = ({
   const isBigBlind = bigBlindSeat === seatNo
   const shortName = truncateSeatName(displayName)
   const avatarLabel = seatAvatarLabel(displayName)
+  const statusBadgeClass =
+    'px-1.5 py-[3px] text-[8px] leading-none tracking-[0.12em] max-[1024px]:px-[5px] max-[1024px]:py-[2px] max-[1024px]:text-[0.5rem]'
 
   return (
     <div
       className={cn(
-        'seat-chip grid min-w-[92px] max-w-[120px] gap-[5px] rounded-[18px] border border-[rgba(242,229,187,0.1)] bg-[linear-gradient(180deg,rgba(24,47,31,0.82),rgba(8,18,13,0.88)),rgba(11,24,17,0.82)] px-[9px] py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_22px_rgba(0,0,0,0.18)] backdrop-blur-[6px] max-[1024px]:min-w-[82px] max-[1024px]:max-w-[100px] max-[1024px]:gap-1 max-[1024px]:rounded-[15px] max-[1024px]:px-[7px] max-[1024px]:pb-[7px] max-[1024px]:pt-1.5 max-[520px]:min-w-[70px] max-[520px]:max-w-[84px] max-[520px]:px-[5px] max-[520px]:pb-[5px] max-[520px]:pt-1',
-        isActor && 'border-[var(--color-accent)] shadow-[0_0_0_1px_rgba(217,177,95,0.38),0_14px_24px_rgba(0,0,0,0.2)]',
-        isMine && 'border-[rgba(88,214,141,0.56)] shadow-[0_0_0_1px_rgba(88,214,141,0.32),0_14px_24px_rgba(0,0,0,0.2)]',
+        'seat-chip grid min-w-[92px] max-w-[116px] gap-1.5 rounded-[18px] border border-[rgba(242,229,187,0.1)] bg-[linear-gradient(180deg,rgba(24,47,31,0.84),rgba(8,18,13,0.9)),rgba(11,24,17,0.84)] px-2 py-[9px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_10px_18px_rgba(0,0,0,0.16)] backdrop-blur-[6px] max-[1024px]:min-w-[82px] max-[1024px]:max-w-[100px] max-[1024px]:gap-1 max-[1024px]:rounded-[15px] max-[1024px]:px-[7px] max-[1024px]:pb-[7px] max-[1024px]:pt-1.5 max-[520px]:min-w-[70px] max-[520px]:max-w-[84px] max-[520px]:px-[5px] max-[520px]:pb-[5px] max-[520px]:pt-1',
+        isActor && 'border-[rgba(217,177,95,0.7)] shadow-[0_0_0_1px_rgba(217,177,95,0.24),0_10px_18px_rgba(0,0,0,0.16)]',
+        isMine && 'border-[rgba(88,214,141,0.5)] shadow-[0_0_0_1px_rgba(88,214,141,0.22),0_10px_18px_rgba(0,0,0,0.16)]',
         sittingOut && 'opacity-70',
       )}
     >
-      <div className="flex items-start justify-between gap-1.5 text-[0.68rem] text-[var(--color-muted)] max-[1024px]:items-center max-[1024px]:gap-1 max-[1024px]:text-[0.56rem] max-[520px]:gap-[3px]">
-        <span className="inline-flex min-h-[18px] items-center rounded-full bg-white/6 px-[7px] text-[0.68rem] font-bold uppercase tracking-[0.04em] max-[1024px]:min-h-4 max-[1024px]:px-1.5 max-[520px]:min-h-[15px] max-[520px]:px-[5px]">
-          {t('detail.seatTag', { seat: seatNo })}
+      <div className="grid gap-1 text-[0.68rem] text-[var(--color-muted)] max-[1024px]:text-[0.56rem]">
+        <span className="inline-flex w-fit min-h-[18px] items-center rounded-full bg-white/6 px-[7px] text-[0.62rem] font-bold uppercase tracking-[0.05em] max-[1024px]:min-h-4 max-[1024px]:px-1.5 max-[1024px]:text-[0.54rem] max-[520px]:min-h-[15px] max-[520px]:px-[5px]">
+          #{seatNo}
         </span>
-        <div className="flex items-center gap-1 max-[1024px]:flex-wrap max-[1024px]:justify-end max-[1024px]:gap-[3px]">
-          {isMine && <Badge variant="success" className="px-2 py-0.5 text-[9px] tracking-[0.14em] max-[1024px]:px-[7px] max-[1024px]:py-[2px] max-[1024px]:text-[0.58rem] max-[520px]:text-[0.54rem]">{t('detail.you')}</Badge>}
-          {isActor && <Badge className="px-2 py-0.5 text-[9px] tracking-[0.14em] max-[1024px]:px-[7px] max-[1024px]:py-[2px] max-[1024px]:text-[0.58rem] max-[520px]:text-[0.54rem]">{t('detail.acting')}</Badge>}
-          {isDealer && <Badge variant="accent" className="px-2 py-0.5 text-[9px] tracking-[0.14em] max-[1024px]:px-[7px] max-[1024px]:py-[2px] max-[1024px]:text-[0.58rem] max-[520px]:text-[0.54rem]">D</Badge>}
-          {isSmallBlind && <Badge variant="warning" className="px-2 py-0.5 text-[9px] tracking-[0.14em] max-[1024px]:px-[7px] max-[1024px]:py-[2px] max-[1024px]:text-[0.58rem] max-[520px]:text-[0.54rem]">SB</Badge>}
-          {isBigBlind && <Badge variant="warning" className="px-2 py-0.5 text-[9px] tracking-[0.14em] max-[1024px]:px-[7px] max-[1024px]:py-[2px] max-[1024px]:text-[0.58rem] max-[520px]:text-[0.54rem]">BB</Badge>}
+        <div className="flex min-w-0 flex-wrap items-center gap-1 max-[1024px]:gap-[3px]">
+          {isMine && <Badge variant="success" className={statusBadgeClass}>{t('detail.youShort')}</Badge>}
+          {isActor && <Badge className={statusBadgeClass}>{t('detail.actingShort')}</Badge>}
+          {isDealer && <Badge variant="accent" className={statusBadgeClass}>D</Badge>}
+          {isSmallBlind && <Badge variant="warning" className={statusBadgeClass}>SB</Badge>}
+          {isBigBlind && <Badge variant="warning" className={statusBadgeClass}>BB</Badge>}
         </div>
       </div>
       <div
@@ -238,18 +240,18 @@ const SeatChip = ({
         >
           {avatarLabel}
         </span>
-        <div className="grid min-w-0 gap-0.5">
-          <strong className="overflow-hidden text-[0.76rem] font-semibold leading-[1.2] tracking-[-0.01em] text-ellipsis whitespace-nowrap max-[1024px]:text-[0.64rem] max-[520px]:text-[0.6rem]">
+        <div className="grid min-w-0 gap-px">
+          <strong className="overflow-hidden text-[0.78rem] font-semibold leading-[1.15] tracking-[-0.01em] text-ellipsis whitespace-nowrap max-[1024px]:text-[0.64rem] max-[520px]:text-[0.6rem]">
             {shortName}
           </strong>
-          <span className="text-[0.68rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.56rem] max-[520px]:text-[0.54rem]">
+          <span className="text-[0.66rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.56rem] max-[520px]:text-[0.54rem]">
             {t('detail.stackShort', { value: stack })}
           </span>
         </div>
       </div>
       {(sittingOut || committed > 0) && (
         <div className="flex items-center justify-between gap-1.5 max-[1024px]:flex-col max-[1024px]:items-start max-[1024px]:gap-[3px]">
-          {sittingOut && <Badge className="px-2 py-0.5 text-[9px] tracking-[0.14em] max-[1024px]:px-[7px] max-[1024px]:py-[2px] max-[1024px]:text-[0.58rem] max-[520px]:text-[0.54rem]">{t('detail.sittingOut')}</Badge>}
+          {sittingOut && <Badge className={statusBadgeClass}>{t('detail.sittingOut')}</Badge>}
           {committed > 0 && (
             <span className="text-[0.68rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.56rem] max-[520px]:text-[0.54rem]">
               {t('detail.committedShort', { value: committed })}
@@ -330,4 +332,9 @@ const desktopSeatScale = (y: number) => {
   if (y <= 20) return 0.88
   if (y >= 82) return 1
   return 0.95
+}
+
+const desktopSeatOffsetY = (y: number) => {
+  if (y >= 82) return 12
+  return 0
 }

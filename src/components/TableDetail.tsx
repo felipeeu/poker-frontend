@@ -499,7 +499,23 @@ export const TableDetail = () => {
             />
           </div>
         </div>
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))] max-[1024px]:grid-cols-1">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_repeat(3,minmax(240px,1fr))] max-[1279px]:grid-cols-2 max-[1024px]:grid-cols-1">
+          <TurnActionsSection
+            hasSeatConflict={hasSeatConflict}
+            mySeatNo={mySeatNo}
+            isMyTurn={isMyTurn}
+            actorSeatNo={actorSeatNo}
+            actionAmount={actionAmount}
+            onActionAmountChange={setActionAmount}
+            canBet={canBet}
+            canRaise={canRaise}
+            canAllIn={canAllIn}
+            legalForSeat={legalForSeat}
+            onSubmitAction={submitAction}
+            hasToken={Boolean(token)}
+            actionMessage={actionMessage}
+          />
+
           <PlayerControlsSection
             seatNo={seatNo}
             onSeatNoChange={setSeatNo}
@@ -545,22 +561,6 @@ export const TableDetail = () => {
               disabled={!token}
             />
           )}
-
-          <TurnActionsSection
-            hasSeatConflict={hasSeatConflict}
-            mySeatNo={mySeatNo}
-            isMyTurn={isMyTurn}
-            actorSeatNo={actorSeatNo}
-            actionAmount={actionAmount}
-            onActionAmountChange={setActionAmount}
-            canBet={canBet}
-            canRaise={canRaise}
-            canAllIn={canAllIn}
-            legalForSeat={legalForSeat}
-            onSubmitAction={submitAction}
-            hasToken={Boolean(token)}
-            actionMessage={actionMessage}
-          />
 
           {isAdmin && (
             <AdminDebugSection

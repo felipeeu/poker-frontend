@@ -29,18 +29,18 @@ export const AdminTableControlsSection = ({
     <ControlSection
       title={t('detail.tableControls')}
       description={tableControlsDescription}
-      className="mt-4 border-white/8 bg-[rgba(12,22,17,0.62)]"
+      className="border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
-      <div className="flex flex-wrap gap-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Button
-          size="sm"
+          className="w-full"
           onClick={onOpenTable}
           disabled={openTableDisabled}
           title={openTableDisabledReason}
         >
           {t('detail.openTable')}
         </Button>
-        <Button variant="ghost" size="sm" onClick={onCloseTable} disabled={closeTableDisabled}>
+        <Button className="w-full" variant="ghost" onClick={onCloseTable} disabled={closeTableDisabled}>
           {t('detail.closeTable')}
         </Button>
       </div>
@@ -76,7 +76,7 @@ export const AdminHandControlsSection = ({
     <ControlSection
       title={t('detail.handControls')}
       description={t('detail.handControlsAdminOnly')}
-      className="mt-4 border-white/8 bg-[rgba(12,22,17,0.62)]"
+      className="border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
       <FieldGroup className="mb-3">
         <FieldLabel>{t('detail.dealerSeat')}</FieldLabel>
@@ -87,11 +87,11 @@ export const AdminHandControlsSection = ({
           onChange={(e) => onDealerSeatChange(Number(e.target.value))}
         />
       </FieldGroup>
-      <div className="flex flex-wrap gap-3">
-        <Button size="sm" onClick={onStartHand} disabled={disabled}>{t('detail.startHand')}</Button>
-        <Button variant="ghost" size="sm" onClick={onResolve} disabled={disabled}>{t('detail.resolveShowdown')}</Button>
-        <Button variant="ghost" size="sm" onClick={onTimeout} disabled={disabled}>{t('detail.timeout')}</Button>
-        <Button variant="ghost" size="sm" onClick={onNextHand} disabled={disabled}>{t('detail.nextHand')}</Button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Button className="w-full" onClick={onStartHand} disabled={disabled}>{t('detail.startHand')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onResolve} disabled={disabled}>{t('detail.resolveShowdown')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onTimeout} disabled={disabled}>{t('detail.timeout')}</Button>
+        <Button className="w-full" variant="ghost" onClick={onNextHand} disabled={disabled}>{t('detail.nextHand')}</Button>
       </div>
     </ControlSection>
   )
@@ -148,42 +148,50 @@ export const PlayerControlsSection = ({
     <ControlSection
       title={t('detail.seatActions')}
       description={hasOwnedSeat ? t('detail.alreadySeated') : t('detail.joinToPlay')}
-      className="mt-4"
+      className="border-white/8 bg-[rgba(255,255,255,0.02)]"
     >
-      <FieldGroup className="mb-3">
-        <FieldLabel>{t('detail.seatNo')}</FieldLabel>
-        <Input
-          type="number"
-          min={1}
-          value={seatNo}
-          onChange={(e) => onSeatNoChange(Number(e.target.value))}
-        />
-        {!hasOwnedSeat ? (
-          <>
-            <FieldLabel>{t('detail.playerName')}</FieldLabel>
+      <div className="mb-4 grid gap-4 rounded-2xl border border-white/6 bg-black/10 p-4">
+        <FieldGroup className="gap-3 sm:grid-cols-2">
+          <div className="grid gap-1.5">
+            <FieldLabel>{t('detail.seatNo')}</FieldLabel>
             <Input
-              type="text"
-              value={seatName}
-              onChange={(e) => onSeatNameChange(e.target.value)}
-              placeholder={t('detail.playerNamePlaceholder')}
+              type="number"
+              min={1}
+              value={seatNo}
+              onChange={(e) => onSeatNoChange(Number(e.target.value))}
             />
-          </>
-        ) : null}
-        <FieldLabel>{t('detail.stack')}</FieldLabel>
-        <Input
-          type="number"
-          min={0}
-          value={seatStack}
-          onChange={(e) => onSeatStackChange(Number(e.target.value))}
-        />
-        <FieldLabel>{t('detail.buyIn')}</FieldLabel>
-        <Input
-          type="number"
-          min={0}
-          value={buyInAmount}
-          onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
-        />
-      </FieldGroup>
+          </div>
+          {!hasOwnedSeat ? (
+            <div className="grid gap-1.5 sm:col-span-2">
+              <FieldLabel>{t('detail.playerName')}</FieldLabel>
+              <Input
+                type="text"
+                value={seatName}
+                onChange={(e) => onSeatNameChange(e.target.value)}
+                placeholder={t('detail.playerNamePlaceholder')}
+              />
+            </div>
+          ) : null}
+          <div className="grid gap-1.5">
+            <FieldLabel>{t('detail.stack')}</FieldLabel>
+            <Input
+              type="number"
+              min={0}
+              value={seatStack}
+              onChange={(e) => onSeatStackChange(Number(e.target.value))}
+            />
+          </div>
+          <div className="grid gap-1.5">
+            <FieldLabel>{t('detail.buyIn')}</FieldLabel>
+            <Input
+              type="number"
+              min={0}
+              value={buyInAmount}
+              onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
+            />
+          </div>
+        </FieldGroup>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <Button
           className="w-full"
@@ -256,7 +264,7 @@ export const TurnActionsSection = ({
   const quickActions = legalForSeat?.filter((action) => !primaryActions.includes(action)) ?? []
 
   return (
-    <ControlSection title={t('detail.yourTurn')} className="mt-4 border-[rgba(217,177,95,0.22)] bg-[linear-gradient(180deg,rgba(23,35,27,0.92),rgba(15,23,42,0.58))]">
+    <ControlSection title={t('detail.yourTurn')} className="border-[rgba(217,177,95,0.22)] bg-[linear-gradient(180deg,rgba(23,35,27,0.92),rgba(15,23,42,0.58))] shadow-[0_16px_40px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.04)]">
       <div className="mb-4 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isMyTurn ? 'accent' : 'neutral'}>
@@ -276,7 +284,7 @@ export const TurnActionsSection = ({
       {mySeatNo && !isMyTurn ? (
         <p className="text-sm text-[var(--color-muted)]">{t('detail.waitingForSeat', { seat: actorSeatNo ?? '-' })}</p>
       ) : null}
-      <div className="mb-4 grid gap-3 rounded-2xl border border-white/8 bg-white/4 p-4">
+      <div className="mb-4 grid gap-3 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-white/4 p-4">
         <FieldGroup>
           <FieldLabel>{t('detail.amount')}</FieldLabel>
           <Input
@@ -363,7 +371,7 @@ export const AdminDebugSection = ({
   const { t } = useI18n()
 
   return (
-    <details className="mt-4 rounded-2xl border border-white/8 bg-[rgba(15,23,42,0.38)] p-3.5">
+    <details className="rounded-2xl border border-white/8 bg-[rgba(15,23,42,0.24)] p-3.5 opacity-80">
       <summary className="mb-3 cursor-pointer font-semibold marker:text-[var(--color-muted)]">{t('detail.adminDebug')}</summary>
       <div className="flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onLoadDemoSeats}>
