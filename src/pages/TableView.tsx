@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import { TableDetail } from '../components/TableDetail'
@@ -13,6 +13,7 @@ export const TableView = () => {
   const { tableId } = useParams()
   const { t } = useI18n()
   const api = useApi()
+  const token = useAppStore((state) => state.token)
   const selectedTable = useAppStore((state) => state.selectedTable)
   const events = useAppStore((state) => state.events)
   const setSelectedTable = useAppStore((state) => state.setSelectedTable)
@@ -58,6 +59,13 @@ export const TableView = () => {
   }
 
   useEffect(() => {
+    if (!token && tableId) {
+      setStatus(t('detail.loginRequired'), 'info')
+    }
+  }, [setStatus, t, tableId, token])
+
+  useEffect(() => {
+    if (!token) return
     if (!tableId) return
     if (selectedTable?.id === tableId) return
 
@@ -71,7 +79,11 @@ export const TableView = () => {
     }
 
     load()
-  }, [api, selectedTable?.id, setSelectedTable, setStatus, tableId])
+  }, [api, selectedTable?.id, setSelectedTable, setStatus, tableId, token])
+
+  if (!token) {
+    return <Navigate to="/tables" replace />
+  }
 
   return (
     <>
