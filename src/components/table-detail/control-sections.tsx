@@ -10,7 +10,9 @@ type AdminTableControlsSectionProps = {
   openTableDisabledReason: string
   onOpenTable: () => void
   onCloseTable: () => void
+  onRequestResetTable: () => void
   closeTableDisabled: boolean
+  resetTableDisabled: boolean
   tableControlsDescription?: string
 }
 
@@ -19,7 +21,9 @@ export const AdminTableControlsSection = ({
   openTableDisabledReason,
   onOpenTable,
   onCloseTable,
+  onRequestResetTable,
   closeTableDisabled,
+  resetTableDisabled,
   tableControlsDescription,
 }: AdminTableControlsSectionProps) => {
   const { t } = useI18n()
@@ -31,7 +35,7 @@ export const AdminTableControlsSection = ({
       description={tableControlsDescription}
       className="border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
         <Button
           className="w-full"
           onClick={onOpenTable}
@@ -42,6 +46,9 @@ export const AdminTableControlsSection = ({
         </Button>
         <Button className="w-full" variant="ghost" onClick={onCloseTable} disabled={closeTableDisabled}>
           {t('detail.closeTable')}
+        </Button>
+        <Button className="w-full" variant="ghost" onClick={onRequestResetTable} disabled={resetTableDisabled}>
+          {t('detail.resetTable')}
         </Button>
       </div>
       {showDisabledReason ? (

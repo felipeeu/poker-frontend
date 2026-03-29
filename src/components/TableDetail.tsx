@@ -41,6 +41,7 @@ export const TableDetail = () => {
   const [holeText, setHoleText] = useState('')
   const [isRemovePlayerDialogOpen, setIsRemovePlayerDialogOpen] = useState(false)
   const [isCloseTableDialogOpen, setIsCloseTableDialogOpen] = useState(false)
+  const [isResetTableDialogOpen, setIsResetTableDialogOpen] = useState(false)
 
   const currentHand = useMemo(() => {
     if (!selectedTable) return null
@@ -320,6 +321,26 @@ export const TableDetail = () => {
     } catch (err) {
       setStatus((err as Error).message)
     }
+  }
+
+  const handleResetTable = async () => {
+    if (!selectedTable) return
+    setStatus('')
+    try {
+      const table = await api.request(`/api/tables/${selectedTable.id}/reset`, {
+        method: 'POST',
+      })
+      updateTable(table as Table)
+      setSelectedTable(table as Table)
+      setIsResetTableDialogOpen(false)
+    } catch (err) {
+      setStatus((err as Error).message)
+    }
+  }
+
+  const handleRequestResetTable = () => {
+    if (!selectedTable) return
+    setIsResetTableDialogOpen(true)
   }
 
   const handleRequestCloseTable = () => {
@@ -619,7 +640,9 @@ export const TableDetail = () => {
                 openTableDisabledReason={openTableDisabledReason}
                 onOpenTable={handleOpenTable}
                 onCloseTable={handleRequestCloseTable}
+                onRequestResetTable={handleRequestResetTable}
                 closeTableDisabled={!token}
+                resetTableDisabled={!token}
                 tableControlsDescription={
                   hasHandInProgress
                     ? t('detail.cannotOpenDuringHand')
@@ -641,7 +664,9 @@ export const TableDetail = () => {
                   openTableDisabledReason={openTableDisabledReason}
                   onOpenTable={handleOpenTable}
                   onCloseTable={handleRequestCloseTable}
+                  onRequestResetTable={handleRequestResetTable}
                   closeTableDisabled={!token}
+                  resetTableDisabled={!token}
                   tableControlsDescription={
                     hasHandInProgress
                       ? t('detail.cannotOpenDuringHand')
@@ -716,6 +741,15 @@ export const TableDetail = () => {
         cancelLabel={t('dialog.cancel')}
         confirmLabel={t('dialog.confirm')}
         onConfirm={handleCloseTable}
+      />
+      <ConfirmDialog
+        open={isResetTableDialogOpen}
+        onOpenChange={setIsResetTableDialogOpen}
+        title={t('detail.confirmResetTableTitle')}
+        description={t('detail.confirmResetTable', { table: selectedTable?.name || selectedTable?.id || '' })}
+        cancelLabel={t('dialog.cancel')}
+        confirmLabel={t('dialog.confirm')}
+        onConfirm={handleResetTable}
       />
     </Panel>
   )

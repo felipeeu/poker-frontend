@@ -160,3 +160,13 @@ TODOs / notes:
 - Decide whether the mobile details accordion is still needed at all, or whether the compact status strip above the felt is enough.
 - Evaluate the sticky `Your Turn` rail on a real touch device to confirm it does not cover too much of the felt when the software keyboard is open.
 - Temporary verification helpers now live in `.codex-tmp/verify-mobile-table.mjs`, `.codex-tmp/web_game_playwright_client.js`, and `.codex-tmp/noop-actions.json`; keep or remove them intentionally.
+
+Update:
+- Diagnosed a live gameplay bug where player action controls could disappear even when the backend still allowed actions like `fold`.
+- Root cause: websocket events broadcast public table snapshots (`project-table` with `nil` user-id), and the frontend was merging that public `current-hand` into `selectedTable`, overwriting private fields such as `legal-actions` and player hole cards.
+- Fixed `src/hooks/useTableEvents.ts` to refetch `/api/tables/:id` for the currently selected table on incoming websocket table events, preserving the authenticated/private hand view instead of replacing it with the public one.
+- `npm run build` passes after the websocket sync fix.
+
+TODOs / notes:
+- This fix restores private turn controls for the selected table, but the tables list still intentionally uses public websocket snapshots.
+- If turn-state glitches remain, the next place to inspect is whether some paths update only `current-hand` locally while other table-level fields depend on websocket timing.

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { createApiClient } from '../api/client'
 import { useAppStore } from '../state/useAppStore'
-import type { ApiEvent } from '../types'
+import type { ApiEvent, Table } from '../types'
 
 export const useTableEvents = () => {
   const apiBase = useAppStore((state) => state.apiBase)
@@ -14,6 +15,7 @@ export const useTableEvents = () => {
     if (!apiBase) return
     if (wsRef.current) wsRef.current.close()
 
+    const api = createApiClient(apiBase)
     const wsUrl = apiBase.replace('http', 'ws') + '/ws'
     setWsStatus('connecting')
     const ws = new WebSocket(wsUrl)
@@ -28,9 +30,24 @@ export const useTableEvents = () => {
         if (data.table) updateTable(data.table)
         appendEvent(data)
         if (data.table) {
-          mergeSelectedTable((prev) =>
-            prev && data.table?.id === prev.id ? { ...prev, ...data.table } : prev,
-          )
+          const selectedTableId = useAppStore.getState().selectedTable?.id
+          if (selectedTableId && data.table.id === selectedTableId) {
+            api.request<Table>(`/api/tables/${data.table.id}`)
+              .then((table) => {
+                mergeSelectedTable((prev) =>
+                  prev && table.id === prev.id ? table : prev,
+                )
+              })
+              .catch(() => {
+                mergeSelectedTable((prev) =>
+                  prev && data.table?.id === prev.id ? { ...prev, ...data.table } : prev,
+                )
+              })
+          } else {
+            mergeSelectedTable((prev) =>
+              prev && data.table?.id === prev.id ? { ...prev, ...data.table } : prev,
+            )
+          }
         }
       } catch {
         // ignore bad payloads
