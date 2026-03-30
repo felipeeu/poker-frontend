@@ -66,6 +66,8 @@ type AdminHandControlsSectionProps = {
   onTimeout: () => void
   onNextHand: () => void
   disabled: boolean
+  title?: string
+  description?: string
 }
 
 export const AdminHandControlsSection = ({
@@ -76,13 +78,15 @@ export const AdminHandControlsSection = ({
   onTimeout,
   onNextHand,
   disabled,
+  title,
+  description,
 }: AdminHandControlsSectionProps) => {
   const { t } = useI18n()
 
   return (
     <ControlSection
-      title={t('detail.handControls')}
-      description={t('detail.handControlsAdminOnly')}
+      title={title ?? t('detail.handControls')}
+      description={description ?? t('detail.handControlsAdminOnly')}
       className="border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
       <FieldGroup className="mb-3">

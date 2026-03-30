@@ -680,22 +680,9 @@ export const TableDetail = () => {
           )}
 
           {isAdmin && (
-            <div className="max-[1024px]:hidden">
-              <AdminHandControlsSection
-                dealerSeat={dealerSeat}
-                onDealerSeatChange={setDealerSeat}
-                onStartHand={handleStartHand}
-                onResolve={handleResolve}
-                onTimeout={handleTimeout}
-                onNextHand={handleNextHand}
-                disabled={!token}
-              />
-            </div>
-          )}
-          {isAdmin && (
-            <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)] min-[1025px]:hidden">
+            <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)]">
               <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
-                {t('detail.handControls')}
+                {t('detail.recoveryToolsSummary')}
               </summary>
               <div className="mt-3">
                 <AdminHandControlsSection
@@ -706,6 +693,8 @@ export const TableDetail = () => {
                   onTimeout={handleTimeout}
                   onNextHand={handleNextHand}
                   disabled={!token}
+                  title={t('detail.recoveryTools')}
+                  description={t('detail.handControlsRecoveryOnly')}
                 />
               </div>
             </details>
