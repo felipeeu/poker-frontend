@@ -111,6 +111,7 @@ export const AdminHandControlsSection = ({
 type PlayerControlsSectionProps = {
   seatNo: number
   onSeatNoChange: (value: number) => void
+  seatNoLocked: boolean
   hasOwnedSeat: boolean
   seatName: string
   onSeatNameChange: (value: string) => void
@@ -134,6 +135,7 @@ type PlayerControlsSectionProps = {
 export const PlayerControlsSection = ({
   seatNo,
   onSeatNoChange,
+  seatNoLocked,
   hasOwnedSeat,
   seatName,
   onSeatNameChange,
@@ -170,6 +172,7 @@ export const PlayerControlsSection = ({
               min={1}
               value={seatNo}
               onChange={(e) => onSeatNoChange(Number(e.target.value))}
+              disabled={seatNoLocked}
             />
           </div>
           {!hasOwnedSeat ? (

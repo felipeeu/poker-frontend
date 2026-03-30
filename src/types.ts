@@ -13,6 +13,8 @@ export type Table = {
   id: string
   name?: string
   status?: string
+  max_seats?: number
+  'max-seats'?: number
   seats?: Seat[]
   current_hand?: unknown
   'current-hand'?: unknown

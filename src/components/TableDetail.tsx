@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import {
@@ -31,7 +31,7 @@ export const TableDetail = () => {
   const setSelectedTable = useAppStore((state) => state.setSelectedTable)
   const setStatus = useAppStore((state) => state.setStatus)
   const mergeSelectedTable = useAppStore((state) => state.mergeSelectedTable)
-  const [seatNo, setSeatNo] = useState(1)
+  const [seatNo, setSeatNo] = useState(0)
   const [seatName, setSeatName] = useState('')
   const [seatStack, setSeatStack] = useState(1000)
   const [buyInAmount, setBuyInAmount] = useState(500)
@@ -72,6 +72,8 @@ export const TableDetail = () => {
   }, [selectedTable, userId])
 
   const mySeatNo = ownedSeats.length === 1 ? ownedSeats[0]['seat-no'] ?? ownedSeats[0].seat_no : undefined
+  const mySeat = ownedSeats.length === 1 ? ownedSeats[0] : undefined
+  const isSittingOut = Boolean(mySeat && (mySeat['sitting-out?'] ?? mySeat.sitting_out))
   const legalForSeat =
     mySeatNo != null && legalActions
       ? legalActions[String(mySeatNo)] || legalActions[mySeatNo]
@@ -114,6 +116,32 @@ export const TableDetail = () => {
       return aNo - bNo
     })
   }, [selectedTable])
+  const firstOpenSeatNo = useMemo(() => {
+    const occupied = new Set(
+      displaySeats
+        .filter((seat) => Boolean(seat['user-id'] ?? seat.user_id))
+        .map((seat) => seat['seat-no'] ?? seat.seat_no)
+        .filter((value): value is number => typeof value === 'number'),
+    )
+    const maxSeats = selectedTable?.['max-seats'] ?? Math.max(displaySeats.length, 1)
+    for (let candidate = 1; candidate <= maxSeats; candidate += 1) {
+      if (!occupied.has(candidate)) return candidate
+    }
+    return undefined
+  }, [displaySeats, selectedTable?.['max-seats']])
+  const hasManualSeatNo = Number.isFinite(seatNo) && seatNo > 0
+  const effectiveSeatNo = mySeatNo ?? (hasManualSeatNo ? seatNo : firstOpenSeatNo ?? 1)
+
+  useEffect(() => {
+    if (mySeatNo != null) {
+      if (seatNo !== mySeatNo) setSeatNo(mySeatNo)
+      return
+    }
+    if (!hasManualSeatNo && firstOpenSeatNo != null && seatNo !== firstOpenSeatNo) {
+      setSeatNo(firstOpenSeatNo)
+    }
+  }, [firstOpenSeatNo, hasManualSeatNo, mySeatNo, seatNo])
+
   const activeSeats = displaySeats.filter((seat) => {
     const seatUserId = seat['user-id'] ?? seat.user_id
     const seatStack = seat.stack ?? 0
@@ -121,11 +149,11 @@ export const TableDetail = () => {
     return Boolean(seatUserId) && !sittingOut && seatStack > 0
   })
   const activeSeatCount = activeSeats.length
-  const selectedSeat = displaySeats.find((seat) => (seat['seat-no'] ?? seat.seat_no) === seatNo)
+  const selectedSeat = displaySeats.find((seat) => (seat['seat-no'] ?? seat.seat_no) === effectiveSeatNo)
   const selectedSeatUserId = selectedSeat?.['user-id'] ?? selectedSeat?.user_id ?? ''
   const isSeatOccupied = Boolean(selectedSeatUserId)
   const hasOwnedSeat = ownedSeats.length > 0
-  const hasValidSeatNo = Number.isFinite(seatNo) && seatNo > 0
+  const hasValidSeatNo = Number.isFinite(effectiveSeatNo) && effectiveSeatNo > 0
   const hasValidSeatName = seatName.trim().length > 0
   const hasValidSeatStack = Number.isFinite(seatStack) && seatStack > 0
   const joinSeatDisabled =
@@ -165,6 +193,7 @@ export const TableDetail = () => {
   const canRemovePlayer = Boolean(token && selectedTable && selectedSeatUserId)
   const nextStepMessage = (() => {
     if (!token) return t('detail.loginToControlTable')
+    if (isSittingOut) return t('detail.sittingOutNeedSitIn')
     if (isHandFinished) {
       if (activeSeatCount < 2) return t('detail.handCompleteNeedPlayers')
       return t('detail.handCompleteReadyNext')
@@ -183,6 +212,7 @@ export const TableDetail = () => {
     if (!token) return t('detail.loginRequired')
     if (hasSeatConflict) return t('detail.seatConflict')
     if (mySeatNo == null) return t('detail.joinToPlay')
+    if (isSittingOut) return t('detail.sittingOutNeedSitIn')
     if (!currentHand) return t('detail.startHandToReceiveActions')
     if (isHandFinished) return t('detail.handAlreadyFinished')
     if (handStatus === 'showdown') return t('detail.waitingForShowdownResolution')
@@ -203,7 +233,7 @@ export const TableDetail = () => {
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/join`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo, name: trimmedSeatName, stack: seatStack }),
+        body: JSON.stringify({ 'seat-no': effectiveSeatNo, name: trimmedSeatName, stack: seatStack }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
@@ -219,7 +249,7 @@ export const TableDetail = () => {
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/buy-in`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo, amount: buyInAmount }),
+        body: JSON.stringify({ 'seat-no': effectiveSeatNo, amount: buyInAmount }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
@@ -234,7 +264,7 @@ export const TableDetail = () => {
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/sit-out`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo }),
+        body: JSON.stringify({ 'seat-no': effectiveSeatNo }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
@@ -249,7 +279,7 @@ export const TableDetail = () => {
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/sit-in`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo }),
+        body: JSON.stringify({ 'seat-no': effectiveSeatNo }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
@@ -264,7 +294,7 @@ export const TableDetail = () => {
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/leave`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo }),
+        body: JSON.stringify({ 'seat-no': effectiveSeatNo }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
@@ -284,7 +314,7 @@ export const TableDetail = () => {
     try {
       const table = await api.request(`/api/tables/${selectedTable.id}/leave`, {
         method: 'POST',
-        body: JSON.stringify({ 'seat-no': seatNo }),
+        body: JSON.stringify({ 'seat-no': effectiveSeatNo }),
       })
       updateTable(table as Table)
       setSelectedTable(table as Table)
@@ -417,7 +447,7 @@ export const TableDetail = () => {
 
       const payload: Record<string, unknown> = {}
       if (board.length > 0) payload.board = board
-      if (holes.length > 0) payload['hole-cards'] = { [String(seatNo)]: holes }
+      if (holes.length > 0) payload['hole-cards'] = { [String(effectiveSeatNo)]: holes }
 
       const hand = await api.request(`/api/tables/${selectedTable.id}/hands/cards`, {
         method: 'POST',
@@ -581,8 +611,9 @@ export const TableDetail = () => {
           </details>
           <div className="max-[1024px]:hidden">
             <PlayerControlsSection
-              seatNo={seatNo}
+              seatNo={effectiveSeatNo}
               onSeatNoChange={setSeatNo}
+              seatNoLocked={Boolean(mySeatNo != null)}
               hasOwnedSeat={hasOwnedSeat}
               seatName={seatName}
               onSeatNameChange={setSeatName}
@@ -609,8 +640,9 @@ export const TableDetail = () => {
             </summary>
             <div className="mt-3">
               <PlayerControlsSection
-                seatNo={seatNo}
+                seatNo={effectiveSeatNo}
                 onSeatNoChange={setSeatNo}
+                seatNoLocked={Boolean(mySeatNo != null)}
                 hasOwnedSeat={hasOwnedSeat}
                 seatName={seatName}
                 onSeatNameChange={setSeatName}
@@ -717,7 +749,7 @@ export const TableDetail = () => {
         open={isRemovePlayerDialogOpen}
         onOpenChange={setIsRemovePlayerDialogOpen}
         title={t('detail.removePlayerConfirmTitle')}
-        description={t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: seatNo })}
+        description={t('detail.confirmRemovePlayer', { user: selectedSeatUserId, seat: effectiveSeatNo })}
         cancelLabel={t('dialog.cancel')}
         confirmLabel={t('dialog.confirm')}
         onConfirm={handleRemovePlayer}
