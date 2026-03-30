@@ -41,20 +41,21 @@ export const TableCenter = ({
               <span>{t('detail.potLabel')}</span>
               <strong>{typeof pot === 'number' ? pot : 0}</strong>
             </div>
-            {sidePots && sidePots.length > 0 && (
+            {sidePots && sidePots.length > 1 && (
               <div className="flex justify-between gap-3 border-b border-dashed border-[var(--color-border)] py-1.5 max-[1024px]:items-start">
                 <span>{t('detail.sidePots')}</span>
                 <div className="flex flex-wrap gap-2">
                   {sidePots.map((side, idx) => (
                     <div
                       key={`side-pot-${idx}`}
-                      className="rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-xs text-[var(--color-foreground)]"
+                      className="grid gap-0.5 rounded-2xl border border-white/10 bg-white/8 px-3 py-2 text-xs text-[var(--color-foreground)]"
                     >
-                      {t('detail.sidePotSeats', {
-                        index: idx + 1,
-                        amount: side.amount,
-                        seats: side['eligible-seat-nos'].join(', '),
-                      })}
+                      <strong className="text-[0.78rem] font-semibold">
+                        {t('detail.sidePotLabel', { index: idx + 1, amount: side.amount })}
+                      </strong>
+                      <span className="text-[0.72rem] text-[var(--color-muted)]">
+                        {t('detail.sidePotEligibleSeats', { seats: side['eligible-seat-nos'].join(', ') })}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -87,6 +88,7 @@ type SeatLayoutProps = {
   dealerSeat?: number
   smallBlindSeat?: number
   bigBlindSeat?: number
+  handRankBySeatNo?: Record<number, string>
 }
 
 export const DesktopSeatLayout = ({
@@ -95,6 +97,7 @@ export const DesktopSeatLayout = ({
   dealerSeat,
   smallBlindSeat,
   bigBlindSeat,
+  handRankBySeatNo,
 }: SeatLayoutProps) => {
   const { t } = useI18n()
   const positions = seatPositions(seats.length)
@@ -123,6 +126,7 @@ export const DesktopSeatLayout = ({
               dealerSeat={dealerSeat}
               smallBlindSeat={smallBlindSeat}
               bigBlindSeat={bigBlindSeat}
+              handRank={handRankBySeatNo?.[seatNo]}
             />
           </div>
         )
@@ -137,6 +141,7 @@ export const MobileSeatLayout = ({
   dealerSeat,
   smallBlindSeat,
   bigBlindSeat,
+  handRankBySeatNo,
 }: SeatLayoutProps) => {
   const { topSeats, bottomSeats } = useMemo(() => splitSeatsForMobile(seats), [seats])
   const { t } = useI18n()
@@ -153,6 +158,7 @@ export const MobileSeatLayout = ({
               dealerSeat={dealerSeat}
               smallBlindSeat={smallBlindSeat}
               bigBlindSeat={bigBlindSeat}
+              handRank={handRankBySeatNo?.[(seat['seat-no'] ?? seat.seat_no ?? 0)]}
             />
           ))
         ) : (
@@ -168,6 +174,7 @@ export const MobileSeatLayout = ({
             dealerSeat={dealerSeat}
             smallBlindSeat={smallBlindSeat}
             bigBlindSeat={bigBlindSeat}
+            handRank={handRankBySeatNo?.[(seat['seat-no'] ?? seat.seat_no ?? 0)]}
           />
         ))}
       </div>
@@ -181,6 +188,7 @@ type SeatChipProps = {
   dealerSeat?: number
   smallBlindSeat?: number
   bigBlindSeat?: number
+  handRank?: string
 }
 
 const SeatChip = ({
@@ -189,6 +197,7 @@ const SeatChip = ({
   dealerSeat,
   smallBlindSeat,
   bigBlindSeat,
+  handRank,
 }: SeatChipProps) => {
   const { t } = useI18n()
   const seatNo = seat['seat-no'] ?? seat.seat_no ?? 0
@@ -206,6 +215,8 @@ const SeatChip = ({
   const isBigBlind = bigBlindSeat === seatNo
   const shortName = truncateSeatName(displayName)
   const avatarLabel = seatAvatarLabel(displayName)
+  const handRankLabel = translateHandRank(t, handRank)
+  const handRankClass = handRankToneClass(handRank)
   const statusBadgeClass =
     'px-1.5 py-[3px] text-[8px] leading-none tracking-[0.12em] max-[1024px]:px-[5px] max-[1024px]:py-[2px] max-[1024px]:text-[0.5rem]'
 
@@ -247,6 +258,11 @@ const SeatChip = ({
           <span className="text-[0.66rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.56rem] max-[520px]:text-[0.54rem]">
             {t('detail.stackShort', { value: stack })}
           </span>
+          {handRankLabel ? (
+            <span className={cn('text-[0.6rem] leading-[1.2] max-[1024px]:text-[0.52rem] max-[520px]:text-[0.5rem]', handRankClass)}>
+              {handRankLabel}
+            </span>
+          ) : null}
         </div>
       </div>
       {(sittingOut || committed > 0) && (
@@ -261,6 +277,52 @@ const SeatChip = ({
       )}
     </div>
   )
+}
+
+const translateHandRank = (t: (key: string, params?: Record<string, string | number>) => string, handRank?: string) => {
+  switch (handRank) {
+    case 'high-card':
+      return t('detail.rank.highCard')
+    case 'one-pair':
+      return t('detail.rank.onePair')
+    case 'two-pair':
+      return t('detail.rank.twoPair')
+    case 'three-of-a-kind':
+      return t('detail.rank.threeOfAKind')
+    case 'straight':
+      return t('detail.rank.straight')
+    case 'flush':
+      return t('detail.rank.flush')
+    case 'full-house':
+      return t('detail.rank.fullHouse')
+    case 'four-of-a-kind':
+      return t('detail.rank.fourOfAKind')
+    case 'straight-flush':
+      return t('detail.rank.straightFlush')
+    default:
+      return null
+  }
+}
+
+const handRankToneClass = (handRank?: string) => {
+  switch (handRank) {
+    case 'straight-flush':
+    case 'four-of-a-kind':
+      return 'font-semibold text-[#f59e0b]'
+    case 'full-house':
+    case 'flush':
+      return 'font-semibold text-[#f7e4b7]'
+    case 'straight':
+    case 'three-of-a-kind':
+      return 'text-[#cbd5e1]'
+    case 'two-pair':
+    case 'one-pair':
+      return 'text-[var(--color-muted)]'
+    case 'high-card':
+      return 'text-[rgba(148,163,184,0.8)]'
+    default:
+      return 'text-[var(--color-muted)]'
+  }
 }
 
 const seatPositions = (count: number) => {

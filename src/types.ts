@@ -7,6 +7,8 @@ export type Seat = {
   stack?: number
   sitting_out?: boolean
   'sitting-out?'?: boolean
+  'showdown-rank'?: string | null
+  showdown_rank?: string | null
 }
 
 export type Table = {

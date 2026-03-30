@@ -19,6 +19,7 @@ import type { CurrentHand, Seat, Table } from '../types'
 import { ConfirmDialog } from '../components/ui/confirm-dialog'
 import { Badge } from '../components/ui/badge'
 import { Panel } from '../components/ui/panel'
+import { evaluateVisibleHandRank } from '../lib/hand-rank'
 
 export const TableDetail = () => {
   const api = useApi()
@@ -81,6 +82,26 @@ export const TableDetail = () => {
   const seatHoleCards = holeCards
     ? holeCards[String(mySeatNo ?? '')] || holeCards[mySeatNo as number]
     : undefined
+  const handRankBySeatNo = useMemo(() => {
+    const ranks: Record<number, string> = {}
+    const handSeats = ((currentHand?.seats as Array<Record<string, unknown>> | undefined) ?? [])
+    for (const seat of handSeats) {
+      const seatNo = (seat['seat-no'] as number | undefined) ?? (seat.seat_no as number | undefined)
+      if (seatNo == null) continue
+      const showdownRank =
+        (seat['showdown-rank'] as string | undefined) ??
+        (seat.showdown_rank as string | undefined)
+      if (showdownRank) {
+        ranks[seatNo] = showdownRank
+        continue
+      }
+      const visibleHoleCards = holeCards?.[String(seatNo)] ?? holeCards?.[seatNo]
+      if (!board || !visibleHoleCards || visibleHoleCards.length !== 2) continue
+      const category = evaluateVisibleHandRank([...board, ...visibleHoleCards])
+      if (category) ranks[seatNo] = category
+    }
+    return ranks
+  }, [board, currentHand?.seats, holeCards])
   const canBet = Boolean(legalForSeat?.includes('bet'))
   const canRaise = Boolean(legalForSeat?.includes('raise'))
   const canAllIn = Boolean(legalForSeat?.includes('all-in'))
@@ -149,6 +170,14 @@ export const TableDetail = () => {
     return Boolean(seatUserId) && !sittingOut && seatStack > 0
   })
   const activeSeatCount = activeSeats.length
+  const mySeatInCurrentHand = Boolean(
+    mySeatNo != null &&
+      ((currentHand?.seats as Array<Record<string, unknown>> | undefined) ?? []).some(
+        (seat) =>
+          (((seat['seat-no'] as number | undefined) ?? (seat.seat_no as number | undefined)) === mySeatNo) &&
+          Boolean(seat['in-hand?']),
+      ),
+  )
   const selectedSeat = displaySeats.find((seat) => (seat['seat-no'] ?? seat.seat_no) === effectiveSeatNo)
   const selectedSeatUserId = selectedSeat?.['user-id'] ?? selectedSeat?.user_id ?? ''
   const isSeatOccupied = Boolean(selectedSeatUserId)
@@ -191,6 +220,13 @@ export const TableDetail = () => {
     }
   })()
   const canRemovePlayer = Boolean(token && selectedTable && selectedSeatUserId)
+  const leaveSeatDisabled = !token || mySeatNo == null || mySeatInCurrentHand
+  const leaveSeatDisabledReason = (() => {
+    if (!token) return t('detail.loginRequired')
+    if (mySeatNo == null) return t('detail.notSeated')
+    if (mySeatInCurrentHand) return t('detail.cannotLeaveDuringHand')
+    return t('detail.leaveSeat')
+  })()
   const nextStepMessage = (() => {
     if (!token) return t('detail.loginToControlTable')
     if (isSittingOut) return t('detail.sittingOutNeedSitIn')
@@ -511,7 +547,6 @@ export const TableDetail = () => {
 
   return (
       <Panel className="min-h-[420px] bg-[radial-gradient(circle_at_top,rgba(217,177,95,0.08),transparent_18%),rgba(19,29,22,0.88)]">
-      <h2 className="max-[1024px]:hidden">{t('detail.title')}</h2>
       <div className="grid gap-[18px]">
         <div className="grid gap-[18px]">
           <div className="grid gap-2 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-[linear-gradient(135deg,rgba(19,29,22,0.88),rgba(14,24,20,0.72))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] max-[1024px]:gap-1.5 max-[1024px]:px-3.5 max-[1024px]:py-3 max-[1024px]:shadow-none sm:px-5">
@@ -523,14 +558,11 @@ export const TableDetail = () => {
                 {actorSeatNo != null ? t('detail.actorSeatValue', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
               </Badge>
               <Badge>{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</Badge>
-              <Badge>{t('detail.seats', { count: selectedTable.seats?.length || 0 })}</Badge>
+              <Badge>{t('detail.seats')} {selectedTable.seats?.length || 0}</Badge>
             </div>
-            <div className="grid gap-1 max-[1024px]:gap-0.5">
-              <strong className="text-[0.82rem] font-bold uppercase tracking-[0.16em] text-[var(--color-muted)] max-[1024px]:text-[0.68rem] max-[1024px]:tracking-[0.12em]">
-                {t('detail.nextStepTitle')}
-              </strong>
-              <p className="m-0 text-[15px] leading-6 max-[1024px]:text-[13px] max-[1024px]:leading-5">{nextStepMessage}</p>
-            </div>
+            <p className="m-0 text-[15px] leading-6 text-[var(--color-muted)] max-[1024px]:text-[13px] max-[1024px]:leading-5">
+              {nextStepMessage}
+            </p>
           </div>
           <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[40px] border-[10px] border-[#57351c] bg-[radial-gradient(circle_at_50%_40%,rgba(52,122,78,0.92),rgba(18,68,39,0.96)_58%,rgba(9,39,24,0.98)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[inset_0_0_0_3px_rgba(245,228,177,0.18),inset_0_-18px_36px_rgba(0,0,0,0.25),0_28px_50px_rgba(0,0,0,0.3)] max-[1024px]:min-h-0 max-[1024px]:gap-[18px] max-[1024px]:rounded-[28px] max-[1024px]:border-[8px] max-[1024px]:px-3 max-[1024px]:py-[22px] max-[520px]:gap-[14px] max-[520px]:rounded-[24px] max-[520px]:border-[7px] max-[520px]:px-2 max-[520px]:py-4">
             <div className="pointer-events-none absolute inset-4 rounded-[999px] border-2 border-[rgba(242,229,187,0.14)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
@@ -541,6 +573,7 @@ export const TableDetail = () => {
               dealerSeat={handDealerSeat}
               smallBlindSeat={smallBlindSeat}
               bigBlindSeat={bigBlindSeat}
+              handRankBySeatNo={handRankBySeatNo}
             />
             <TableCenter
               board={board}
@@ -555,6 +588,7 @@ export const TableDetail = () => {
               dealerSeat={handDealerSeat}
               smallBlindSeat={smallBlindSeat}
               bigBlindSeat={bigBlindSeat}
+              handRankBySeatNo={handRankBySeatNo}
             />
           </div>
           <div className="hidden min-[1025px]:block">
@@ -566,7 +600,6 @@ export const TableDetail = () => {
               street={street}
               pot={pot}
               isHandFinished={isHandFinished}
-              tableId={selectedTable.id}
               actorSeatNo={actorSeatNo}
               seatCount={selectedTable.seats?.length || 0}
             />
@@ -592,7 +625,7 @@ export const TableDetail = () => {
           </div>
           <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)] min-[1025px]:hidden">
             <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
-              {t('detail.title')}
+              {t('detail.status')}
             </summary>
             <div className="mt-3">
               <TableSummary
@@ -603,7 +636,6 @@ export const TableDetail = () => {
                 street={street}
                 pot={pot}
                 isHandFinished={isHandFinished}
-                tableId={selectedTable.id}
                 actorSeatNo={actorSeatNo}
                 seatCount={selectedTable.seats?.length || 0}
               />
@@ -626,6 +658,8 @@ export const TableDetail = () => {
               joinSeatDisabledReason={joinSeatDisabledReason}
               onBuyIn={handleBuyIn}
               onLeaveSeat={handleLeaveSeat}
+              leaveSeatDisabled={leaveSeatDisabled}
+              leaveSeatDisabledReason={leaveSeatDisabledReason}
               onRemovePlayer={handleRequestRemovePlayer}
               canRemovePlayer={canRemovePlayer}
               onSitOut={handleSitOut}
@@ -655,6 +689,8 @@ export const TableDetail = () => {
                 joinSeatDisabledReason={joinSeatDisabledReason}
                 onBuyIn={handleBuyIn}
                 onLeaveSeat={handleLeaveSeat}
+                leaveSeatDisabled={leaveSeatDisabled}
+                leaveSeatDisabledReason={leaveSeatDisabledReason}
                 onRemovePlayer={handleRequestRemovePlayer}
                 canRemovePlayer={canRemovePlayer}
                 onSitOut={handleSitOut}

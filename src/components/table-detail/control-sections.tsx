@@ -124,6 +124,8 @@ type PlayerControlsSectionProps = {
   joinSeatDisabledReason: string
   onBuyIn: () => void
   onLeaveSeat: () => void
+  leaveSeatDisabled: boolean
+  leaveSeatDisabledReason: string
   onRemovePlayer: () => void
   canRemovePlayer: boolean
   onSitOut: () => void
@@ -148,6 +150,8 @@ export const PlayerControlsSection = ({
   joinSeatDisabledReason,
   onBuyIn,
   onLeaveSeat,
+  leaveSeatDisabled,
+  leaveSeatDisabledReason,
   onRemovePlayer,
   canRemovePlayer,
   onSitOut,
@@ -216,7 +220,15 @@ export const PlayerControlsSection = ({
           {t('detail.joinSeat')}
         </Button>
         <Button className="w-full" variant="ghost" onClick={onBuyIn} disabled={!hasToken}>{t('detail.buyInAction')}</Button>
-        <Button className="w-full" variant="ghost" onClick={onLeaveSeat} disabled={!hasToken}>{t('detail.leaveSeat')}</Button>
+        <Button
+          className="w-full"
+          variant="ghost"
+          onClick={onLeaveSeat}
+          disabled={leaveSeatDisabled}
+          title={leaveSeatDisabledReason}
+        >
+          {t('detail.leaveSeat')}
+        </Button>
         {isAdmin ? (
           <Button
             className="w-full"
