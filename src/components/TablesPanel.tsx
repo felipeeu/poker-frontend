@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { useApi } from '../api/useApi'
 import { useAppStore } from '../state/useAppStore'
 import type { Table } from '../types'
+import { filterTablesByClub, scopedSelectedTableName } from '../lib/clubs-view'
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
+import { ButtonLink } from '../components/ui/button-link'
 import { Input } from '../components/ui/input'
 import { Panel } from '../components/ui/panel'
 
@@ -18,17 +20,22 @@ export const TablesPanel = () => {
   const { t } = useI18n()
   const tables = useAppStore((state) => state.tables)
   const selectedTable = useAppStore((state) => state.selectedTable)
+  const selectedClub = useAppStore((state) => state.selectedClub)
   const token = useAppStore((state) => state.token)
   const setTables = useAppStore((state) => state.setTables)
   const updateTable = useAppStore((state) => state.updateTable)
   const setSelectedTable = useAppStore((state) => state.setSelectedTable)
+  const setSelectedClub = useAppStore((state) => state.setSelectedClub)
   const pushToast = useAppStore((state) => state.pushToast)
   const setStatus = useAppStore((state) => state.setStatus)
   const [newTableId, setNewTableId] = useState('table-1')
   const [newTableName, setNewTableName] = useState('Main Table')
   const navigate = useNavigate()
-  const tableCount = tables.length
-  const selectedTableName = selectedTable?.name || selectedTable?.id || '—'
+  const selectedClubId = selectedClub?.id
+  const selectedClubName = selectedClub?.name || selectedClub?.id || t('clubs.allTables')
+  const visibleTables = filterTablesByClub(tables, selectedClubId)
+  const tableCount = visibleTables.length
+  const selectedTableName = scopedSelectedTableName(selectedTable, visibleTables)
 
   const loadTables = async () => {
     try {
@@ -55,6 +62,7 @@ export const TablesPanel = () => {
       const payload = {
         id: newTableId.trim(),
         name: newTableName.trim(),
+        ...(selectedClubId ? { 'club-id': selectedClubId } : {}),
       }
       const table = await api.request<Table>('/api/tables', {
         method: 'POST',
@@ -78,7 +86,18 @@ export const TablesPanel = () => {
     <Panel className="h-fit">
       <div className="mb-5 flex items-center justify-between gap-3">
         <h2 className="m-0 text-2xl font-semibold">{t('tables.title')}</h2>
-        <Button size="sm" onClick={loadTables}>{t('tables.refresh')}</Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={loadTables}>{t('tables.refresh')}</Button>
+          <ButtonLink size="sm" variant="ghost" to="/clubs">{t('clubs.manage')}</ButtonLink>
+        </div>
+      </div>
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Badge variant={selectedClubId ? 'accent' : 'neutral'}>{selectedClubName}</Badge>
+        {selectedClubId ? (
+          <Button size="sm" variant="ghost" onClick={() => setSelectedClub(null)}>
+            {t('clubs.allTables')}
+          </Button>
+        ) : null}
       </div>
       <div className="mb-6 grid gap-3 sm:grid-cols-2">
         <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
@@ -91,7 +110,9 @@ export const TablesPanel = () => {
         </div>
       </div>
       <div className="mb-6 rounded-[24px] border border-[var(--color-border)] bg-[rgba(16,29,21,0.66)] p-5">
-        <p className="mb-4 text-sm text-[var(--color-muted)]">{t('tables.helper')}</p>
+        <p className="mb-4 text-sm text-[var(--color-muted)]">
+          {selectedClubId ? t('clubs.tables') : t('clubs.publicTables')}
+        </p>
         <div className="grid gap-4">
           <div className="grid gap-2">
             <label className="text-sm font-medium">{t('tables.tableId')}</label>
@@ -105,7 +126,7 @@ export const TablesPanel = () => {
         <Button className="mt-4" onClick={handleCreateTable} disabled={!token}>{t('tables.create')}</Button>
       </div>
       <ul className="grid gap-3 p-0">
-        {tables.map((table) => (
+        {visibleTables.map((table) => (
           <li key={table.id} className="list-none">
             <button
               className={
@@ -119,12 +140,15 @@ export const TablesPanel = () => {
                 <strong className="block text-sm sm:text-base">{table.name || table.id}</strong>
                 <span className="text-sm text-[var(--color-muted)]">{table.id}</span>
               </div>
-              <Badge>{table.status || t('tables.unknown')}</Badge>
+              <div className="flex items-center gap-2">
+                {(table['club-id'] ?? table.club_id) ? <Badge>{t('clubs.private')}</Badge> : null}
+                <Badge>{table.status || t('tables.unknown')}</Badge>
+              </div>
             </button>
           </li>
         ))}
       </ul>
-      {tables.length === 0 && (
+      {visibleTables.length === 0 && (
         <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-white/4 px-4 py-5 text-sm text-[var(--color-muted)]">
           {t(token ? 'tables.empty' : 'tables.emptyLoggedOut')}
         </p>

@@ -5,6 +5,7 @@ import { ApiHeader } from './components/ApiHeader'
 import { AuthPanel } from './components/AuthPanel'
 import { useApi } from './api/useApi'
 import { useTableEvents } from './hooks/useTableEvents'
+import { ClubsPage } from './pages/ClubsPage'
 import { TableView } from './pages/TableView'
 import { TablesDashboard } from './pages/TablesDashboard'
 import { useAppStore } from './state/useAppStore'
@@ -29,6 +30,7 @@ const AppLayout = () => {
   const role = useAppStore((state) => state.role)
   const setAuth = useAppStore((state) => state.setAuth)
   const isTableRoute = location.pathname.startsWith('/tables/')
+  const isClubRoute = location.pathname === '/clubs'
 
   useEffect(() => {
     if (!token || role) return
@@ -61,13 +63,16 @@ const AppLayout = () => {
         className={
           isTableRoute
             ? 'grid grid-cols-1 gap-6'
+            : isClubRoute
+              ? 'grid grid-cols-1 gap-6'
             : 'grid grid-cols-1 gap-6 xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)_minmax(300px,360px)]'
         }
       >
-        {!isTableRoute && <AuthPanel />}
+        {!isTableRoute && !isClubRoute && <AuthPanel />}
         <Routes>
           <Route path="/" element={<Navigate to="/tables" replace />} />
           <Route path="/tables" element={<TablesDashboard />} />
+          <Route path="/clubs" element={<ClubsPage />} />
           <Route path="/tables/:tableId" element={<TableView />} />
           <Route path="*" element={<Navigate to="/tables" replace />} />
         </Routes>

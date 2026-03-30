@@ -15,11 +15,47 @@ export type Table = {
   id: string
   name?: string
   status?: string
+  club_id?: string
+  'club-id'?: string
   max_seats?: number
   'max-seats'?: number
   seats?: Seat[]
   current_hand?: unknown
   'current-hand'?: unknown
+}
+
+export type ClubMember = {
+  user_id?: string
+  'user-id'?: string
+  role?: string
+  joined_at?: number
+  'joined-at'?: number
+}
+
+export type ClubHistoryEvent = {
+  type: string
+  at?: number
+  user_id?: string
+  'user-id'?: string
+  table_id?: string
+  'table-id'?: string
+  table_name?: string
+  'table-name'?: string
+  hand_id?: string
+  'hand-id'?: string
+}
+
+export type Club = {
+  id: string
+  name?: string
+  private?: boolean
+  'private?'?: boolean
+  invite_code?: string
+  'invite-code'?: string
+  owner_user_id?: string
+  'owner-user-id'?: string
+  members?: ClubMember[]
+  history?: ClubHistoryEvent[]
 }
 
 export type ApiEvent = {

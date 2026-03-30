@@ -20,6 +20,11 @@ import { ConfirmDialog } from '../components/ui/confirm-dialog'
 import { Badge } from '../components/ui/badge'
 import { Panel } from '../components/ui/panel'
 import { evaluateVisibleHandRank } from '../lib/hand-rank'
+import {
+  isSeatInCurrentHand,
+  resolveEffectiveSeatNo,
+  syncedSeatNo,
+} from '../lib/table-seat'
 
 export const TableDetail = () => {
   const api = useApi()
@@ -150,18 +155,12 @@ export const TableDetail = () => {
     }
     return undefined
   }, [displaySeats, selectedTable?.['max-seats']])
-  const hasManualSeatNo = Number.isFinite(seatNo) && seatNo > 0
-  const effectiveSeatNo = mySeatNo ?? (hasManualSeatNo ? seatNo : firstOpenSeatNo ?? 1)
+  const effectiveSeatNo = resolveEffectiveSeatNo({ mySeatNo, seatNo, firstOpenSeatNo })
 
   useEffect(() => {
-    if (mySeatNo != null) {
-      if (seatNo !== mySeatNo) setSeatNo(mySeatNo)
-      return
-    }
-    if (!hasManualSeatNo && firstOpenSeatNo != null && seatNo !== firstOpenSeatNo) {
-      setSeatNo(firstOpenSeatNo)
-    }
-  }, [firstOpenSeatNo, hasManualSeatNo, mySeatNo, seatNo])
+    const nextSeatNo = syncedSeatNo({ mySeatNo, seatNo, firstOpenSeatNo })
+    if (nextSeatNo != null) setSeatNo(nextSeatNo)
+  }, [firstOpenSeatNo, mySeatNo, seatNo])
 
   const activeSeats = displaySeats.filter((seat) => {
     const seatUserId = seat['user-id'] ?? seat.user_id
@@ -170,13 +169,9 @@ export const TableDetail = () => {
     return Boolean(seatUserId) && !sittingOut && seatStack > 0
   })
   const activeSeatCount = activeSeats.length
-  const mySeatInCurrentHand = Boolean(
-    mySeatNo != null &&
-      ((currentHand?.seats as Array<Record<string, unknown>> | undefined) ?? []).some(
-        (seat) =>
-          (((seat['seat-no'] as number | undefined) ?? (seat.seat_no as number | undefined)) === mySeatNo) &&
-          Boolean(seat['in-hand?']),
-      ),
+  const mySeatInCurrentHand = isSeatInCurrentHand(
+    mySeatNo,
+    ((currentHand?.seats as Array<Record<string, unknown>> | undefined) ?? []),
   )
   const selectedSeat = displaySeats.find((seat) => (seat['seat-no'] ?? seat.seat_no) === effectiveSeatNo)
   const selectedSeatUserId = selectedSeat?.['user-id'] ?? selectedSeat?.user_id ?? ''

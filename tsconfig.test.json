@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "./.codex-tests",
+    "rootDir": "."
+  },
+  "include": [
+    "src/lib/clubs-view.ts",
+    "src/lib/clubs-page.ts",
+    "src/lib/api-auth.ts",
+    "src/lib/table-events.ts",
+    "src/lib/table-seat.ts",
+    "src/types.ts"
+  ]
+}

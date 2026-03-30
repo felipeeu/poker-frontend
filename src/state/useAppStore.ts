@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Locale } from '../i18n'
-import type { ApiEvent, Table, WsStatus } from '../types'
+import type { ApiEvent, Club, Table, WsStatus } from '../types'
 
 const DEFAULT_API = 'http://localhost:8080'
 
@@ -18,6 +18,8 @@ type AppStore = {
   userId: string
   role: string
   locale: Locale
+  clubs: Club[]
+  selectedClub: Club | null
   tables: Table[]
   selectedTable: Table | null
   events: ApiEvent[]
@@ -31,6 +33,9 @@ type AppStore = {
   setAuth: (token: string, refreshToken: string, userId: string, role?: string) => void
   setLocale: (locale: Locale) => void
   clearAuth: () => void
+  setClubs: (clubs: Club[]) => void
+  updateClub: (club: Club) => void
+  setSelectedClub: (club: Club | null) => void
   setTables: (tables: Table[]) => void
   updateTable: (table: Table) => void
   setSelectedTable: (table: Table | null) => void
@@ -54,6 +59,8 @@ export const useAppStore = create<AppStore>((set) => ({
   userId: readLocal('poker_user_id'),
   role: readLocal('poker_role'),
   locale: (readLocal('poker_locale') as Locale) || 'en',
+  clubs: [],
+  selectedClub: null,
   tables: [],
   selectedTable: null,
   events: [],
@@ -103,8 +110,18 @@ export const useAppStore = create<AppStore>((set) => ({
     } catch {
       // ignore storage errors
     }
-    set({ token: '', refreshToken: '', userId: '', role: '', selectedTable: null })
+    set({ token: '', refreshToken: '', userId: '', role: '', selectedClub: null, selectedTable: null, clubs: [] })
   },
+  setClubs: (clubs) => set({ clubs }),
+  updateClub: (club) =>
+    set((state) => {
+      const idx = state.clubs.findIndex((c) => c.id === club.id)
+      if (idx === -1) return { clubs: [club, ...state.clubs] }
+      const next = [...state.clubs]
+      next[idx] = { ...next[idx], ...club }
+      return { clubs: next }
+    }),
+  setSelectedClub: (club) => set({ selectedClub: club }),
   setTables: (tables) => set({ tables }),
   updateTable: (table) =>
     set((state) => {

@@ -1,4 +1,5 @@
 import { useAppStore } from '../state/useAppStore'
+import { shouldAttemptTokenRefresh, shouldClearAuthForPath } from '../lib/api-auth'
 
 export type ApiClient = {
   request: <T = unknown>(path: string, options?: RequestInit) => Promise<T>
@@ -106,7 +107,7 @@ export const createApiClient = (apiBase: string): ApiClient => ({
     const { token, clearAuth } = useAppStore.getState()
     let { res, body } = await makeRequest(token)
 
-    if (res.status === 401 && token && path !== '/api/auth/login' && path !== '/api/auth/refresh') {
+    if (shouldAttemptTokenRefresh({ status: res.status, path, token })) {
       try {
         const nextToken = await getRefreshedToken(apiBase)
         if (nextToken) {
@@ -117,7 +118,7 @@ export const createApiClient = (apiBase: string): ApiClient => ({
       }
     }
 
-    if (res.status === 401 && path === '/api/me') {
+    if (shouldClearAuthForPath(res.status, path)) {
       clearAuth()
     }
 

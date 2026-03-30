@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { createApiClient } from '../api/client'
+import { mergeSelectedTableEvent, shouldRefetchSelectedTable } from '../lib/table-events'
 import { useAppStore } from '../state/useAppStore'
 import type { ApiEvent, Table } from '../types'
 
@@ -31,7 +32,7 @@ export const useTableEvents = () => {
         appendEvent(data)
         if (data.table) {
           const selectedTableId = useAppStore.getState().selectedTable?.id
-          if (selectedTableId && data.table.id === selectedTableId) {
+          if (shouldRefetchSelectedTable(selectedTableId, data.table.id)) {
             api.request<Table>(`/api/tables/${data.table.id}`)
               .then((table) => {
                 mergeSelectedTable((prev) =>
@@ -39,14 +40,10 @@ export const useTableEvents = () => {
                 )
               })
               .catch(() => {
-                mergeSelectedTable((prev) =>
-                  prev && data.table?.id === prev.id ? { ...prev, ...data.table } : prev,
-                )
+                mergeSelectedTable((prev) => mergeSelectedTableEvent(prev, data.table))
               })
           } else {
-            mergeSelectedTable((prev) =>
-              prev && data.table?.id === prev.id ? { ...prev, ...data.table } : prev,
-            )
+            mergeSelectedTable((prev) => mergeSelectedTableEvent(prev, data.table))
           }
         }
       } catch {
