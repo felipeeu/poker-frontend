@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
-import { useI18n } from '../i18n'
+import { useI18n } from '@/i18n'
 import { useNavigate } from 'react-router-dom'
 import { useApi } from '../api/useApi'
-import { useAppStore } from '../state/useAppStore'
+import { useAppStore } from '@/state/useAppStore'
 import type { Table } from '../types'
 import { filterTablesByClub, scopedSelectedTableName } from '../lib/clubs-view'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { ButtonLink } from '../components/ui/button-link'
-import { Input } from '../components/ui/input'
-import { Panel } from '../components/ui/panel'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ButtonLink } from '@/components/ui/button-link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert } from '@/components/ui/alert'
 
 type TablesResponse = {
   tables: Table[]
@@ -83,7 +85,8 @@ export const TablesPanel = () => {
   }, [token])
 
   return (
-    <Panel className="h-fit">
+    <Card className="h-fit">
+      <CardContent className="p-5">
       <div className="mb-5 flex items-center justify-between gap-3">
         <h2 className="m-0 text-2xl font-semibold">{t('tables.title')}</h2>
         <div className="flex items-center gap-2">
@@ -109,11 +112,11 @@ export const TablesPanel = () => {
         </p>
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <label className="text-sm font-medium">{t('tables.tableId')}</label>
+            <Label>{t('tables.tableId')}</Label>
             <Input value={newTableId} onChange={(e) => setNewTableId(e.target.value)} />
           </div>
           <div className="grid gap-2">
-            <label className="text-sm font-medium">{t('tables.name')}</label>
+            <Label>{t('tables.name')}</Label>
             <Input value={newTableName} onChange={(e) => setNewTableName(e.target.value)} />
           </div>
         </div>
@@ -143,10 +146,11 @@ export const TablesPanel = () => {
         ))}
       </ul>
       {visibleTables.length === 0 && (
-        <p className="mt-5 rounded-[16px] border border-dashed border-[var(--color-border)] px-4 py-5 text-sm text-[var(--color-muted)]">
+        <Alert tone="muted" className="mt-5 px-4 py-5">
           {t(token ? 'tables.empty' : 'tables.emptyLoggedOut')}
-        </p>
+        </Alert>
       )}
-    </Panel>
+      </CardContent>
+    </Card>
   )
 }

@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { useI18n } from '../../i18n'
-import { useAppStore } from '../../state/useAppStore'
+import { useI18n } from '@/i18n'
+import { useAppStore } from '@/state/useAppStore'
 import type { Seat } from '../../types'
-import { Badge } from '../../components/ui/badge'
-import { cn } from '../../lib/cn'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/cn'
 import { Card } from '../Card'
 
 type TableCenterProps = {

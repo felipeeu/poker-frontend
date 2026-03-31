@@ -1,13 +1,14 @@
 import { useEffect } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
-import { useI18n } from '../i18n'
+import { useI18n } from '@/i18n'
 import { useApi } from '../api/useApi'
 import { TableDetail } from '../components/TableDetail'
-import { useAppStore } from '../state/useAppStore'
+import { useAppStore } from '@/state/useAppStore'
 import type { Table } from '../types'
-import { Badge } from '../components/ui/badge'
-import { ButtonLink } from '../components/ui/button-link'
-import { Panel } from '../components/ui/panel'
+import { Badge } from '@/components/ui/badge'
+import { ButtonLink } from '@/components/ui/button-link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Alert } from '@/components/ui/alert'
 
 export const TableView = () => {
   const { tableId } = useParams()
@@ -87,8 +88,8 @@ export const TableView = () => {
 
   return (
     <>
-      <Panel className="min-h-0 p-3 sm:p-5 max-[1024px]:rounded-none max-[1024px]:border-x-0 max-[1024px]:border-t-0 max-[1024px]:bg-transparent max-[1024px]:px-0 max-[1024px]:py-1 max-[1024px]:shadow-none">
-        <div className="flex items-center justify-between gap-3">
+      <Card className="min-h-0 max-[1024px]:rounded-none max-[1024px]:border-x-0 max-[1024px]:border-t-0 max-[1024px]:bg-transparent max-[1024px]:shadow-none">
+        <CardContent className="flex items-center justify-between gap-3 p-3 sm:p-5 max-[1024px]:px-0 max-[1024px]:py-1">
           <div>
             <h2 className="m-0 text-[12px] font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
             <p className="mt-0 text-[9px] text-[var(--color-muted)] sm:mt-1 sm:text-sm">{tableId || t('table.loading')}</p>
@@ -96,10 +97,11 @@ export const TableView = () => {
           <ButtonLink className="min-h-6 rounded-md px-2 py-0.5 text-[9px] sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm" variant="ghost" to="/tables">
             {t('table.backToTables')}
           </ButtonLink>
-        </div>
-      </Panel>
+        </CardContent>
+      </Card>
       <TableDetail />
-      <Panel className="hidden min-h-0 min-[1025px]:block">
+      <Card className="hidden min-h-0 min-[1025px]:block">
+        <CardContent className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="m-0 text-2xl font-semibold">{t('table.recentEvents')}</h2>
@@ -123,9 +125,10 @@ export const TableView = () => {
               <p className="mt-3 text-sm leading-6 text-[var(--color-foreground)]">{formatEvent(event)}</p>
             </div>
           ))}
-          {tableEvents.length === 0 && <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p>}
+          {tableEvents.length === 0 && <Alert tone="muted">{t('events.none')}</Alert>}
         </div>
-      </Panel>
+        </CardContent>
+      </Card>
       <details className="rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 min-[1025px]:hidden">
         <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
           {t('table.recentEvents')}
@@ -143,7 +146,7 @@ export const TableView = () => {
               <p className="mt-3 text-sm leading-6 text-[var(--color-foreground)]">{formatEvent(event)}</p>
             </div>
           ))}
-          {tableEvents.length === 0 ? <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p> : null}
+          {tableEvents.length === 0 ? <Alert tone="muted">{t('events.none')}</Alert> : null}
         </div>
       </details>
     </>

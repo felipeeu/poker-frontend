@@ -1,4 +1,4 @@
-import { useI18n } from '../../i18n'
+import { useI18n } from '@/i18n'
 import { InfoCard } from './info-card'
 type TableSummaryProps = {
   nextStepMessage: string

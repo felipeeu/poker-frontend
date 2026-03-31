@@ -1,8 +1,8 @@
-import { useI18n } from '../../i18n'
-import { Badge } from '../../components/ui/badge'
-import { Button } from '../../components/ui/button'
-import { FieldGroup, FieldLabel } from '../../components/ui/field-group'
-import { Input } from '../../components/ui/input'
+import { useI18n } from '@/i18n'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ControlSection } from './control-section'
 
 type AdminTableControlsSectionProps = {
@@ -97,15 +97,15 @@ export const AdminHandControlsSection = ({
       description={description ?? t('detail.handControlsAdminOnly')}
     >
       {canSetDealerSeat ? (
-        <FieldGroup className="mb-3">
-          <FieldLabel>{t('detail.dealerSeat')}</FieldLabel>
+        <div className="mb-3 grid gap-1.5">
+          <Label>{t('detail.dealerSeat')}</Label>
           <Input
             type="number"
             min={1}
             value={dealerSeat}
             onChange={(e) => onDealerSeatChange(Number(e.target.value))}
           />
-        </FieldGroup>
+        </div>
       ) : null}
       {hasAnyAction ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -194,22 +194,22 @@ export const PlayerControlsSection = ({
       description={hasOwnedSeat ? t('detail.alreadySeated') : t('detail.joinToPlay')}
     >
       <div className="mb-4 grid gap-4 rounded-[14px] border border-[var(--color-border)] p-4">
-        <FieldGroup className="gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {showJoinSeat ? (
-          <div className="grid gap-1.5">
-            <FieldLabel>{t('detail.seatNo')}</FieldLabel>
-            <Input
-              type="number"
-              min={1}
-              value={seatNo}
-              onChange={(e) => onSeatNoChange(Number(e.target.value))}
-              disabled={seatNoLocked}
-            />
-          </div>
+            <div className="grid gap-1.5">
+              <Label>{t('detail.seatNo')}</Label>
+              <Input
+                type="number"
+                min={1}
+                value={seatNo}
+                onChange={(e) => onSeatNoChange(Number(e.target.value))}
+                disabled={seatNoLocked}
+              />
+            </div>
           ) : null}
           {showIdentityFields ? (
             <div className="grid gap-1.5 sm:col-span-2">
-              <FieldLabel>{t('detail.playerName')}</FieldLabel>
+              <Label>{t('detail.playerName')}</Label>
               <Input
                 type="text"
                 value={seatName}
@@ -219,28 +219,28 @@ export const PlayerControlsSection = ({
             </div>
           ) : null}
           {showStackField ? (
-          <div className="grid gap-1.5">
-            <FieldLabel>{t('detail.stack')}</FieldLabel>
-            <Input
-              type="number"
-              min={0}
-              value={seatStack}
-              onChange={(e) => onSeatStackChange(Number(e.target.value))}
-            />
-          </div>
+            <div className="grid gap-1.5">
+              <Label>{t('detail.stack')}</Label>
+              <Input
+                type="number"
+                min={0}
+                value={seatStack}
+                onChange={(e) => onSeatStackChange(Number(e.target.value))}
+              />
+            </div>
           ) : null}
           {showBuyInField ? (
-          <div className="grid gap-1.5">
-            <FieldLabel>{t('detail.buyIn')}</FieldLabel>
-            <Input
-              type="number"
-              min={0}
-              value={buyInAmount}
-              onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
-            />
-          </div>
+            <div className="grid gap-1.5">
+              <Label>{t('detail.buyIn')}</Label>
+              <Input
+                type="number"
+                min={0}
+                value={buyInAmount}
+                onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
+              />
+            </div>
           ) : null}
-        </FieldGroup>
+        </div>
       </div>
       {showActions ? (
         <div className="grid gap-3 sm:grid-cols-2">
@@ -352,8 +352,8 @@ export const TurnActionsSection = ({
       {infoOnlyState ? null : <div className="mb-4" />}
       {showAmountBox ? (
         <div className="mb-4 grid gap-2 rounded-[14px] border border-[var(--color-border)] p-4">
-          <FieldGroup>
-            <FieldLabel className="text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{t('detail.amount')}</FieldLabel>
+          <div className="grid gap-1.5">
+            <Label className="text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{t('detail.amount')}</Label>
             <Input
               type="number"
               min={0}
@@ -361,7 +361,7 @@ export const TurnActionsSection = ({
               onChange={(e) => onActionAmountChange(Number(e.target.value))}
               disabled={!canSetAmount}
             />
-          </FieldGroup>
+          </div>
         </div>
       ) : null}
       {!showEmptyState ? (
@@ -437,20 +437,20 @@ export const AdminDebugSection = ({
           {t('detail.loadDemoSeats')}
         </Button>
       </div>
-      <FieldGroup className="mb-3 mt-3 gap-2.5">
-        <FieldLabel>{t('detail.boardCards')}</FieldLabel>
+      <div className="mb-3 mt-3 grid gap-2.5">
+        <Label>{t('detail.boardCards')}</Label>
         <Input
           placeholder={t('detail.boardCardsPlaceholder')}
           value={boardText}
           onChange={(e) => onBoardTextChange(e.target.value)}
         />
-        <FieldLabel>{t('detail.holeCardsSeatInput')}</FieldLabel>
+        <Label>{t('detail.holeCardsSeatInput')}</Label>
         <Input
           placeholder={t('detail.holeCardsPlaceholder')}
           value={holeText}
           onChange={(e) => onHoleTextChange(e.target.value)}
         />
-      </FieldGroup>
+      </div>
       <div className="flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onSetCards} disabled={disabled}>{t('detail.setCards')}</Button>
       </div>

@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 import { Link } from 'react-router-dom'
-import { buttonVariants } from './button'
-import { cn } from '../../lib/cn'
+import { cn } from '@/lib/cn'
+import { buttonVariants } from '@/components/ui/button'
 
 type ButtonLinkProps = ComponentProps<typeof Link> & {
   variant?: 'primary' | 'ghost' | 'danger'

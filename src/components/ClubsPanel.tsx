@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useApi } from '../api/useApi'
-import { useI18n } from '../i18n'
-import { useAppStore } from '../state/useAppStore'
+import { useI18n } from '@/i18n'
+import { useAppStore } from '@/state/useAppStore'
 import type { Club } from '../types'
 import { nextSelectedClub, selectedClubRoleForUser } from '../lib/clubs-view'
-import { Badge } from './ui/badge'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
-import { Panel } from './ui/panel'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 type ClubsResponse = {
   clubs: Club[]
@@ -116,7 +118,8 @@ export const ClubsPanel = () => {
   }, [token])
 
   return (
-    <Panel className="h-fit">
+    <Card className="h-fit">
+      <CardContent className="p-5">
       <div className="mb-5 flex items-center justify-between gap-3">
         <h2 className="m-0 text-2xl font-semibold">{t('clubs.title')}</h2>
         {selectedClubRole ? <Badge>{clubRoleLabel(t, selectedClubRole)}</Badge> : null}
@@ -168,17 +171,17 @@ export const ClubsPanel = () => {
           ) : null}
         </div>
       ) : (
-        <div className="mb-6 rounded-[24px] border border-dashed border-white/10 bg-white/4 px-4 py-5">
+        <Alert tone="muted" className="mb-6 px-4 py-5">
           <strong className="block">{t('clubs.noneSelected')}</strong>
           <p className="mb-0 mt-1 text-sm text-[var(--color-muted)]">{t('clubs.pickClub')}</p>
-        </div>
+        </Alert>
       )}
       <div className="mb-6 grid gap-3">
         <div className="rounded-[24px] border border-[var(--color-border)] bg-[rgba(16,29,21,0.66)] p-5">
           <strong className="block">{t('clubs.newClub')}</strong>
           <div className="mt-3 grid gap-3">
             <div className="grid gap-2">
-              <label className="text-sm font-medium">{t('clubs.name')}</label>
+              <Label>{t('clubs.name')}</Label>
               <Input value={clubName} onChange={(e) => setClubName(e.target.value)} />
             </div>
             <Button onClick={handleCreateClub} disabled={!token || !clubName.trim()}>{t('clubs.create')}</Button>
@@ -188,7 +191,7 @@ export const ClubsPanel = () => {
           <strong className="block">{t('clubs.joinWithCode')}</strong>
           <div className="mt-3 grid gap-3">
             <div className="grid gap-2">
-              <label className="text-sm font-medium">{t('clubs.code')}</label>
+              <Label>{t('clubs.code')}</Label>
               <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} />
             </div>
             <Button variant="ghost" onClick={handleJoinClub} disabled={!token || !inviteCode.trim()}>
@@ -223,10 +226,11 @@ export const ClubsPanel = () => {
         })}
       </ul>
       {clubs.length === 0 ? (
-        <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-white/4 px-4 py-5 text-sm text-[var(--color-muted)]">
+        <Alert tone="muted" className="mt-5 px-4 py-5">
           {t(token ? 'clubs.empty' : 'clubs.emptyLoggedOut')}
-        </p>
+        </Alert>
       ) : null}
-    </Panel>
+      </CardContent>
+    </Card>
   )
 }

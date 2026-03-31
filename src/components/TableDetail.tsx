@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useI18n } from '../i18n'
+import { useI18n } from '@/i18n'
 import { useApi } from '../api/useApi'
 import {
   AdminDebugSection,
@@ -14,11 +14,12 @@ import {
   TableCenter,
 } from './table-detail/table-visuals'
 import { TableSummary } from './table-detail/table-summary'
-import { useAppStore } from '../state/useAppStore'
+import { useAppStore } from '@/state/useAppStore'
 import type { CurrentHand, Seat, Table } from '../types'
-import { ConfirmDialog } from '../components/ui/confirm-dialog'
-import { Badge } from '../components/ui/badge'
-import { Panel } from '../components/ui/panel'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Alert } from '@/components/ui/alert'
+import { Card, CardContent } from '@/components/ui/card'
 import { evaluateVisibleHandRank } from '../lib/hand-rank'
 import {
   isSeatInCurrentHand,
@@ -540,15 +541,18 @@ export const TableDetail = () => {
 
   if (!selectedTable) {
     return (
-      <Panel className="min-h-[420px]">
-        <h2>{t('detail.title')}</h2>
-        <p className="text-sm text-[var(--color-muted)]">{t('detail.empty')}</p>
-      </Panel>
+      <Card className="min-h-[420px]">
+        <CardContent className="p-5">
+          <h2>{t('detail.title')}</h2>
+          <Alert tone="muted" className="mt-4">{t('detail.empty')}</Alert>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
-      <Panel className="min-h-[420px]">
+      <Card className="min-h-[420px]">
+      <CardContent className="p-5">
       <div className="grid gap-[18px]">
         <div className="grid gap-[18px]">
           <div className="grid gap-2 rounded-[16px] border border-[var(--color-border)] px-4 py-4 max-[1024px]:gap-1.5 max-[1024px]:px-3.5 max-[1024px]:py-3 sm:px-5">
@@ -795,7 +799,8 @@ export const TableDetail = () => {
         confirmLabel={t('dialog.confirm')}
         onConfirm={handleResetTable}
       />
-    </Panel>
+      </CardContent>
+    </Card>
   )
 }
 

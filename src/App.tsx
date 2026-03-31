@@ -2,14 +2,14 @@ import './App.css'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ApiHeader } from './components/ApiHeader'
-import { AuthPanel } from './components/AuthPanel'
 import { useApi } from './api/useApi'
 import { useTableEvents } from './hooks/useTableEvents'
+import { AuthPage } from './pages/AuthPage'
 import { ClubsPage } from './pages/ClubsPage'
 import { TableView } from './pages/TableView'
 import { TablesDashboard } from './pages/TablesDashboard'
 import { useAppStore } from './state/useAppStore'
-import { ToastViewport } from './components/ui/toast'
+import { ToastViewport } from '@/components/ui/toast'
 
 function App() {
   useTableEvents()
@@ -31,6 +31,7 @@ const AppLayout = () => {
   const setAuth = useAppStore((state) => state.setAuth)
   const isTableRoute = location.pathname.startsWith('/tables/')
   const isClubRoute = location.pathname === '/clubs'
+  const isAuthRoute = location.pathname === '/auth'
 
   useEffect(() => {
     if (!token || role) return
@@ -65,12 +66,14 @@ const AppLayout = () => {
             ? 'grid grid-cols-1 gap-6'
             : isClubRoute
               ? 'grid grid-cols-1 gap-6'
-            : 'grid grid-cols-1 gap-6 xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)_minmax(300px,360px)]'
+            : isAuthRoute
+              ? 'grid grid-cols-1 gap-6'
+              : 'grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]'
         }
       >
-        {!isTableRoute && !isClubRoute && <AuthPanel />}
         <Routes>
           <Route path="/" element={<Navigate to="/tables" replace />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/tables" element={<TablesDashboard />} />
           <Route path="/clubs" element={<ClubsPage />} />
           <Route path="/tables/:tableId" element={<TableView />} />
