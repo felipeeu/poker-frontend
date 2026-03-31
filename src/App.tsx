@@ -54,7 +54,7 @@ const AppLayout = () => {
   }, [api, refreshToken, role, setAuth, token, userId])
 
   return (
-    <div className="min-h-screen px-5 py-8 text-[var(--color-foreground)] sm:px-8 lg:px-14 lg:py-12">
+    <div className="min-h-screen px-3 py-2.5 text-[var(--color-foreground)] sm:px-6 sm:py-6 lg:px-14 lg:py-12">
       <ToastViewport />
       <StatusToastBridge />
       <div className={isTableRoute ? 'hidden min-[1025px]:block' : ''}>
@@ -63,12 +63,12 @@ const AppLayout = () => {
       <main
         className={
           isTableRoute
-            ? 'grid grid-cols-1 gap-6'
+            ? 'grid grid-cols-1 gap-4 sm:gap-6'
             : isClubRoute
-              ? 'grid grid-cols-1 gap-6'
+              ? 'grid grid-cols-1 gap-4 sm:gap-6'
             : isAuthRoute
-              ? 'grid grid-cols-1 gap-6'
-              : 'grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]'
+              ? 'grid grid-cols-1 gap-4 sm:gap-6'
+              : 'grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]'
         }
       >
         <Routes>

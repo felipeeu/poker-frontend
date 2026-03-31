@@ -542,7 +542,7 @@ export const TableDetail = () => {
   if (!selectedTable) {
     return (
       <Card className="min-h-[420px]">
-        <CardContent className="p-5">
+        <CardContent className="p-4 sm:p-5">
           <h2>{t('detail.title')}</h2>
           <Alert tone="muted" className="mt-4">{t('detail.empty')}</Alert>
         </CardContent>
@@ -552,21 +552,21 @@ export const TableDetail = () => {
 
   return (
       <Card className="min-h-[420px]">
-      <CardContent className="p-5">
-      <div className="grid gap-[18px]">
-        <div className="grid gap-[18px]">
-          <div className="grid gap-2 rounded-[16px] border border-[var(--color-border)] px-4 py-4 max-[1024px]:gap-1.5 max-[1024px]:px-3.5 max-[1024px]:py-3 sm:px-5">
+      <CardContent className="p-3.5 sm:p-5">
+      <div className="grid gap-4 sm:gap-[18px]">
+        <div className="grid gap-4 sm:gap-[18px]">
+          <div className="grid gap-2 rounded-[16px] border border-[var(--color-border)] px-3.5 py-3 max-[1024px]:gap-1.5 max-[1024px]:px-3 max-[1024px]:py-2.5 sm:px-5 sm:py-4">
             <div className="flex flex-wrap items-center gap-2 max-[1024px]:gap-1.5">
               <Badge variant={isHandFinished ? 'success' : actorSeatNo != null ? 'accent' : 'neutral'}>
                 {t('detail.street', { street })}
               </Badge>
               {isMyTurn ? <Badge variant="accent">{t('detail.yourTurnToAct')}</Badge> : null}
             </div>
-            <p className="m-0 text-[15px] leading-6 text-[var(--color-muted)] max-[1024px]:text-[13px] max-[1024px]:leading-5">
+            <p className="m-0 text-[14px] leading-5 text-[var(--color-muted)] max-[1024px]:text-[12px]">
               {nextStepMessage}
             </p>
           </div>
-          <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_50%_40%,rgba(32,47,38,0.96),rgba(17,24,20,0.98)_58%,rgba(12,16,14,1)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[0_18px_36px_rgba(0,0,0,0.18)] max-[1024px]:min-h-0 max-[1024px]:gap-[18px] max-[1024px]:rounded-[22px] max-[1024px]:px-3 max-[1024px]:py-[22px] max-[520px]:gap-[14px] max-[520px]:rounded-[20px] max-[520px]:px-2 max-[520px]:py-4">
+          <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_50%_40%,rgba(32,47,38,0.96),rgba(17,24,20,0.98)_58%,rgba(12,16,14,1)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[0_18px_36px_rgba(0,0,0,0.18)] max-[1024px]:min-h-0 max-[1024px]:gap-[14px] max-[1024px]:rounded-[20px] max-[1024px]:px-2.5 max-[1024px]:py-4 max-[520px]:gap-3 max-[520px]:rounded-[18px] max-[520px]:px-2 max-[520px]:py-3.5">
             <div className="pointer-events-none absolute inset-4 rounded-[999px] border border-[rgba(255,255,255,0.08)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
             <DesktopSeatLayout
               seats={displaySeats}
@@ -606,8 +606,8 @@ export const TableDetail = () => {
             />
           </div>
         </div>
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_repeat(3,minmax(240px,1fr))] max-[1279px]:grid-cols-2 max-[1024px]:grid-cols-1">
-          <div className={hasAvailableTurnActions ? 'max-[1024px]:sticky max-[1024px]:bottom-3 max-[1024px]:z-10' : ''}>
+        <div className="grid gap-3 sm:gap-4 xl:grid-cols-[minmax(0,1.35fr)_repeat(3,minmax(240px,1fr))] max-[1279px]:grid-cols-2 max-[1024px]:grid-cols-1">
+          <div className={hasAvailableTurnActions ? 'max-[1024px]:sticky max-[1024px]:bottom-2.5 max-[1024px]:z-10' : ''}>
             <TurnActionsSection
               hasSeatConflict={hasSeatConflict}
               mySeatNo={mySeatNo}
@@ -818,12 +818,12 @@ const DisclosurePanel = ({
   className = '',
 }: DisclosurePanelProps) => (
   <details
-    className={`rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 text-[var(--color-foreground)] ${className}`.trim()}
+    className={`rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-3.5 py-2.5 text-[var(--color-foreground)] sm:px-4 sm:py-3 ${className}`.trim()}
     open={defaultOpen}
   >
     <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
       {title}
     </summary>
-    <div className="mt-3">{children}</div>
+    <div className="mt-2.5 sm:mt-3">{children}</div>
   </details>
 )

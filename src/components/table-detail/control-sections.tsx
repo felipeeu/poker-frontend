@@ -33,7 +33,7 @@ export const AdminTableControlsSection = ({
       description={tableControlsDescription}
     >
       {hasAnyAction ? (
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-2.5 sm:grid-cols-3 sm:gap-3">
           {canOpenTable ? (
             <Button className="w-full" onClick={onOpenTable}>
               {t('detail.openTable')}
@@ -97,7 +97,7 @@ export const AdminHandControlsSection = ({
       description={description ?? t('detail.handControlsAdminOnly')}
     >
       {canSetDealerSeat ? (
-        <div className="mb-3 grid gap-1.5">
+        <div className="mb-2.5 grid gap-1.5 sm:mb-3">
           <Label>{t('detail.dealerSeat')}</Label>
           <Input
             type="number"
@@ -108,7 +108,7 @@ export const AdminHandControlsSection = ({
         </div>
       ) : null}
       {hasAnyAction ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
           {canStartHand ? <Button className="w-full" onClick={onStartHand}>{t('detail.startHand')}</Button> : null}
           {canResolve ? <Button className="w-full" variant="ghost" onClick={onResolve}>{t('detail.resolveShowdown')}</Button> : null}
           {canTimeout ? <Button className="w-full" variant="ghost" onClick={onTimeout}>{t('detail.timeout')}</Button> : null}
@@ -193,8 +193,8 @@ export const PlayerControlsSection = ({
       title={t('detail.seatActions')}
       description={hasOwnedSeat ? t('detail.alreadySeated') : t('detail.joinToPlay')}
     >
-      <div className="mb-4 grid gap-4 rounded-[14px] border border-[var(--color-border)] p-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="mb-3.5 grid gap-3 rounded-[14px] border border-[var(--color-border)] p-3 sm:mb-4 sm:gap-4 sm:p-4">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
           {showJoinSeat ? (
             <div className="grid gap-1.5">
               <Label>{t('detail.seatNo')}</Label>
@@ -243,7 +243,7 @@ export const PlayerControlsSection = ({
         </div>
       </div>
       {showActions ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
           {showJoinSeat ? (
             <Button
               className="w-full"
@@ -286,7 +286,7 @@ export const PlayerControlsSection = ({
         </div>
       ) : null}
       {showJoinSeat && joinSeatDisabled ? (
-        <p className="mt-2.5 text-sm text-[var(--color-muted)]">{joinSeatDisabledReason}</p>
+        <p className="mt-2 text-sm leading-5 text-[var(--color-muted)] sm:mt-2.5">{joinSeatDisabledReason}</p>
       ) : null}
     </ControlSection>
   )
@@ -339,7 +339,7 @@ export const TurnActionsSection = ({
 
   return (
     <ControlSection title={t('detail.yourTurn')} className={isMyTurn ? 'border-[var(--color-border-strong)]' : ''}>
-      <div className="rounded-[14px] border border-[var(--color-border)] px-4 py-3">
+      <div className="rounded-[14px] border border-[var(--color-border)] px-3 py-2.5 sm:px-4 sm:py-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isMyTurn ? 'accent' : 'neutral'}>
             {isMyTurn ? t('detail.yourTurnToAct') : t('detail.waitingForActorSeat', { seat: actorSeatNo ?? '-' })}
@@ -347,11 +347,11 @@ export const TurnActionsSection = ({
           {mySeatNo ? <Badge>{t('detail.yourSeat')}: {mySeatNo}</Badge> : null}
           {hasSeatConflict ? <Badge variant="danger">{t('detail.seatConflict')}</Badge> : null}
         </div>
-        <p className="mt-3 text-sm text-[var(--color-muted)]">{actionMessage}</p>
+        <p className="mt-2.5 text-sm leading-5 text-[var(--color-muted)] sm:mt-3">{actionMessage}</p>
       </div>
-      {infoOnlyState ? null : <div className="mb-4" />}
+      {infoOnlyState ? null : <div className="mb-3 sm:mb-4" />}
       {showAmountBox ? (
-        <div className="mb-4 grid gap-2 rounded-[14px] border border-[var(--color-border)] p-4">
+        <div className="mb-3 grid gap-2 rounded-[14px] border border-[var(--color-border)] p-3 sm:mb-4 sm:p-4">
           <div className="grid gap-1.5">
             <Label className="text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{t('detail.amount')}</Label>
             <Input
@@ -365,7 +365,7 @@ export const TurnActionsSection = ({
         </div>
       ) : null}
       {!showEmptyState ? (
-        <div className="grid gap-3">
+        <div className="grid gap-2.5 sm:gap-3">
           {quickActions.length > 0 ? (
             <div className="grid gap-2">
               <div className={`grid gap-2 ${quickActionGridClass}`}>
@@ -402,7 +402,7 @@ export const TurnActionsSection = ({
         </div>
       ) : null}
       {hasAnyActions && legalForSeat ? (
-        <p className="mt-3 text-sm text-[var(--color-muted)]">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
+        <p className="mt-2.5 text-sm leading-5 text-[var(--color-muted)] sm:mt-3">{t('detail.legalActions', { actions: legalForSeat.join(', ') })}</p>
       ) : null}
     </ControlSection>
   )
@@ -430,14 +430,14 @@ export const AdminDebugSection = ({
   const { t } = useI18n()
 
   return (
-    <details className="rounded-[16px] border border-[var(--color-border)] px-3 py-2.5 text-[var(--color-foreground)] opacity-80 transition-opacity open:opacity-100">
+    <details className="rounded-[16px] border border-[var(--color-border)] px-3 py-2.5 text-[var(--color-foreground)] opacity-80 transition-opacity open:opacity-100 sm:px-3.5 sm:py-3">
       <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">{t('detail.adminDebug')}</summary>
-      <div className="mt-3 flex flex-wrap gap-3">
+      <div className="mt-2.5 flex flex-wrap gap-2.5 sm:mt-3 sm:gap-3">
         <Button variant="ghost" size="sm" onClick={onLoadDemoSeats}>
           {t('detail.loadDemoSeats')}
         </Button>
       </div>
-      <div className="mb-3 mt-3 grid gap-2.5">
+      <div className="mb-2.5 mt-2.5 grid gap-2.5 sm:mb-3 sm:mt-3">
         <Label>{t('detail.boardCards')}</Label>
         <Input
           placeholder={t('detail.boardCardsPlaceholder')}
@@ -451,10 +451,10 @@ export const AdminDebugSection = ({
           onChange={(e) => onHoleTextChange(e.target.value)}
         />
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2.5 sm:gap-3">
         <Button variant="ghost" size="sm" onClick={onSetCards} disabled={disabled}>{t('detail.setCards')}</Button>
       </div>
-      <p className="mt-3 text-sm text-[var(--color-muted)]">{t('detail.manualCardInjection')}</p>
+      <p className="mt-2.5 text-sm leading-5 text-[var(--color-muted)] sm:mt-3">{t('detail.manualCardInjection')}</p>
     </details>
   )
 }

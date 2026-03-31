@@ -24,14 +24,14 @@ export const TableCenter = ({
   const { t } = useI18n()
 
   return (
-    <div className="z-[2] w-full py-[132px] pb-[118px] max-[1024px]:w-[min(100%,360px)] max-[1024px]:p-0 max-[520px]:w-[min(100%,296px)]">
-      <div className="mx-auto grid w-[min(100%,520px)] gap-3 rounded-[18px] border border-[var(--color-border)] bg-[rgba(17,22,19,0.9)] p-3.5 max-[1024px]:w-full max-[1024px]:p-3 max-[520px]:gap-3 max-[520px]:rounded-[14px] max-[520px]:p-2.5">
+    <div className="z-[2] w-full py-[132px] pb-[118px] max-[1024px]:w-[min(100%,340px)] max-[1024px]:p-0 max-[520px]:w-[min(100%,282px)]">
+      <div className="mx-auto grid w-[min(100%,520px)] gap-3 rounded-[18px] border border-[var(--color-border)] bg-[rgba(17,22,19,0.9)] p-3.5 max-[1024px]:w-full max-[1024px]:gap-2.5 max-[1024px]:p-2.5 max-[520px]:gap-2 max-[520px]:rounded-[14px] max-[520px]:p-2">
         <div className="grid gap-2.5">
           <div className="flex items-center justify-between">
             <h3 className="m-0 text-base">{t('detail.board')}</h3>
             <span className="text-[0.85rem] text-[var(--color-muted)]">{board?.length || 0} / 5</span>
           </div>
-          <div className="flex flex-wrap gap-2.5 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-1.5">
+          <div className="flex flex-wrap gap-2.5 max-[1024px]:justify-center max-[1024px]:gap-1.5 max-[520px]:gap-1">
             {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map((card, idx) => (
               <Card key={`board-${idx}`} value={card} faceDown={!card} />
             ))}
@@ -44,11 +44,11 @@ export const TableCenter = ({
             {sidePots && sidePots.length > 1 && (
               <div className="flex justify-between gap-3 border-b border-dashed border-[var(--color-border)] py-1.5 max-[1024px]:items-start">
                 <span>{t('detail.sidePots')}</span>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {sidePots.map((side, idx) => (
                     <div
                       key={`side-pot-${idx}`}
-                      className="grid gap-0.5 rounded-[14px] border border-[var(--color-border)] px-3 py-2 text-xs text-[var(--color-foreground)]"
+                      className="grid gap-0.5 rounded-[14px] border border-[var(--color-border)] px-2.5 py-1.5 text-xs text-[var(--color-foreground)] sm:px-3 sm:py-2"
                     >
                       <strong className="text-[0.78rem] font-semibold">
                         {t('detail.sidePotLabel', { index: idx + 1, amount: side.amount })}
@@ -69,7 +69,7 @@ export const TableCenter = ({
             <h3 className="m-0 text-base">{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
             <span className="text-[0.85rem] text-[var(--color-muted)]">{seatHoleCards?.length || 0} / 2</span>
           </div>
-          <div className="flex flex-wrap gap-2.5 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-1.5">
+          <div className="flex flex-wrap gap-2.5 max-[1024px]:justify-center max-[1024px]:gap-1.5 max-[520px]:gap-1">
             {(seatHoleCards && seatHoleCards.length > 0 ? seatHoleCards : Array.from({ length: 2 }).map(() => undefined)).map(
               (card, idx) => (
                 <Card key={`hole-${idx}`} value={card} faceDown={!card} />
@@ -147,8 +147,8 @@ export const MobileSeatLayout = ({
   const { t } = useI18n()
 
   return (
-    <div className="z-[3] hidden w-full gap-3 max-[1024px]:grid">
-      <div className="order-[-1] flex flex-wrap justify-center gap-2">
+    <div className="z-[3] hidden w-full gap-2.5 max-[1024px]:grid">
+      <div className="order-[-1] flex flex-wrap justify-center gap-1.5">
         {topSeats.length > 0 ? (
           topSeats.map((seat) => (
             <SeatChip
@@ -165,7 +165,7 @@ export const MobileSeatLayout = ({
           <p className="text-[0.85rem] text-[var(--color-muted)]">{t('detail.noSeatsYet')}</p>
         )}
       </div>
-      <div className="flex flex-wrap justify-center gap-2">
+      <div className="flex flex-wrap justify-center gap-1.5">
         {bottomSeats.map((seat) => (
           <SeatChip
             key={seat['seat-no'] ?? seat.seat_no}
@@ -223,14 +223,14 @@ const SeatChip = ({
   return (
     <div
       className={cn(
-        'seat-chip grid min-w-[82px] max-w-[102px] gap-1 rounded-[14px] border border-[var(--color-border)] bg-[rgba(18,23,20,0.96)] px-2 py-[8px] shadow-[0_6px_14px_rgba(0,0,0,0.1)] max-[1024px]:min-w-[76px] max-[1024px]:max-w-[92px] max-[1024px]:gap-1 max-[1024px]:rounded-[14px] max-[1024px]:px-[6px] max-[1024px]:pb-[6px] max-[1024px]:pt-1.5 max-[520px]:min-w-[66px] max-[520px]:max-w-[78px] max-[520px]:px-[5px] max-[520px]:pb-[5px] max-[520px]:pt-1',
+        'seat-chip grid min-w-[82px] max-w-[102px] gap-1 rounded-[14px] border border-[var(--color-border)] bg-[rgba(18,23,20,0.96)] px-2 py-[8px] shadow-[0_6px_14px_rgba(0,0,0,0.1)] max-[1024px]:min-w-[72px] max-[1024px]:max-w-[88px] max-[1024px]:gap-[3px] max-[1024px]:rounded-[13px] max-[1024px]:px-[5px] max-[1024px]:pb-[5px] max-[1024px]:pt-1.5 max-[520px]:min-w-[62px] max-[520px]:max-w-[74px] max-[520px]:px-1 max-[520px]:pb-1 max-[520px]:pt-[3px]',
         isActor && 'border-[var(--color-border-strong)]',
         isMine && 'border-emerald-200/24',
         sittingOut && 'opacity-70',
       )}
     >
-      <div className="grid gap-1 text-[0.66rem] text-[var(--color-muted)] max-[1024px]:text-[0.56rem]">
-        <span className="inline-flex w-fit min-h-[17px] items-center rounded-full border border-[var(--color-border)] px-[6px] text-[0.6rem] font-medium tracking-[0.03em] max-[1024px]:min-h-4 max-[1024px]:px-1.5 max-[1024px]:text-[0.52rem] max-[520px]:min-h-[15px] max-[520px]:px-[5px]">
+      <div className="grid gap-1 text-[0.66rem] text-[var(--color-muted)] max-[1024px]:gap-[3px] max-[1024px]:text-[0.54rem]">
+        <span className="inline-flex w-fit min-h-[17px] items-center rounded-full border border-[var(--color-border)] px-[6px] text-[0.6rem] font-medium tracking-[0.03em] max-[1024px]:min-h-[15px] max-[1024px]:px-[5px] max-[1024px]:text-[0.5rem] max-[520px]:min-h-[14px] max-[520px]:px-1">
           #{seatNo}
         </span>
         <div className="flex min-w-0 flex-wrap items-center gap-1 max-[1024px]:gap-[3px]">
@@ -242,34 +242,34 @@ const SeatChip = ({
         </div>
       </div>
       <div
-        className="grid grid-cols-[28px_minmax(0,1fr)] items-center gap-2 max-[1024px]:grid-cols-[20px_minmax(0,1fr)] max-[1024px]:gap-[5px] max-[520px]:grid-cols-[18px_minmax(0,1fr)] max-[520px]:gap-1"
+        className="grid grid-cols-[28px_minmax(0,1fr)] items-center gap-2 max-[1024px]:grid-cols-[18px_minmax(0,1fr)] max-[1024px]:gap-1 max-[520px]:grid-cols-[16px_minmax(0,1fr)]"
         title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}
       >
         <span
-          className="grid size-7 place-items-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.03)] text-[0.72rem] font-semibold tracking-[0.04em] text-[var(--color-foreground)] max-[1024px]:size-5 max-[1024px]:text-[0.58rem] max-[520px]:size-[18px] max-[520px]:text-[0.52rem]"
+          className="grid size-7 place-items-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.03)] text-[0.72rem] font-semibold tracking-[0.04em] text-[var(--color-foreground)] max-[1024px]:size-[18px] max-[1024px]:text-[0.54rem] max-[520px]:size-4 max-[520px]:text-[0.48rem]"
           aria-hidden="true"
         >
           {avatarLabel}
         </span>
         <div className="grid min-w-0 gap-px">
-          <strong className="overflow-hidden text-[0.74rem] font-semibold leading-[1.1] tracking-[-0.01em] text-ellipsis whitespace-nowrap max-[1024px]:text-[0.62rem] max-[520px]:text-[0.58rem]">
+          <strong className="overflow-hidden text-[0.74rem] font-semibold leading-[1.1] tracking-[-0.01em] text-ellipsis whitespace-nowrap max-[1024px]:text-[0.58rem] max-[520px]:text-[0.55rem]">
             {shortName}
           </strong>
-          <span className="text-[0.62rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.54rem] max-[520px]:text-[0.52rem]">
+          <span className="text-[0.62rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.52rem] max-[520px]:text-[0.5rem]">
             {t('detail.stackShort', { value: stack })}
           </span>
           {handRankLabel ? (
-            <span className={cn('text-[0.56rem] leading-[1.15] max-[1024px]:text-[0.5rem] max-[520px]:text-[0.48rem]', handRankClass)}>
+            <span className={cn('text-[0.56rem] leading-[1.15] max-[1024px]:text-[0.48rem] max-[520px]:text-[0.46rem]', handRankClass)}>
               {handRankLabel}
             </span>
           ) : null}
         </div>
       </div>
       {(sittingOut || committed > 0) && (
-        <div className="flex items-center justify-between gap-1.5 max-[1024px]:flex-col max-[1024px]:items-start max-[1024px]:gap-[3px]">
-          {sittingOut && <span className="text-[0.58rem] uppercase tracking-[0.08em] text-[var(--color-muted)]">{t('detail.sittingOut')}</span>}
+        <div className="flex items-center justify-between gap-1.5 max-[1024px]:flex-col max-[1024px]:items-start max-[1024px]:gap-[2px]">
+          {sittingOut && <span className="text-[0.58rem] uppercase tracking-[0.08em] text-[var(--color-muted)] max-[1024px]:text-[0.48rem]">{t('detail.sittingOut')}</span>}
           {committed > 0 && (
-            <span className="text-[0.62rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.54rem] max-[520px]:text-[0.52rem]">
+            <span className="text-[0.62rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.52rem] max-[520px]:text-[0.5rem]">
               {t('detail.committedShort', { value: committed })}
             </span>
           )}

@@ -89,12 +89,12 @@ export const TableView = () => {
   return (
     <>
       <Card className="min-h-0 max-[1024px]:rounded-none max-[1024px]:border-x-0 max-[1024px]:border-t-0 max-[1024px]:bg-transparent max-[1024px]:shadow-none">
-        <CardContent className="flex items-center justify-between gap-3 p-3 sm:p-5 max-[1024px]:px-0 max-[1024px]:py-1">
+        <CardContent className="flex items-center justify-between gap-3 p-3 sm:p-5 max-[1024px]:px-0 max-[1024px]:py-0.5">
           <div>
-            <h2 className="m-0 text-[12px] font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
-            <p className="mt-0 text-[9px] text-[var(--color-muted)] sm:mt-1 sm:text-sm">{tableId || t('table.loading')}</p>
+            <h2 className="m-0 text-[11px] font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
+            <p className="mt-0 text-[8.5px] text-[var(--color-muted)] sm:mt-1 sm:text-sm">{tableId || t('table.loading')}</p>
           </div>
-          <ButtonLink className="min-h-6 rounded-md px-2 py-0.5 text-[9px] sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm" variant="ghost" to="/tables">
+          <ButtonLink className="min-h-[22px] rounded-md px-2 py-0.5 text-[8.5px] sm:min-h-11 sm:px-4 sm:py-2.5 sm:text-sm" variant="ghost" to="/tables">
             {t('table.backToTables')}
           </ButtonLink>
         </CardContent>
@@ -129,21 +129,21 @@ export const TableView = () => {
         </div>
         </CardContent>
       </Card>
-      <details className="rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 min-[1025px]:hidden">
+      <details className="rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-3.5 py-2.5 min-[1025px]:hidden sm:px-4 sm:py-3">
         <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
           {t('table.recentEvents')}
         </summary>
-        <div className="mt-4 grid gap-3">
+        <div className="mt-3 grid gap-2.5 sm:mt-4 sm:gap-3">
           {tableEvents.length > 0 ? <Badge variant="accent">{tableEvents[0]?.type}</Badge> : null}
           {tableEvents.map((event, idx) => (
-            <div key={idx} className="rounded-[16px] border border-[var(--color-border)] p-4">
+            <div key={idx} className="rounded-[16px] border border-[var(--color-border)] p-3 sm:p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Badge>{event.type}</Badge>
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
                   #{String(idx + 1).padStart(2, '0')}
                 </span>
               </div>
-              <p className="mt-3 text-sm leading-6 text-[var(--color-foreground)]">{formatEvent(event)}</p>
+              <p className="mt-2.5 text-sm leading-5 text-[var(--color-foreground)] sm:mt-3 sm:leading-6">{formatEvent(event)}</p>
             </div>
           ))}
           {tableEvents.length === 0 ? <Alert tone="muted">{t('events.none')}</Alert> : null}

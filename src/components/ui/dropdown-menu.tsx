@@ -15,7 +15,7 @@ export const DropdownMenuContent = ({
     <DropdownMenuPrimitive.Content
       sideOffset={sideOffset}
       className={cn(
-        'z-50 min-w-[180px] overflow-hidden rounded-[14px] border border-[var(--color-border)] bg-[var(--color-panel)] p-2 text-[var(--color-foreground)] shadow-[0_12px_30px_rgba(0,0,0,0.18)]',
+        'z-50 min-w-[168px] overflow-hidden rounded-[14px] border border-[var(--color-border)] bg-[var(--color-panel)] p-1.5 text-[var(--color-foreground)] shadow-[0_12px_30px_rgba(0,0,0,0.18)] sm:min-w-[180px] sm:p-2',
         className,
       )}
       {...props}
@@ -32,7 +32,7 @@ export const DropdownMenuItem = ({
 }) => (
   <DropdownMenuPrimitive.Item
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-[10px] px-2.5 py-2 text-sm outline-none transition-colors focus:bg-white/5 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-[10px] px-2 py-1.5 text-sm outline-none transition-colors focus:bg-white/5 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 sm:px-2.5 sm:py-2',
       inset && 'pl-8',
       className,
     )}

@@ -8,7 +8,7 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
 export const Card = ({ as: Component = 'div', className, ...props }: CardProps) => (
   <Component
     className={cn(
-      'rounded-xl border border-[var(--color-border)] bg-[var(--color-panel)] text-[var(--color-foreground)] shadow-[0_8px_24px_rgba(0,0,0,0.16)]',
+      'rounded-xl border border-[var(--color-border)] bg-[var(--color-panel)] text-[var(--color-foreground)] shadow-[0_8px_24px_rgba(0,0,0,0.16)] transition-[border-color,transform,box-shadow] duration-200 ease-out',
       className,
     )}
     {...props}

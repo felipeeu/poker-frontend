@@ -27,7 +27,7 @@ export const TableSummary = ({
 
   return (
     <>
-      <div className="mb-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mb-2.5 grid gap-2 sm:mb-3 sm:grid-cols-2 xl:grid-cols-3">
         <InfoCard label={t('detail.statusLabel')} value={tableStatus || t('tables.unknown')} />
         <InfoCard label={t('detail.streetLabel')} value={street} />
         <InfoCard
@@ -39,7 +39,7 @@ export const TableSummary = ({
         <InfoCard label={t('detail.seats')} value={seatCount} />
         {isHandFinished ? <InfoCard label={t('detail.hand')} value={t('detail.gameFinished')} /> : null}
       </div>
-      <p className="m-0 text-sm leading-6 text-[var(--color-muted)]">{nextStepMessage}</p>
+      <p className="m-0 text-sm leading-5 text-[var(--color-muted)] sm:leading-6">{nextStepMessage}</p>
     </>
   )
 }

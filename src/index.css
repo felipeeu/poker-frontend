@@ -52,6 +52,12 @@
     color: var(--color-foreground);
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    body {
+      animation: page-enter 240ms ease-out;
+    }
+  }
+
   a {
     color: inherit;
     text-decoration: none;
@@ -66,5 +72,17 @@
 
   #root {
     min-height: 100vh;
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
