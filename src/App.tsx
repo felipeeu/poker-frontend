@@ -1,6 +1,7 @@
 import './App.css'
 import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import { ApiHeader } from './components/ApiHeader'
 import { useApi } from './api/useApi'
 import { useTableEvents } from './hooks/useTableEvents'
@@ -72,16 +73,50 @@ const AppLayout = () => {
         }
       >
         <Routes>
-          <Route path="/" element={<Navigate to="/tables" replace />} />
+          <Route path="/" element={<Navigate to={token ? '/tables' : '/auth'} replace />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/tables" element={<TablesDashboard />} />
-          <Route path="/clubs" element={<ClubsPage />} />
-          <Route path="/tables/:tableId" element={<TableView />} />
-          <Route path="*" element={<Navigate to="/tables" replace />} />
+          <Route
+            path="/tables"
+            element={(
+              <ProtectedRoute token={token}>
+                <TablesDashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/clubs"
+            element={(
+              <ProtectedRoute token={token}>
+                <ClubsPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/tables/:tableId"
+            element={(
+              <ProtectedRoute token={token}>
+                <TableView />
+              </ProtectedRoute>
+            )}
+          />
+          <Route path="*" element={<Navigate to={token ? '/tables' : '/auth'} replace />} />
         </Routes>
       </main>
     </div>
   )
+}
+
+type ProtectedRouteProps = {
+  token: string
+  children: ReactNode
+}
+
+const ProtectedRoute = ({ token, children }: ProtectedRouteProps) => {
+  if (!token) {
+    return <Navigate to="/auth" replace />
+  }
+
+  return <>{children}</>
 }
 
 const StatusToastBridge = () => {

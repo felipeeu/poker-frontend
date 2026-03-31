@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useI18n } from '@/i18n'
 import { useApi } from '../api/useApi'
 import { TableDetail } from '../components/TableDetail'
@@ -81,10 +81,6 @@ export const TableView = () => {
 
     load()
   }, [api, selectedTable?.id, setSelectedTable, setStatus, tableId, token])
-
-  if (!token) {
-    return <Navigate to="/tables" replace />
-  }
 
   return (
     <>
