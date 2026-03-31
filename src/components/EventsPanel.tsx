@@ -13,9 +13,12 @@ export const EventsPanel = () => {
       <div className="mt-5 grid gap-3">
         {events.length === 0 && <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p>}
         {events.map((event, idx) => (
-          <div key={idx} className="rounded-2xl border border-white/8 bg-black/15 p-4">
-            <Badge>{event.type}</Badge>
-            <pre className="mt-3 overflow-x-auto text-xs leading-6 text-[var(--color-muted)]">
+          <div key={idx} className="rounded-[16px] border border-[var(--color-border)] p-4">
+            <div className="flex items-center justify-between gap-3">
+              <Badge>{event.type}</Badge>
+              <span className="text-xs text-[var(--color-muted)]">#{idx + 1}</span>
+            </div>
+            <pre className="mt-3 overflow-x-auto text-xs leading-5 text-[var(--color-muted)]">
               {JSON.stringify(event.table ?? event.payload ?? event, null, 2)}
             </pre>
           </div>

@@ -6,54 +6,53 @@ import { Input } from '../../components/ui/input'
 import { ControlSection } from './control-section'
 
 type AdminTableControlsSectionProps = {
-  openTableDisabled: boolean
-  openTableDisabledReason: string
+  canOpenTable: boolean
   onOpenTable: () => void
+  canCloseTable: boolean
   onCloseTable: () => void
+  canResetTable: boolean
   onRequestResetTable: () => void
-  closeTableDisabled: boolean
-  resetTableDisabled: boolean
   tableControlsDescription?: string
 }
 
 export const AdminTableControlsSection = ({
-  openTableDisabled,
-  openTableDisabledReason,
+  canOpenTable,
   onOpenTable,
+  canCloseTable,
   onCloseTable,
+  canResetTable,
   onRequestResetTable,
-  closeTableDisabled,
-  resetTableDisabled,
   tableControlsDescription,
 }: AdminTableControlsSectionProps) => {
   const { t } = useI18n()
-  const showDisabledReason = openTableDisabled && openTableDisabledReason !== tableControlsDescription
+  const hasAnyAction = canOpenTable || canCloseTable || canResetTable
 
   return (
     <ControlSection
       title={t('detail.tableControls')}
       description={tableControlsDescription}
-      className="border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Button
-          className="w-full"
-          onClick={onOpenTable}
-          disabled={openTableDisabled}
-          title={openTableDisabledReason}
-        >
-          {t('detail.openTable')}
-        </Button>
-        <Button className="w-full" variant="ghost" onClick={onCloseTable} disabled={closeTableDisabled}>
-          {t('detail.closeTable')}
-        </Button>
-        <Button className="w-full" variant="ghost" onClick={onRequestResetTable} disabled={resetTableDisabled}>
-          {t('detail.resetTable')}
-        </Button>
-      </div>
-      {showDisabledReason ? (
-        <p className="mt-2.5 text-sm text-[var(--color-muted)]">{openTableDisabledReason}</p>
-      ) : null}
+      {hasAnyAction ? (
+        <div className="grid gap-3 sm:grid-cols-3">
+          {canOpenTable ? (
+            <Button className="w-full" onClick={onOpenTable}>
+              {t('detail.openTable')}
+            </Button>
+          ) : null}
+          {canCloseTable ? (
+            <Button className="w-full" variant="ghost" onClick={onCloseTable}>
+              {t('detail.closeTable')}
+            </Button>
+          ) : null}
+          {canResetTable ? (
+            <Button className="w-full" variant="ghost" onClick={onRequestResetTable}>
+              {t('detail.resetTable')}
+            </Button>
+          ) : null}
+        </div>
+      ) : (
+        <p className="text-sm text-[var(--color-muted)]">{tableControlsDescription}</p>
+      )}
     </ControlSection>
   )
 }
@@ -61,11 +60,15 @@ export const AdminTableControlsSection = ({
 type AdminHandControlsSectionProps = {
   dealerSeat: number
   onDealerSeatChange: (value: number) => void
+  canSetDealerSeat: boolean
+  canStartHand: boolean
   onStartHand: () => void
+  canResolve: boolean
   onResolve: () => void
+  canTimeout: boolean
   onTimeout: () => void
+  canNextHand: boolean
   onNextHand: () => void
-  disabled: boolean
   title?: string
   description?: string
 }
@@ -73,37 +76,47 @@ type AdminHandControlsSectionProps = {
 export const AdminHandControlsSection = ({
   dealerSeat,
   onDealerSeatChange,
+  canSetDealerSeat,
+  canStartHand,
   onStartHand,
+  canResolve,
   onResolve,
+  canTimeout,
   onTimeout,
+  canNextHand,
   onNextHand,
-  disabled,
   title,
   description,
 }: AdminHandControlsSectionProps) => {
   const { t } = useI18n()
+  const hasAnyAction = canStartHand || canResolve || canTimeout || canNextHand
 
   return (
     <ControlSection
       title={title ?? t('detail.handControls')}
       description={description ?? t('detail.handControlsAdminOnly')}
-      className="border-white/8 bg-[rgba(12,22,17,0.62)]"
     >
-      <FieldGroup className="mb-3">
-        <FieldLabel>{t('detail.dealerSeat')}</FieldLabel>
-        <Input
-          type="number"
-          min={1}
-          value={dealerSeat}
-          onChange={(e) => onDealerSeatChange(Number(e.target.value))}
-        />
-      </FieldGroup>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Button className="w-full" onClick={onStartHand} disabled={disabled}>{t('detail.startHand')}</Button>
-        <Button className="w-full" variant="ghost" onClick={onResolve} disabled={disabled}>{t('detail.resolveShowdown')}</Button>
-        <Button className="w-full" variant="ghost" onClick={onTimeout} disabled={disabled}>{t('detail.timeout')}</Button>
-        <Button className="w-full" variant="ghost" onClick={onNextHand} disabled={disabled}>{t('detail.nextHand')}</Button>
-      </div>
+      {canSetDealerSeat ? (
+        <FieldGroup className="mb-3">
+          <FieldLabel>{t('detail.dealerSeat')}</FieldLabel>
+          <Input
+            type="number"
+            min={1}
+            value={dealerSeat}
+            onChange={(e) => onDealerSeatChange(Number(e.target.value))}
+          />
+        </FieldGroup>
+      ) : null}
+      {hasAnyAction ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {canStartHand ? <Button className="w-full" onClick={onStartHand}>{t('detail.startHand')}</Button> : null}
+          {canResolve ? <Button className="w-full" variant="ghost" onClick={onResolve}>{t('detail.resolveShowdown')}</Button> : null}
+          {canTimeout ? <Button className="w-full" variant="ghost" onClick={onTimeout}>{t('detail.timeout')}</Button> : null}
+          {canNextHand ? <Button className="w-full" variant="ghost" onClick={onNextHand}>{t('detail.nextHand')}</Button> : null}
+        </div>
+      ) : (
+        <p className="text-sm text-[var(--color-muted)]">{description ?? t('detail.handControlsAdminOnly')}</p>
+      )}
     </ControlSection>
   )
 }
@@ -122,16 +135,21 @@ type PlayerControlsSectionProps = {
   onJoinSeat: () => void
   joinSeatDisabled: boolean
   joinSeatDisabledReason: string
+  showJoinSeat: boolean
   onBuyIn: () => void
+  showBuyIn: boolean
   onLeaveSeat: () => void
   leaveSeatDisabled: boolean
   leaveSeatDisabledReason: string
+  showLeaveSeat: boolean
   onRemovePlayer: () => void
   canRemovePlayer: boolean
+  showRemovePlayer: boolean
   onSitOut: () => void
+  showSitOut: boolean
   onSitIn: () => void
+  showSitIn: boolean
   hasToken: boolean
-  isAdmin: boolean
 }
 
 export const PlayerControlsSection = ({
@@ -148,27 +166,36 @@ export const PlayerControlsSection = ({
   onJoinSeat,
   joinSeatDisabled,
   joinSeatDisabledReason,
+  showJoinSeat,
   onBuyIn,
+  showBuyIn,
   onLeaveSeat,
   leaveSeatDisabled,
   leaveSeatDisabledReason,
+  showLeaveSeat,
   onRemovePlayer,
   canRemovePlayer,
+  showRemovePlayer,
   onSitOut,
+  showSitOut,
   onSitIn,
+  showSitIn,
   hasToken,
-  isAdmin,
 }: PlayerControlsSectionProps) => {
   const { t } = useI18n()
+  const showIdentityFields = showJoinSeat && !hasOwnedSeat
+  const showStackField = showJoinSeat
+  const showBuyInField = showBuyIn
+  const showActions = showJoinSeat || showBuyIn || showLeaveSeat || showRemovePlayer || showSitOut || showSitIn
 
   return (
     <ControlSection
       title={t('detail.seatActions')}
       description={hasOwnedSeat ? t('detail.alreadySeated') : t('detail.joinToPlay')}
-      className="border-white/8 bg-[rgba(255,255,255,0.02)]"
     >
-      <div className="mb-4 grid gap-4 rounded-2xl border border-white/6 bg-black/10 p-4">
+      <div className="mb-4 grid gap-4 rounded-[14px] border border-[var(--color-border)] p-4">
         <FieldGroup className="gap-3 sm:grid-cols-2">
+          {showJoinSeat ? (
           <div className="grid gap-1.5">
             <FieldLabel>{t('detail.seatNo')}</FieldLabel>
             <Input
@@ -179,7 +206,8 @@ export const PlayerControlsSection = ({
               disabled={seatNoLocked}
             />
           </div>
-          {!hasOwnedSeat ? (
+          ) : null}
+          {showIdentityFields ? (
             <div className="grid gap-1.5 sm:col-span-2">
               <FieldLabel>{t('detail.playerName')}</FieldLabel>
               <Input
@@ -190,6 +218,7 @@ export const PlayerControlsSection = ({
               />
             </div>
           ) : null}
+          {showStackField ? (
           <div className="grid gap-1.5">
             <FieldLabel>{t('detail.stack')}</FieldLabel>
             <Input
@@ -199,6 +228,8 @@ export const PlayerControlsSection = ({
               onChange={(e) => onSeatStackChange(Number(e.target.value))}
             />
           </div>
+          ) : null}
+          {showBuyInField ? (
           <div className="grid gap-1.5">
             <FieldLabel>{t('detail.buyIn')}</FieldLabel>
             <Input
@@ -208,42 +239,53 @@ export const PlayerControlsSection = ({
               onChange={(e) => onBuyInAmountChange(Number(e.target.value))}
             />
           </div>
+          ) : null}
         </FieldGroup>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Button
-          className="w-full"
-          onClick={onJoinSeat}
-          disabled={joinSeatDisabled}
-          title={joinSeatDisabledReason}
-        >
-          {t('detail.joinSeat')}
-        </Button>
-        <Button className="w-full" variant="ghost" onClick={onBuyIn} disabled={!hasToken}>{t('detail.buyInAction')}</Button>
-        <Button
-          className="w-full"
-          variant="ghost"
-          onClick={onLeaveSeat}
-          disabled={leaveSeatDisabled}
-          title={leaveSeatDisabledReason}
-        >
-          {t('detail.leaveSeat')}
-        </Button>
-        {isAdmin ? (
-          <Button
-            className="w-full"
-            variant="ghost"
-            onClick={onRemovePlayer}
-            disabled={!canRemovePlayer}
-            title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
-          >
-            {t('detail.removePlayer')}
-          </Button>
-        ) : null}
-        <Button className="w-full" variant="ghost" onClick={onSitOut} disabled={!hasToken}>{t('detail.sitOut')}</Button>
-        <Button className="w-full" variant="ghost" onClick={onSitIn} disabled={!hasToken}>{t('detail.sitIn')}</Button>
-      </div>
-      {joinSeatDisabled ? (
+      {showActions ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {showJoinSeat ? (
+            <Button
+              className="w-full"
+              onClick={onJoinSeat}
+              disabled={joinSeatDisabled}
+              title={joinSeatDisabledReason}
+            >
+              {t('detail.joinSeat')}
+            </Button>
+          ) : null}
+          {showBuyIn ? (
+            <Button className="w-full" variant="ghost" onClick={onBuyIn} disabled={!hasToken}>
+              {t('detail.buyInAction')}
+            </Button>
+          ) : null}
+          {showLeaveSeat ? (
+            <Button
+              className="w-full"
+              variant="ghost"
+              onClick={onLeaveSeat}
+              disabled={leaveSeatDisabled}
+              title={leaveSeatDisabledReason}
+            >
+              {t('detail.leaveSeat')}
+            </Button>
+          ) : null}
+          {showRemovePlayer ? (
+            <Button
+              className="w-full"
+              variant="ghost"
+              onClick={onRemovePlayer}
+              disabled={!canRemovePlayer}
+              title={canRemovePlayer ? t('detail.removePlayerTitle') : t('detail.selectedSeatEmpty')}
+            >
+              {t('detail.removePlayer')}
+            </Button>
+          ) : null}
+          {showSitOut ? <Button className="w-full" variant="ghost" onClick={onSitOut} disabled={!hasToken}>{t('detail.sitOut')}</Button> : null}
+          {showSitIn ? <Button className="w-full" variant="ghost" onClick={onSitIn} disabled={!hasToken}>{t('detail.sitIn')}</Button> : null}
+        </div>
+      ) : null}
+      {showJoinSeat && joinSeatDisabled ? (
         <p className="mt-2.5 text-sm text-[var(--color-muted)]">{joinSeatDisabledReason}</p>
       ) : null}
     </ControlSection>
@@ -292,24 +334,26 @@ export const TurnActionsSection = ({
   const showAmountBox = primaryActions.length > 0
   const showEmptyState = hasSeatConflict || !mySeatNo || !isMyTurn || !hasAnyActions
   const infoOnlyState = showEmptyState && !hasAnyActions
+  const quickActionGridClass = quickActions.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+  const primaryActionGridClass = primaryActions.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
 
   return (
-    <ControlSection title={t('detail.yourTurn')} className="border-[rgba(217,177,95,0.22)] bg-[linear-gradient(180deg,rgba(23,35,27,0.92),rgba(15,23,42,0.58))] shadow-[0_16px_40px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
+    <ControlSection title={t('detail.yourTurn')} className={isMyTurn ? 'border-[var(--color-border-strong)]' : ''}>
+      <div className="rounded-[14px] border border-[var(--color-border)] px-4 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={isMyTurn ? 'accent' : 'neutral'}>
             {isMyTurn ? t('detail.yourTurnToAct') : t('detail.waitingForActorSeat', { seat: actorSeatNo ?? '-' })}
           </Badge>
-          {mySeatNo ? <Badge variant="success">{t('detail.yourSeat')}: {mySeatNo}</Badge> : null}
+          {mySeatNo ? <Badge>{t('detail.yourSeat')}: {mySeatNo}</Badge> : null}
           {hasSeatConflict ? <Badge variant="danger">{t('detail.seatConflict')}</Badge> : null}
         </div>
         <p className="mt-3 text-sm text-[var(--color-muted)]">{actionMessage}</p>
       </div>
       {infoOnlyState ? null : <div className="mb-4" />}
       {showAmountBox ? (
-        <div className="mb-4 grid gap-3 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-white/4 p-4">
+        <div className="mb-4 grid gap-2 rounded-[14px] border border-[var(--color-border)] p-4">
           <FieldGroup>
-            <FieldLabel>{t('detail.amount')}</FieldLabel>
+            <FieldLabel className="text-xs uppercase tracking-[0.08em] text-[var(--color-muted)]">{t('detail.amount')}</FieldLabel>
             <Input
               type="number"
               min={0}
@@ -321,13 +365,10 @@ export const TurnActionsSection = ({
         </div>
       ) : null}
       {!showEmptyState ? (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {quickActions.length > 0 ? (
             <div className="grid gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                {t('detail.yourTurn')}
-              </span>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className={`grid gap-2 ${quickActionGridClass}`}>
                 {quickActions.map((action) => (
                   <Button
                     key={action}
@@ -343,10 +384,7 @@ export const TurnActionsSection = ({
           ) : null}
           {showAmountBox ? (
             <div className="grid gap-2">
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
-                {t('detail.amount')}
-              </span>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className={`grid gap-2 ${primaryActionGridClass}`}>
                 {primaryActions.map((action) => (
                   <Button
                     key={action}
@@ -392,8 +430,8 @@ export const AdminDebugSection = ({
   const { t } = useI18n()
 
   return (
-    <details className="rounded-2xl border border-white/6 bg-[rgba(9,16,13,0.26)] px-3 py-2.5 text-[rgba(247,236,214,0.86)] opacity-75 transition-opacity open:opacity-90">
-      <summary className="cursor-pointer text-sm font-semibold marker:text-[rgba(247,236,214,0.4)]">{t('detail.adminDebug')}</summary>
+    <details className="rounded-[16px] border border-[var(--color-border)] px-3 py-2.5 text-[var(--color-foreground)] opacity-80 transition-opacity open:opacity-100">
+      <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">{t('detail.adminDebug')}</summary>
       <div className="mt-3 flex flex-wrap gap-3">
         <Button variant="ghost" size="sm" onClick={onLoadDemoSeats}>
           {t('detail.loadDemoSeats')}

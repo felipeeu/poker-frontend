@@ -15,7 +15,7 @@ export const ControlSection = ({
 }: ControlSectionProps) => (
   <div
     className={cn(
-      'rounded-2xl border border-[var(--color-border)] bg-[rgba(15,23,42,0.5)] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]',
+      'rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] p-4',
       className,
     )}
     {...props}
@@ -23,6 +23,7 @@ export const ControlSection = ({
     <div className="mb-3 flex items-center justify-between gap-3">
       <h3 className="m-0 text-base font-semibold text-[var(--color-foreground)]">{title}</h3>
     </div>
+    {description ? <p className="mb-3 text-sm text-[var(--color-muted)]">{description}</p> : null}
     {children}
   </div>
 )

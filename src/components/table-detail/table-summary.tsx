@@ -1,5 +1,5 @@
 import { useI18n } from '../../i18n'
-import { Badge } from '../../components/ui/badge'
+import { InfoCard } from './info-card'
 type TableSummaryProps = {
   nextStepMessage: string
   activeSeatCount: number
@@ -24,22 +24,22 @@ export const TableSummary = ({
   seatCount,
 }: TableSummaryProps) => {
   const { t } = useI18n()
-  const phaseTone = handStatus === 'showdown' || isHandFinished ? 'success' : actorSeatNo != null ? 'accent' : 'neutral'
 
   return (
     <>
-      <div className="mb-3 flex flex-wrap gap-2">
-        <Badge variant="accent">{t('detail.status', { status: tableStatus || t('tables.unknown') })}</Badge>
-        <Badge variant={phaseTone}>{t('detail.street', { street })}</Badge>
-        <Badge variant={actorSeatNo != null ? 'warning' : 'neutral'}>
-          {actorSeatNo != null ? t('detail.actorSeatValue', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
-        </Badge>
-        <Badge>{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</Badge>
-        <Badge>{t('detail.activePlayersValue', { count: activeSeatCount })}</Badge>
-        <Badge>{t('detail.seats')} {seatCount}</Badge>
-        {isHandFinished ? <Badge variant="success">{t('detail.gameFinished')}</Badge> : null}
+      <div className="mb-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        <InfoCard label={t('detail.statusLabel')} value={tableStatus || t('tables.unknown')} />
+        <InfoCard label={t('detail.streetLabel')} value={street} />
+        <InfoCard
+          label={t('detail.handLabel')}
+          value={actorSeatNo != null ? t('detail.actorSeatValue', { seat: actorSeatNo }) : handStatus}
+        />
+        <InfoCard label={t('detail.potLabel')} value={typeof pot === 'number' ? pot : 0} />
+        <InfoCard label={t('detail.activePlayersLabel')} value={activeSeatCount} />
+        <InfoCard label={t('detail.seats')} value={seatCount} />
+        {isHandFinished ? <InfoCard label={t('detail.hand')} value={t('detail.gameFinished')} /> : null}
       </div>
-      <p className="m-0 text-sm text-[var(--color-muted)]">{nextStepMessage}</p>
+      <p className="m-0 text-sm leading-6 text-[var(--color-muted)]">{nextStepMessage}</p>
     </>
   )
 }

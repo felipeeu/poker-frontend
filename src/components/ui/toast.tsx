@@ -27,13 +27,13 @@ const ToastItem = ({ id, message, tone }: ToastItemProps) => {
   return (
     <div
       className={cn(
-        'pointer-events-auto w-full rounded-2xl border p-4 shadow-[var(--shadow-panel)] backdrop-blur-md',
+        'pointer-events-auto w-full rounded-[16px] border p-4 shadow-[0_8px_24px_rgba(0,0,0,0.18)]',
         tone === 'success' &&
-          'border-emerald-300/25 bg-[linear-gradient(135deg,rgba(52,211,153,0.18),rgba(6,78,59,0.92))]',
+          'border-emerald-300/18 bg-[#16201a]',
         tone === 'error' &&
-          'border-rose-300/25 bg-[linear-gradient(135deg,rgba(251,113,133,0.18),rgba(76,5,25,0.92))]',
+          'border-rose-300/18 bg-[#211517]',
         tone === 'info' &&
-          'border-sky-300/20 bg-[linear-gradient(135deg,rgba(96,165,250,0.18),rgba(15,23,42,0.92))]',
+          'border-[var(--color-border-strong)] bg-[var(--color-panel)]',
       )}
       role="status"
       aria-live="polite"

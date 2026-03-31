@@ -82,24 +82,24 @@ export const AuthPanel = () => {
   }
 
   return (
-    <Panel className="h-fit bg-[linear-gradient(180deg,rgba(19,29,22,0.94),rgba(12,21,16,0.9))]">
+    <Panel className="h-fit">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="m-0 text-2xl font-semibold">{t('auth.title')}</h2>
-          <p className="mb-0 mt-2 max-w-md text-sm leading-6 text-[var(--color-muted)]">{t('auth.helper')}</p>
+          <p className="mb-0 mt-2 max-w-md text-sm text-[var(--color-muted)]">{t('auth.helper')}</p>
         </div>
         <Badge variant={token ? 'success' : 'neutral'}>
           {token ? t('auth.loggedInAs') : t('auth.login')}
         </Badge>
       </div>
 
-      <div className="mt-6 grid gap-4 rounded-[24px] border border-[rgba(217,177,95,0.14)] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-5">
+      <div className="mt-6 grid gap-4 border-t border-[var(--color-border)] pt-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <strong className="block text-base">{t('auth.login')}</strong>
             <p className="m-0 mt-1 text-sm text-[var(--color-muted)]">`admin@example.com` / `Secret123!`</p>
           </div>
-          <Badge variant="accent">Seeded</Badge>
+          <Badge>Seeded</Badge>
         </div>
         <div className="grid gap-4">
           <div className="grid gap-2">
@@ -118,13 +118,13 @@ export const AuthPanel = () => {
       </div>
 
       {token && (
-        <div className="mt-5 rounded-[24px] border border-[rgba(88,214,141,0.18)] bg-[linear-gradient(180deg,rgba(17,43,28,0.72),rgba(10,22,16,0.6))] p-5">
+        <div className="mt-5 border-t border-[var(--color-border)] pt-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="m-0 text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
+              <p className="m-0 text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t('auth.loggedInAs')}</p>
               <strong className="mt-2 block text-sm">{userId || t('auth.unknown')}</strong>
             </div>
-            <Badge variant="success">Live Session</Badge>
+            <Badge variant="success">Live session</Badge>
           </div>
           <Button className="mt-4 w-full sm:w-auto" variant="ghost" size="sm" onClick={handleRequestLogout}>
             {t('auth.logout')}

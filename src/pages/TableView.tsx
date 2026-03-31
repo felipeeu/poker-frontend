@@ -87,7 +87,7 @@ export const TableView = () => {
 
   return (
     <>
-      <Panel className="min-h-0 p-3 sm:p-6 max-[1024px]:rounded-none max-[1024px]:border-x-0 max-[1024px]:border-t-0 max-[1024px]:bg-transparent max-[1024px]:px-0 max-[1024px]:py-1 max-[1024px]:shadow-none max-[1024px]:backdrop-blur-0">
+      <Panel className="min-h-0 p-3 sm:p-5 max-[1024px]:rounded-none max-[1024px]:border-x-0 max-[1024px]:border-t-0 max-[1024px]:bg-transparent max-[1024px]:px-0 max-[1024px]:py-1 max-[1024px]:shadow-none">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="m-0 text-[12px] font-semibold sm:text-2xl">{t('table.navTitle')}</h2>
@@ -113,7 +113,7 @@ export const TableView = () => {
         </div>
         <div className="mt-5 grid gap-3">
           {tableEvents.map((event, idx) => (
-            <div key={idx} className="rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4">
+            <div key={idx} className="rounded-[16px] border border-[var(--color-border)] p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Badge>{event.type}</Badge>
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">
@@ -126,14 +126,14 @@ export const TableView = () => {
           {tableEvents.length === 0 && <p className="text-sm text-[var(--color-muted)]">{t('events.none')}</p>}
         </div>
       </Panel>
-      <details className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 shadow-[var(--shadow-panel)] backdrop-blur-md min-[1025px]:hidden">
+      <details className="rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 min-[1025px]:hidden">
         <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
           {t('table.recentEvents')}
         </summary>
         <div className="mt-4 grid gap-3">
           {tableEvents.length > 0 ? <Badge variant="accent">{tableEvents[0]?.type}</Badge> : null}
           {tableEvents.map((event, idx) => (
-            <div key={idx} className="rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.12))] p-4">
+            <div key={idx} className="rounded-[16px] border border-[var(--color-border)] p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Badge>{event.type}</Badge>
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-muted)]">

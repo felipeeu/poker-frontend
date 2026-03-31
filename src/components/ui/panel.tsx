@@ -10,7 +10,7 @@ export const Panel = ({ as = 'section', className, ...props }: PanelProps) => {
   return (
     <Component
       className={cn(
-        'rounded-[28px] border border-[var(--color-border)] bg-[var(--color-panel)] p-6 shadow-[var(--shadow-panel)] backdrop-blur-md',
+        'rounded-[18px] border border-[var(--color-border)] bg-[var(--color-panel)] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.16)]',
         className,
       )}
       {...props}

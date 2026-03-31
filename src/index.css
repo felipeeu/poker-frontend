@@ -3,18 +3,18 @@
 
 @theme {
   --font-sans: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
-  --color-background: #09110d;
-  --color-background-elevated: #10261f;
-  --color-foreground: #f7f1d5;
-  --color-muted: #b4b08d;
-  --color-panel: rgba(24, 34, 24, 0.84);
-  --color-input: rgba(16, 29, 21, 0.96);
-  --color-border: rgba(213, 179, 108, 0.2);
-  --color-border-strong: rgba(242, 229, 187, 0.12);
-  --color-accent: #d9b15f;
-  --color-accent-foreground: #20150a;
+  --color-background: #0d100e;
+  --color-background-elevated: #131816;
+  --color-foreground: #f2f4ef;
+  --color-muted: #9aa39b;
+  --color-panel: #151a17;
+  --color-input: #111613;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.12);
+  --color-accent: #d7dccf;
+  --color-accent-foreground: #101310;
   --color-danger: #dc2626;
-  --color-ring: rgba(244, 212, 143, 0.72);
+  --color-ring: rgba(215, 220, 207, 0.42);
   --shadow-panel: 0 24px 60px rgba(3, 10, 7, 0.45);
   --ink: var(--color-foreground);
   --muted: var(--color-muted);
@@ -48,10 +48,7 @@
   body {
     margin: 0;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at 20% 0%, rgba(217, 177, 95, 0.12), transparent 28%),
-      radial-gradient(circle at 80% 10%, rgba(34, 197, 94, 0.16), transparent 25%),
-      linear-gradient(180deg, #10261f 0%, #09110d 100%);
+    background: var(--color-background);
     color: var(--color-foreground);
   }
 

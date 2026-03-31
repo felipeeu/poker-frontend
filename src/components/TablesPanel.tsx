@@ -99,17 +99,11 @@ export const TablesPanel = () => {
           </Button>
         ) : null}
       </div>
-      <div className="mb-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
-          <span className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('tables.countLabel')}</span>
-          <strong className="mt-2 block text-3xl">{tableCount}</strong>
-        </div>
-        <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
-          <span className="text-xs uppercase tracking-[0.18em] text-[var(--color-muted)]">{t('tables.selectedLabel')}</span>
-          <strong className="mt-2 block text-lg">{selectedTableName}</strong>
-        </div>
+      <div className="mb-6 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-b border-[var(--color-border)] pb-4 text-sm text-[var(--color-muted)]">
+        <span>{t('tables.countLabel')}: <strong className="text-[var(--color-foreground)]">{tableCount}</strong></span>
+        <span>{t('tables.selectedLabel')}: <strong className="text-[var(--color-foreground)]">{selectedTableName}</strong></span>
       </div>
-      <div className="mb-6 rounded-[24px] border border-[var(--color-border)] bg-[rgba(16,29,21,0.66)] p-5">
+      <div className="mb-6 border-b border-[var(--color-border)] pb-6">
         <p className="mb-4 text-sm text-[var(--color-muted)]">
           {selectedClubId ? t('clubs.tables') : t('clubs.publicTables')}
         </p>
@@ -131,8 +125,8 @@ export const TablesPanel = () => {
             <button
               className={
                 selectedTable?.id === table.id
-                  ? 'flex w-full items-center justify-between gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--color-accent)_35%,transparent)] bg-[color-mix(in_oklab,var(--color-accent)_12%,transparent)] p-4 text-left shadow-[0_10px_30px_rgba(3,10,7,0.24)]'
-                  : 'flex w-full items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/5 p-4 text-left transition-colors hover:bg-white/8'
+                  ? 'flex w-full items-center justify-between gap-3 rounded-[16px] border border-[var(--color-border-strong)] bg-white/4 p-4 text-left'
+                  : 'flex w-full items-center justify-between gap-3 rounded-[16px] border border-[var(--color-border)] p-4 text-left transition-colors hover:bg-white/3'
               }
               onClick={() => loadTable(table.id)}
             >
@@ -149,7 +143,7 @@ export const TablesPanel = () => {
         ))}
       </ul>
       {visibleTables.length === 0 && (
-        <p className="mt-5 rounded-2xl border border-dashed border-white/10 bg-white/4 px-4 py-5 text-sm text-[var(--color-muted)]">
+        <p className="mt-5 rounded-[16px] border border-dashed border-[var(--color-border)] px-4 py-5 text-sm text-[var(--color-muted)]">
           {t(token ? 'tables.empty' : 'tables.emptyLoggedOut')}
         </p>
       )}

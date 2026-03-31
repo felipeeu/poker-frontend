@@ -25,13 +25,13 @@ export const TableCenter = ({
 
   return (
     <div className="z-[2] w-full py-[132px] pb-[118px] max-[1024px]:w-[min(100%,360px)] max-[1024px]:p-0 max-[520px]:w-[min(100%,296px)]">
-      <div className="mx-auto grid w-[min(100%,560px)] gap-4 rounded-2xl border border-[rgba(242,229,187,0.08)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),rgba(7,18,12,0.5))] p-4 backdrop-blur-[4px] max-[1024px]:w-full max-[1024px]:p-3 max-[520px]:gap-3 max-[520px]:rounded-[14px] max-[520px]:p-2.5">
+      <div className="mx-auto grid w-[min(100%,520px)] gap-3 rounded-[18px] border border-[var(--color-border)] bg-[rgba(17,22,19,0.9)] p-3.5 max-[1024px]:w-full max-[1024px]:p-3 max-[520px]:gap-3 max-[520px]:rounded-[14px] max-[520px]:p-2.5">
         <div className="grid gap-2.5">
           <div className="flex items-center justify-between">
             <h3 className="m-0 text-base">{t('detail.board')}</h3>
             <span className="text-[0.85rem] text-[var(--color-muted)]">{board?.length || 0} / 5</span>
           </div>
-          <div className="flex flex-wrap gap-3 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-2">
+          <div className="flex flex-wrap gap-2.5 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-1.5">
             {(board && board.length > 0 ? board : Array.from({ length: 5 }).map(() => undefined)).map((card, idx) => (
               <Card key={`board-${idx}`} value={card} faceDown={!card} />
             ))}
@@ -48,7 +48,7 @@ export const TableCenter = ({
                   {sidePots.map((side, idx) => (
                     <div
                       key={`side-pot-${idx}`}
-                      className="grid gap-0.5 rounded-2xl border border-white/10 bg-white/8 px-3 py-2 text-xs text-[var(--color-foreground)]"
+                      className="grid gap-0.5 rounded-[14px] border border-[var(--color-border)] px-3 py-2 text-xs text-[var(--color-foreground)]"
                     >
                       <strong className="text-[0.78rem] font-semibold">
                         {t('detail.sidePotLabel', { index: idx + 1, amount: side.amount })}
@@ -69,7 +69,7 @@ export const TableCenter = ({
             <h3 className="m-0 text-base">{mySeatNo != null ? t('detail.holeCardsSeat', { seat: mySeatNo }) : t('detail.holeCards')}</h3>
             <span className="text-[0.85rem] text-[var(--color-muted)]">{seatHoleCards?.length || 0} / 2</span>
           </div>
-          <div className="flex flex-wrap gap-3 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-2">
+          <div className="flex flex-wrap gap-2.5 max-[1024px]:justify-center max-[1024px]:gap-2 max-[520px]:gap-1.5">
             {(seatHoleCards && seatHoleCards.length > 0 ? seatHoleCards : Array.from({ length: 2 }).map(() => undefined)).map(
               (card, idx) => (
                 <Card key={`hole-${idx}`} value={card} faceDown={!card} />
@@ -218,27 +218,27 @@ const SeatChip = ({
   const handRankLabel = translateHandRank(t, handRank)
   const handRankClass = handRankToneClass(handRank)
   const statusBadgeClass =
-    'px-1.5 py-[3px] text-[8px] leading-none tracking-[0.12em] max-[1024px]:px-[5px] max-[1024px]:py-[2px] max-[1024px]:text-[0.5rem]'
+    'px-1.5 py-[3px] text-[8px] leading-none tracking-[0.08em] max-[1024px]:px-[5px] max-[1024px]:py-[2px] max-[1024px]:text-[0.5rem]'
 
   return (
     <div
       className={cn(
-        'seat-chip grid min-w-[92px] max-w-[116px] gap-1.5 rounded-[18px] border border-[rgba(242,229,187,0.1)] bg-[linear-gradient(180deg,rgba(24,47,31,0.84),rgba(8,18,13,0.9)),rgba(11,24,17,0.84)] px-2 py-[9px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_10px_18px_rgba(0,0,0,0.16)] backdrop-blur-[6px] max-[1024px]:min-w-[82px] max-[1024px]:max-w-[100px] max-[1024px]:gap-1 max-[1024px]:rounded-[15px] max-[1024px]:px-[7px] max-[1024px]:pb-[7px] max-[1024px]:pt-1.5 max-[520px]:min-w-[70px] max-[520px]:max-w-[84px] max-[520px]:px-[5px] max-[520px]:pb-[5px] max-[520px]:pt-1',
-        isActor && 'border-[rgba(217,177,95,0.7)] shadow-[0_0_0_1px_rgba(217,177,95,0.24),0_10px_18px_rgba(0,0,0,0.16)]',
-        isMine && 'border-[rgba(88,214,141,0.5)] shadow-[0_0_0_1px_rgba(88,214,141,0.22),0_10px_18px_rgba(0,0,0,0.16)]',
+        'seat-chip grid min-w-[82px] max-w-[102px] gap-1 rounded-[14px] border border-[var(--color-border)] bg-[rgba(18,23,20,0.96)] px-2 py-[8px] shadow-[0_6px_14px_rgba(0,0,0,0.1)] max-[1024px]:min-w-[76px] max-[1024px]:max-w-[92px] max-[1024px]:gap-1 max-[1024px]:rounded-[14px] max-[1024px]:px-[6px] max-[1024px]:pb-[6px] max-[1024px]:pt-1.5 max-[520px]:min-w-[66px] max-[520px]:max-w-[78px] max-[520px]:px-[5px] max-[520px]:pb-[5px] max-[520px]:pt-1',
+        isActor && 'border-[var(--color-border-strong)]',
+        isMine && 'border-emerald-200/24',
         sittingOut && 'opacity-70',
       )}
     >
-      <div className="grid gap-1 text-[0.68rem] text-[var(--color-muted)] max-[1024px]:text-[0.56rem]">
-        <span className="inline-flex w-fit min-h-[18px] items-center rounded-full bg-white/6 px-[7px] text-[0.62rem] font-bold uppercase tracking-[0.05em] max-[1024px]:min-h-4 max-[1024px]:px-1.5 max-[1024px]:text-[0.54rem] max-[520px]:min-h-[15px] max-[520px]:px-[5px]">
+      <div className="grid gap-1 text-[0.66rem] text-[var(--color-muted)] max-[1024px]:text-[0.56rem]">
+        <span className="inline-flex w-fit min-h-[17px] items-center rounded-full border border-[var(--color-border)] px-[6px] text-[0.6rem] font-medium tracking-[0.03em] max-[1024px]:min-h-4 max-[1024px]:px-1.5 max-[1024px]:text-[0.52rem] max-[520px]:min-h-[15px] max-[520px]:px-[5px]">
           #{seatNo}
         </span>
         <div className="flex min-w-0 flex-wrap items-center gap-1 max-[1024px]:gap-[3px]">
           {isMine && <Badge variant="success" className={statusBadgeClass}>{t('detail.youShort')}</Badge>}
-          {isActor && <Badge className={statusBadgeClass}>{t('detail.actingShort')}</Badge>}
+          {isActor && <Badge variant="accent" className={statusBadgeClass}>{t('detail.actingShort')}</Badge>}
           {isDealer && <Badge variant="accent" className={statusBadgeClass}>D</Badge>}
-          {isSmallBlind && <Badge variant="warning" className={statusBadgeClass}>SB</Badge>}
-          {isBigBlind && <Badge variant="warning" className={statusBadgeClass}>BB</Badge>}
+          {isSmallBlind && !isBigBlind && <Badge className={statusBadgeClass}>SB</Badge>}
+          {isBigBlind && <Badge className={statusBadgeClass}>BB</Badge>}
         </div>
       </div>
       <div
@@ -246,20 +246,20 @@ const SeatChip = ({
         title={`${displayName}${displayName !== user ? ` (${user})` : ''}`}
       >
         <span
-          className="grid size-7 place-items-center rounded-full bg-[linear-gradient(160deg,rgba(217,177,95,0.26),rgba(74,222,128,0.18))] text-[0.72rem] font-bold tracking-[0.04em] text-[#f7e4b7] max-[1024px]:size-5 max-[1024px]:text-[0.58rem] max-[520px]:size-[18px] max-[520px]:text-[0.52rem]"
+          className="grid size-7 place-items-center rounded-full border border-[var(--color-border)] bg-[rgba(255,255,255,0.03)] text-[0.72rem] font-semibold tracking-[0.04em] text-[var(--color-foreground)] max-[1024px]:size-5 max-[1024px]:text-[0.58rem] max-[520px]:size-[18px] max-[520px]:text-[0.52rem]"
           aria-hidden="true"
         >
           {avatarLabel}
         </span>
         <div className="grid min-w-0 gap-px">
-          <strong className="overflow-hidden text-[0.78rem] font-semibold leading-[1.15] tracking-[-0.01em] text-ellipsis whitespace-nowrap max-[1024px]:text-[0.64rem] max-[520px]:text-[0.6rem]">
+          <strong className="overflow-hidden text-[0.74rem] font-semibold leading-[1.1] tracking-[-0.01em] text-ellipsis whitespace-nowrap max-[1024px]:text-[0.62rem] max-[520px]:text-[0.58rem]">
             {shortName}
           </strong>
-          <span className="text-[0.66rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.56rem] max-[520px]:text-[0.54rem]">
+          <span className="text-[0.62rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.54rem] max-[520px]:text-[0.52rem]">
             {t('detail.stackShort', { value: stack })}
           </span>
           {handRankLabel ? (
-            <span className={cn('text-[0.6rem] leading-[1.2] max-[1024px]:text-[0.52rem] max-[520px]:text-[0.5rem]', handRankClass)}>
+            <span className={cn('text-[0.56rem] leading-[1.15] max-[1024px]:text-[0.5rem] max-[520px]:text-[0.48rem]', handRankClass)}>
               {handRankLabel}
             </span>
           ) : null}
@@ -267,9 +267,9 @@ const SeatChip = ({
       </div>
       {(sittingOut || committed > 0) && (
         <div className="flex items-center justify-between gap-1.5 max-[1024px]:flex-col max-[1024px]:items-start max-[1024px]:gap-[3px]">
-          {sittingOut && <Badge className={statusBadgeClass}>{t('detail.sittingOut')}</Badge>}
+          {sittingOut && <span className="text-[0.58rem] uppercase tracking-[0.08em] text-[var(--color-muted)]">{t('detail.sittingOut')}</span>}
           {committed > 0 && (
-            <span className="text-[0.68rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.56rem] max-[520px]:text-[0.54rem]">
+            <span className="text-[0.62rem] leading-[1.2] text-[var(--color-muted)] [font-variant-numeric:tabular-nums] max-[1024px]:text-[0.54rem] max-[520px]:text-[0.52rem]">
               {t('detail.committedShort', { value: committed })}
             </span>
           )}

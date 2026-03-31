@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useI18n } from '../i18n'
 import { useApi } from '../api/useApi'
 import {
@@ -118,22 +118,6 @@ export const TableDetail = () => {
   const isTableOpen = ['open', 'opened', 'active', 'running', 'waiting'].includes(tableStatus)
   const isHandFinished = finishedHandStatuses.includes(handStatus)
   const hasHandInProgress = currentHand != null && !['idle', 'waiting', ...finishedHandStatuses].includes(handStatus)
-  const openTableDisabled = !token || !selectedTable || isTableOpen || hasHandInProgress
-  const openTableDisabledReason = (() => {
-    switch (true) {
-      case !token:
-        return t('detail.loginRequired')
-      case !selectedTable:
-        return t('detail.selectTableFirst')
-      case isTableOpen:
-        return t('detail.tableAlreadyOpen')
-      case hasHandInProgress:
-        return t('detail.cannotOpenDuringHand')
-      default:
-        return t('detail.openTable')
-    }
-  })()
-
   const displaySeats = useMemo(() => {
     const seats = selectedTable?.seats ?? []
     return [...seats].sort((a, b) => {
@@ -252,6 +236,29 @@ export const TableDetail = () => {
     return t('detail.chooseActionPrompt')
   })()
   const hasAvailableTurnActions = isMyTurn && !hasSeatConflict && Boolean(legalForSeat?.length)
+  const canOpenTable = Boolean(token && selectedTable && !isTableOpen && !hasHandInProgress)
+  const canCloseTable = Boolean(token && selectedTable && isTableOpen && !hasHandInProgress)
+  const canResetTable = Boolean(token && selectedTable)
+  const canStartHand = Boolean(token && selectedTable && isTableOpen && !currentHand && activeSeatCount >= 2)
+  const canResolveHand = Boolean(token && selectedTable && handStatus === 'showdown')
+  const canTimeoutHand = Boolean(token && selectedTable && currentHand && !isHandFinished && handStatus !== 'showdown')
+  const canGoNextHand = Boolean(token && selectedTable && isHandFinished && activeSeatCount >= 2)
+  const showDealerSeatControl = canStartHand
+  const showJoinSeatAction = !hasOwnedSeat
+  const showBuyInAction = Boolean(hasOwnedSeat && token)
+  const showLeaveSeatAction = mySeatNo != null
+  const showRemovePlayerAction = Boolean(isAdmin && selectedSeatUserId && selectedSeatUserId !== userId)
+  const showSitOutAction = Boolean(mySeatNo != null && token && !isSittingOut)
+  const showSitInAction = Boolean(mySeatNo != null && token && isSittingOut)
+  const hasVisiblePlayerActions =
+    showJoinSeatAction ||
+    showBuyInAction ||
+    showLeaveSeatAction ||
+    showRemovePlayerAction ||
+    showSitOutAction ||
+    showSitInAction
+  const hasVisibleAdminTableActions = canOpenTable || canCloseTable || canResetTable
+  const hasVisibleRecoveryActions = canStartHand || canResolveHand || canTimeoutHand || canGoNextHand
 
   const handleJoinSeat = async () => {
     if (!selectedTable) return
@@ -541,27 +548,22 @@ export const TableDetail = () => {
   }
 
   return (
-      <Panel className="min-h-[420px] bg-[radial-gradient(circle_at_top,rgba(217,177,95,0.08),transparent_18%),rgba(19,29,22,0.88)]">
+      <Panel className="min-h-[420px]">
       <div className="grid gap-[18px]">
         <div className="grid gap-[18px]">
-          <div className="grid gap-2 rounded-2xl border border-[rgba(217,177,95,0.14)] bg-[linear-gradient(135deg,rgba(19,29,22,0.88),rgba(14,24,20,0.72))] px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] max-[1024px]:gap-1.5 max-[1024px]:px-3.5 max-[1024px]:py-3 max-[1024px]:shadow-none sm:px-5">
+          <div className="grid gap-2 rounded-[16px] border border-[var(--color-border)] px-4 py-4 max-[1024px]:gap-1.5 max-[1024px]:px-3.5 max-[1024px]:py-3 sm:px-5">
             <div className="flex flex-wrap items-center gap-2 max-[1024px]:gap-1.5">
               <Badge variant={isHandFinished ? 'success' : actorSeatNo != null ? 'accent' : 'neutral'}>
                 {t('detail.street', { street })}
               </Badge>
-              <Badge variant={actorSeatNo != null ? 'warning' : 'neutral'}>
-                {actorSeatNo != null ? t('detail.actorSeatValue', { seat: actorSeatNo }) : t('detail.hand', { status: handStatus })}
-              </Badge>
-              <Badge>{t('detail.pot', { pot: typeof pot === 'number' ? pot : 0 })}</Badge>
-              <Badge>{t('detail.seats')} {selectedTable.seats?.length || 0}</Badge>
+              {isMyTurn ? <Badge variant="accent">{t('detail.yourTurnToAct')}</Badge> : null}
             </div>
             <p className="m-0 text-[15px] leading-6 text-[var(--color-muted)] max-[1024px]:text-[13px] max-[1024px]:leading-5">
               {nextStepMessage}
             </p>
           </div>
-          <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[40px] border-[10px] border-[#57351c] bg-[radial-gradient(circle_at_50%_40%,rgba(52,122,78,0.92),rgba(18,68,39,0.96)_58%,rgba(9,39,24,0.98)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[inset_0_0_0_3px_rgba(245,228,177,0.18),inset_0_-18px_36px_rgba(0,0,0,0.25),0_28px_50px_rgba(0,0,0,0.3)] max-[1024px]:min-h-0 max-[1024px]:gap-[18px] max-[1024px]:rounded-[28px] max-[1024px]:border-[8px] max-[1024px]:px-3 max-[1024px]:py-[22px] max-[520px]:gap-[14px] max-[520px]:rounded-[24px] max-[520px]:border-[7px] max-[520px]:px-2 max-[520px]:py-4">
-            <div className="pointer-events-none absolute inset-4 rounded-[999px] border-2 border-[rgba(242,229,187,0.14)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
-            <div className="pointer-events-none absolute inset-[10px] rounded-[999px] border border-[rgba(28,13,4,0.4)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
+          <div className="relative grid min-h-[620px] items-center justify-items-center gap-[26px] overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[radial-gradient(circle_at_50%_40%,rgba(32,47,38,0.96),rgba(17,24,20,0.98)_58%,rgba(12,16,14,1)_100%)] px-[clamp(14px,3vw,28px)] py-8 shadow-[0_18px_36px_rgba(0,0,0,0.18)] max-[1024px]:min-h-0 max-[1024px]:gap-[18px] max-[1024px]:rounded-[22px] max-[1024px]:px-3 max-[1024px]:py-[22px] max-[520px]:gap-[14px] max-[520px]:rounded-[20px] max-[520px]:px-2 max-[520px]:py-4">
+            <div className="pointer-events-none absolute inset-4 rounded-[999px] border border-[rgba(255,255,255,0.08)] max-[1024px]:rounded-[28px] max-[520px]:rounded-[24px]" />
             <DesktopSeatLayout
               seats={displaySeats}
               actorSeatNo={actorSeatNo}
@@ -618,56 +620,28 @@ export const TableDetail = () => {
               actionMessage={actionMessage}
             />
           </div>
-          <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)] min-[1025px]:hidden">
-            <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
-              {t('detail.status')}
-            </summary>
-            <div className="mt-3">
-              <TableSummary
-                nextStepMessage={nextStepMessage}
-                activeSeatCount={activeSeatCount}
-                tableStatus={selectedTable.status}
-                handStatus={handStatus}
-                street={street}
-                pot={pot}
-                isHandFinished={isHandFinished}
-                actorSeatNo={actorSeatNo}
-                seatCount={selectedTable.seats?.length || 0}
-              />
-            </div>
-          </details>
-          <div className="max-[1024px]:hidden">
-            <PlayerControlsSection
-              seatNo={effectiveSeatNo}
-              onSeatNoChange={setSeatNo}
-              seatNoLocked={Boolean(mySeatNo != null)}
-              hasOwnedSeat={hasOwnedSeat}
-              seatName={seatName}
-              onSeatNameChange={setSeatName}
-              seatStack={seatStack}
-              onSeatStackChange={setSeatStack}
-              buyInAmount={buyInAmount}
-              onBuyInAmountChange={setBuyInAmount}
-              onJoinSeat={handleJoinSeat}
-              joinSeatDisabled={joinSeatDisabled}
-              joinSeatDisabledReason={joinSeatDisabledReason}
-              onBuyIn={handleBuyIn}
-              onLeaveSeat={handleLeaveSeat}
-              leaveSeatDisabled={leaveSeatDisabled}
-              leaveSeatDisabledReason={leaveSeatDisabledReason}
-              onRemovePlayer={handleRequestRemovePlayer}
-              canRemovePlayer={canRemovePlayer}
-              onSitOut={handleSitOut}
-              onSitIn={handleSitIn}
-              hasToken={Boolean(token)}
-              isAdmin={isAdmin}
+          <DisclosurePanel
+            title={t('detail.statusLabel')}
+            className="min-[1025px]:hidden"
+          >
+            <TableSummary
+              nextStepMessage={nextStepMessage}
+              activeSeatCount={activeSeatCount}
+              tableStatus={selectedTable.status}
+              handStatus={handStatus}
+              street={street}
+              pot={pot}
+              isHandFinished={isHandFinished}
+              actorSeatNo={actorSeatNo}
+              seatCount={selectedTable.seats?.length || 0}
             />
-          </div>
-          <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)] min-[1025px]:hidden">
-            <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
-              {t('detail.seatActions')}
-            </summary>
-            <div className="mt-3">
+          </DisclosurePanel>
+          {hasVisiblePlayerActions ? (
+            <DisclosurePanel
+              title={t('detail.seatActions')}
+              defaultOpen={!hasOwnedSeat}
+              className="min-[1025px]:hidden"
+            >
               <PlayerControlsSection
                 seatNo={effectiveSeatNo}
                 onSeatNoChange={setSeatNo}
@@ -682,30 +656,72 @@ export const TableDetail = () => {
                 onJoinSeat={handleJoinSeat}
                 joinSeatDisabled={joinSeatDisabled}
                 joinSeatDisabledReason={joinSeatDisabledReason}
+                showJoinSeat={showJoinSeatAction}
                 onBuyIn={handleBuyIn}
+                showBuyIn={showBuyInAction}
                 onLeaveSeat={handleLeaveSeat}
                 leaveSeatDisabled={leaveSeatDisabled}
                 leaveSeatDisabledReason={leaveSeatDisabledReason}
+                showLeaveSeat={showLeaveSeatAction}
                 onRemovePlayer={handleRequestRemovePlayer}
                 canRemovePlayer={canRemovePlayer}
+                showRemovePlayer={showRemovePlayerAction}
                 onSitOut={handleSitOut}
+                showSitOut={showSitOutAction}
                 onSitIn={handleSitIn}
+                showSitIn={showSitInAction}
                 hasToken={Boolean(token)}
-                isAdmin={isAdmin}
               />
-            </div>
-          </details>
+            </DisclosurePanel>
+          ) : null}
+          {hasVisiblePlayerActions ? (
+            <DisclosurePanel
+              title={t('detail.seatActions')}
+              defaultOpen={!hasOwnedSeat}
+              className="max-[1024px]:hidden"
+            >
+              <PlayerControlsSection
+                seatNo={effectiveSeatNo}
+                onSeatNoChange={setSeatNo}
+                seatNoLocked={Boolean(mySeatNo != null)}
+                hasOwnedSeat={hasOwnedSeat}
+                seatName={seatName}
+                onSeatNameChange={setSeatName}
+                seatStack={seatStack}
+                onSeatStackChange={setSeatStack}
+                buyInAmount={buyInAmount}
+                onBuyInAmountChange={setBuyInAmount}
+                onJoinSeat={handleJoinSeat}
+                joinSeatDisabled={joinSeatDisabled}
+                joinSeatDisabledReason={joinSeatDisabledReason}
+                showJoinSeat={showJoinSeatAction}
+                onBuyIn={handleBuyIn}
+                showBuyIn={showBuyInAction}
+                onLeaveSeat={handleLeaveSeat}
+                leaveSeatDisabled={leaveSeatDisabled}
+                leaveSeatDisabledReason={leaveSeatDisabledReason}
+                showLeaveSeat={showLeaveSeatAction}
+                onRemovePlayer={handleRequestRemovePlayer}
+                canRemovePlayer={canRemovePlayer}
+                showRemovePlayer={showRemovePlayerAction}
+                onSitOut={handleSitOut}
+                showSitOut={showSitOutAction}
+                onSitIn={handleSitIn}
+                showSitIn={showSitInAction}
+                hasToken={Boolean(token)}
+              />
+            </DisclosurePanel>
+          ) : null}
 
-          {isAdmin && (
-            <div className="max-[1024px]:hidden">
+          {isAdmin && hasVisibleAdminTableActions ? (
+            <DisclosurePanel title={t('detail.tableControls')}>
               <AdminTableControlsSection
-                openTableDisabled={openTableDisabled}
-                openTableDisabledReason={openTableDisabledReason}
+                canOpenTable={canOpenTable}
                 onOpenTable={handleOpenTable}
+                canCloseTable={canCloseTable}
                 onCloseTable={handleRequestCloseTable}
+                canResetTable={canResetTable}
                 onRequestResetTable={handleRequestResetTable}
-                closeTableDisabled={!token}
-                resetTableDisabled={!token}
                 tableControlsDescription={
                   hasHandInProgress
                     ? t('detail.cannotOpenDuringHand')
@@ -714,65 +730,41 @@ export const TableDetail = () => {
                       : t('detail.tableClosedHint')
                 }
               />
-            </div>
-          )}
-          {isAdmin && (
-            <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)] min-[1025px]:hidden">
-              <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
-                {t('detail.tableControls')}
-              </summary>
-              <div className="mt-3">
-                <AdminTableControlsSection
-                  openTableDisabled={openTableDisabled}
-                  openTableDisabledReason={openTableDisabledReason}
-                  onOpenTable={handleOpenTable}
-                  onCloseTable={handleRequestCloseTable}
-                  onRequestResetTable={handleRequestResetTable}
-                  closeTableDisabled={!token}
-                  resetTableDisabled={!token}
-                  tableControlsDescription={
-                    hasHandInProgress
-                      ? t('detail.cannotOpenDuringHand')
-                      : isTableOpen
-                        ? t('detail.tableAlreadyOpen')
-                        : t('detail.tableClosedHint')
-                  }
-                />
-              </div>
-            </details>
-          )}
+            </DisclosurePanel>
+          ) : null}
+
+          {isAdmin && hasVisibleRecoveryActions ? (
+            <DisclosurePanel title={t('detail.recoveryToolsSummary')}>
+              <AdminHandControlsSection
+                dealerSeat={dealerSeat}
+                onDealerSeatChange={setDealerSeat}
+                canSetDealerSeat={showDealerSeatControl}
+                canStartHand={canStartHand}
+                onStartHand={handleStartHand}
+                canResolve={canResolveHand}
+                onResolve={handleResolve}
+                canTimeout={canTimeoutHand}
+                onTimeout={handleTimeout}
+                canNextHand={canGoNextHand}
+                onNextHand={handleNextHand}
+                title={t('detail.recoveryTools')}
+                description={t('detail.handControlsRecoveryOnly')}
+              />
+            </DisclosurePanel>
+          ) : null}
 
           {isAdmin && (
-            <details className="rounded-2xl border border-white/8 bg-[rgba(11,19,15,0.7)] px-4 py-3 text-[var(--color-foreground)]">
-              <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
-                {t('detail.recoveryToolsSummary')}
-              </summary>
-              <div className="mt-3">
-                <AdminHandControlsSection
-                  dealerSeat={dealerSeat}
-                  onDealerSeatChange={setDealerSeat}
-                  onStartHand={handleStartHand}
-                  onResolve={handleResolve}
-                  onTimeout={handleTimeout}
-                  onNextHand={handleNextHand}
-                  disabled={!token}
-                  title={t('detail.recoveryTools')}
-                  description={t('detail.handControlsRecoveryOnly')}
-                />
-              </div>
-            </details>
-          )}
-
-          {isAdmin && (
-            <AdminDebugSection
-              boardText={boardText}
-              onBoardTextChange={setBoardText}
-              holeText={holeText}
-              onHoleTextChange={setHoleText}
-              onLoadDemoSeats={handleLoadDemoSeats}
-              onSetCards={handleSetCards}
-              disabled={!token}
-            />
+            <DisclosurePanel title={t('detail.adminDebug')}>
+              <AdminDebugSection
+                boardText={boardText}
+                onBoardTextChange={setBoardText}
+                holeText={holeText}
+                onHoleTextChange={setHoleText}
+                onLoadDemoSeats={handleLoadDemoSeats}
+                onSetCards={handleSetCards}
+                disabled={!token}
+              />
+            </DisclosurePanel>
           )}
         </div>
       </div>
@@ -806,3 +798,27 @@ export const TableDetail = () => {
     </Panel>
   )
 }
+
+type DisclosurePanelProps = {
+  title: string
+  children: ReactNode
+  defaultOpen?: boolean
+  className?: string
+}
+
+const DisclosurePanel = ({
+  title,
+  children,
+  defaultOpen = false,
+  className = '',
+}: DisclosurePanelProps) => (
+  <details
+    className={`rounded-[16px] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3 text-[var(--color-foreground)] ${className}`.trim()}
+    open={defaultOpen}
+  >
+    <summary className="cursor-pointer text-sm font-semibold marker:text-[var(--color-muted)]">
+      {title}
+    </summary>
+    <div className="mt-3">{children}</div>
+  </details>
+)
