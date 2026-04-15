@@ -170,3 +170,30 @@ Update:
 TODOs / notes:
 - This fix restores private turn controls for the selected table, but the tables list still intentionally uses public websocket snapshots.
 - If turn-state glitches remain, the next place to inspect is whether some paths update only `current-hand` locally while other table-level fields depend on websocket timing.
+
+Update:
+- Ran a real browser verification against the live backend and frontend.
+- Important setup detail: the backend CORS allowlist currently matches `http://localhost:5173` / `http://127.0.0.1:5173`, so running the frontend on another port (for example `4173`) causes browser-side `Failed to fetch` errors even when both servers are healthy.
+- With the frontend on `127.0.0.1:5173`, the live flow worked:
+  - loaded a fresh real table route
+  - observed the table runner auto-start the hand for a ready table
+  - verified authenticated seat-1 hole cards and legal actions render
+  - clicked `Call`
+  - confirmed the UI advanced to `Seat 2 to act` and logged websocket-driven hand updates
+- Artifacts captured under `output/web-game/live-demo/`:
+  - `01-table-loaded.png`
+  - `02-hand-started.png`
+  - `03-after-call.png`
+  - `summary.json`
+
+TODOs / notes:
+- The live verification still shows a suspicious side-pot display after a simple preflop `Call` in a 3-player hand. That should not happen in a normal no-all-in spot and likely matches the backend side-pot TODO already noted in `poker-backend/progress.md`.
+- The summary/status strip still leaks an untranslated key: `detail.activePlayersLabel`.
+
+Update:
+- Added the missing `detail.activePlayersLabel` translation in both `en` and `pt-BR`, so the table summary no longer leaks the raw key during live play.
+- Frontend build still passes with:
+  - `npm run build`
+
+TODOs / notes:
+- Once the backend process is restarted with the patched engine code, rerun the live browser check to confirm the fake side-pot display is gone in the full app.
